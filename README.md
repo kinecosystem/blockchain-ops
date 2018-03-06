@@ -44,9 +44,9 @@ curl -sS localhost:11626/metrics | jq .
 
 1. [Administration](https://www.stellar.org/developers/horizon/reference/admin.html)
 1. [github.com/stellar/horizon](https://github.com/stellar/horizon)
-  1. Deprecated repo
-  1. Has latest stable release v0.11.1
+    1. Deprecated repo
+    1. Has latest stable release v0.11.1
 1. [github.com/stellar/go](https://github.com/stellar/go)
-  1. New mono-repo
-  1. Has v0.12.0 RC
-  1. Includes various other tools e.g. archivist, bifrost, hd wallet, etc.
+    1. New mono-repo
+    1. Has v0.12.0 RC
+    1. Includes various other tools e.g. archivist, bifrost, hd wallet, etc.
