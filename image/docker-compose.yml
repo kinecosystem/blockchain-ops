@@ -1,0 +1,43 @@
+version: "3"
+
+services:
+  stellar-core:
+    image: kinfoundation/stellar-core
+    build:
+      dockerfile: Dockerfile.stellar-core
+      context: .
+    ports:
+      - 11625:11625
+      - 11626:11626
+    links:
+      - stellar-core-db
+
+  stellar-core-db:
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_USER=stellar
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=core
+    ports:
+      - 5432:5432
+
+  horizon:
+    image: kinfoundation/horizon
+    build:
+      dockerfile: Dockerfile.horizon
+      context: .
+    ports:
+      - 8000:8000
+    links: 
+      - horizon-db
+      - stellar-core
+      - stellar-core-db
+
+  horizon-db:
+    image: postgres:10-alpine
+    environment:
+      - POSTGRES_USER=stellar
+      - POSTGRES_PASSWORD=12345678
+      - POSTGRES_DB=horizon
+    ports:
+      - 5433:5432

@@ -1,0 +1,26 @@
+FROM ubuntu:16.04
+
+ENV STELLAR_CORE_VERSION v9.1.0
+
+RUN BUILD_DEPS="git build-essential pkg-config autoconf automake libtool bison flex libpq-dev clang++-3.5 gcc-4.9 g++-4.9 cpp-4.9"; \
+    RUN_DEPS="libpq5"; \
+    apt-get -qq update && apt-get -qq install $BUILD_DEPS $RUN_DEPS \
+    && git clone -q --branch ${STELLAR_CORE_VERSION} --recurse-submodules https://github.com/stellar/stellar-core.git /tmp/stellar-core \
+    && cd /tmp/stellar-core \
+    && ./autogen.sh \
+    && ./configure \
+    && make -j `cat /proc/cpuinfo | awk '/^processor/{print $3}' | tail -1` \
+    && make check \
+    && make install \
+    && make clean \
+    && cd - && rm -rf /tmp/stellar-core \
+    && apt-get -qq autoremove $BUILD_DEPS \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /opt/stellar-core
+WORKDIR /opt/stellar-core
+COPY stellar-core.cfg /opt/stellar-core/
+
+EXPOSE 11626
+
+ENTRYPOINT ["/usr/local/bin/stellar-core"]
