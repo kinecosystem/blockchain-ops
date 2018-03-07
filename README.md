@@ -17,7 +17,7 @@ cd image
 ./init.sh
 
 # read logs
-docker compose logs -f
+docker-compose logs -f
 
 # interesting metrics:
 
