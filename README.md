@@ -4,6 +4,11 @@ Devops repository for Stellar Core and Horizon.
 
 ## Local Private Testnet
 
+- The [examples/](examples) directory consists of pubnet configuration files
+  for Stellar Core and Horizon.
+- The [image/](image) directory consists of a Docker + Compose files for setting up a local testnet.
+    The fiels there also serve as a hands-on tutorial for using Stellar Core and Horizon.
+
 ```bash
 # initialize a new local test network with single core + horizon instances
 # see the steps in init.sh for further details
