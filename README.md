@@ -6,7 +6,7 @@ Devops repository for Stellar Core and Horizon.
 
 - The [examples/](examples) directory consists of pubnet configuration files
   for Stellar Core and Horizon.
-- The [image/](image) directory consists of a Docker + Compose files for setting up a local testnet.
+- The [image/](image) directory consists of Docker + Compose files for setting up a local testnet.
     The fiels there also serve as a hands-on tutorial for using Stellar Core and Horizon.
 
 ```bash
