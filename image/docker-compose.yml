@@ -14,6 +14,12 @@ services:
     volumes:
       - ./stellar-core/opt/stellar-core:/opt/stellar-core
       - ./stellar-core/tmp/stlelar-core:/tmp/stellar-core
+    # deploy:
+    #   restart_policy:
+    #     condition: on-failure
+    #     delay: 5s
+    #     max_attempts: 3
+    #     window: 120s
 
   stellar-core-db:
     image: postgres:10-alpine
@@ -45,6 +51,12 @@ services:
       - INGEST=true
       - PER_HOUR_RATE_LIMIT=999999
       - NETWORK_PASSPHRASE=private testnet
+    # deploy:
+    #   restart_policy:
+    #     condition: on-failure
+    #     delay: 5s
+    #     max_attempts: 3
+    #     window: 120s
 
   horizon-db:
     image: postgres:10-alpine
