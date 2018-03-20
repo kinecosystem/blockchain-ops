@@ -12,7 +12,8 @@ services:
     links:
       - stellar-core-db
     volumes:
-      - .:/opt/stellar-core
+      - ./stellar-core/opt/stellar-core:/opt/stellar-core
+      - ./stellar-core/tmp/stlelar-core:/tmp/stellar-core
 
   stellar-core-db:
     image: postgres:10-alpine
