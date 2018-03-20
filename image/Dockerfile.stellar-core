@@ -19,8 +19,7 @@ RUN BUILD_DEPS="git build-essential pkg-config autoconf automake libtool bison f
 
 RUN mkdir -p /opt/stellar-core
 WORKDIR /opt/stellar-core
-COPY stellar-core.cfg /opt/stellar-core/
 
-EXPOSE 11626
+EXPOSE 11625 11626
 
 ENTRYPOINT ["/usr/local/bin/stellar-core"]

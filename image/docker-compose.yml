@@ -11,6 +11,8 @@ services:
       - 11626:11626
     links:
       - stellar-core-db
+    volumes:
+      - .:/opt/stellar-core
 
   stellar-core-db:
     image: postgres:10-alpine
