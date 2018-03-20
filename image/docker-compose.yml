@@ -34,6 +34,14 @@ services:
       - horizon-db
       - stellar-core
       - stellar-core-db
+    environment:
+      - DATABASE_URL="postgres://stellar:12345678@horizon-db/horizon?sslmode=disable"
+      - STELLAR_CORE_DATABASE_URL="postgres://stellar:12345678@stellar-core-db/core?sslmode=disable"
+      - STELLAR_CORE_URL="http://stellar-core:11626"
+      - LOG_LEVEL="info"
+      - INGEST="true"
+      - PER_HOUR_RATE_LIMIT="999999"
+      - NETWORK_PASSPHRASE="private testnet"
 
   horizon-db:
     image: postgres:10-alpine
