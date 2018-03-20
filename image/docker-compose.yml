@@ -35,6 +35,8 @@ services:
       - horizon-db
       - stellar-core
       - stellar-core-db
+    volumes:
+      - ./horizon/opt/horizon/opt/horizon
     environment:
       - DATABASE_URL="postgres://stellar:12345678@horizon-db/horizon?sslmode=disable"
       - STELLAR_CORE_DATABASE_URL="postgres://stellar:12345678@stellar-core-db/core?sslmode=disable"
