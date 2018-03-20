@@ -17,6 +17,12 @@ RUN BUILD_DEPS="git build-essential pkg-config autoconf automake libtool bison f
     && apt-get -qq autoremove $BUILD_DEPS \
     && rm -rf /var/lib/apt/lists/*
 
+# (optional) install aws cli
+# required for publishing history to s3
+RUN apt-get -qq update && apt-get -qq install python3-pip \
+    && pip3 -qq install awscli \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /opt/stellar-core
 WORKDIR /opt/stellar-core
 
