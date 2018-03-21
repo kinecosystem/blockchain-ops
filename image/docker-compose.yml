@@ -15,6 +15,11 @@ services:
       - ./stellar-core/opt/stellar-core:/opt/stellar-core
       - ./stellar-core/tmp/stlelar-core:/tmp/stellar-core
     restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
 
   stellar-core-db:
     image: postgres:10-alpine
@@ -47,6 +52,11 @@ services:
       - PER_HOUR_RATE_LIMIT=999999
       - NETWORK_PASSPHRASE=private testnet
     restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
 
   horizon-db:
     image: postgres:10-alpine
