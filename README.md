@@ -33,6 +33,11 @@ curl -sS localhost:11626/peers
 
 # for /metrics, pipe output to jq for easier reading:
 curl -sS localhost:11626/metrics | jq .
+
+# upgrade base reserve balance network setting to 0.5 XLM
+# see the following section for more information:
+# https://www.stellar.org/developers/stellar-core/software/admin.html#network-configuration
+curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
 ```
 
 ## Official Resources
