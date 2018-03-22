@@ -1,0 +1,33 @@
+FROM golang:1.10.0-alpine
+
+ENV FRIENDBOT_VERSION 36bb4843f4732ba74925176b14612efde6ab6a3b
+
+ENV GLIDE_VERSION v0.13.1
+ENV GLIDE_ARCH linux-amd64
+
+RUN apk add -qU --no-cache -t .fetch-deps curl tar git mercurial \
+    && mkdir -p /go/src/github.com/stellar \
+    && git clone -q https://github.com/stellar/go.git /go/src/github.com/stellar/go \
+    && cd /go/src/github.com/stellar/go \
+    && git reset --hard -q $FRIENDBOT_VERSION \
+	&& curl -sSLo glide.tar.gz https://github.com/Masterminds/glide/releases/download/$GLIDE_VERSION/glide-$GLIDE_VERSION-$GLIDE_ARCH.tar.gz \
+	&& tar -xf ./glide.tar.gz \
+	&& mv ./$GLIDE_ARCH/glide ./glide \
+	&& rm -rf ./$GLIDE_ARCH ./glide.tar.gz \
+    && ./glide -q install \
+    && cd services/friendbot \
+    && go build -o friendbot main.go init_friendbot.go \
+    && mv friendbot /usr/local/bin/ \
+    && cd / \
+    && rm -rf /go/src/github.com/stellar/go \
+    && apk del -q .fetch-deps
+
+# envsubst
+RUN apk add -qU --no-cache gettext
+
+RUN mkdir -p /opt/friendbot
+WORKDIR /opt/friendbot
+
+EXPOSE 8000
+
+ENTRYPOINT ["/opt/friendbot/run.sh"]

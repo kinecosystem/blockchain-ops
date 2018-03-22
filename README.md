@@ -25,6 +25,9 @@ docker-compose logs -f
 curl -sS localhost:8000
 curl -sS localhost:8000/metrics
 
+# friendbot is available
+curl -sS localhost:8000/friendbot?addr=MyAddress
+
 # core
 # https://www.stellar.org/developers/stellar-core/software/commands.html
 curl -sS localhost:11626/info
