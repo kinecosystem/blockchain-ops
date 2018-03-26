@@ -13,7 +13,6 @@ services:
       - stellar-core-db
     volumes:
       - ./stellar-core/opt/stellar-core:/opt/stellar-core
-      - ./stellar-core/tmp/stlelar-core:/tmp/stellar-core
     restart: on-failure
     logging:
       driver: json-file
