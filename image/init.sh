@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 # initialize a new local test network with single core + horizon instances
-set -x
 set -e
 
 sudo docker-compose down -v
