@@ -23,9 +23,9 @@ services:
   stellar-core-db:
     image: postgres:10-alpine
     environment:
-      - POSTGRES_USER=stellar
-      - POSTGRES_PASSWORD=12345678
-      - POSTGRES_DB=core
+      POSTGRES_USER: stellar
+      POSTGRES_PASSWORD: "12345678"
+      POSTGRES_DB: core
     ports:
       - 5432:5432
 
@@ -64,9 +64,9 @@ services:
   horizon-db:
     image: postgres:10-alpine
     environment:
-      - POSTGRES_USER=stellar
-      - POSTGRES_PASSWORD=12345678
-      - POSTGRES_DB=horizon
+      POSTGRES_USER: stellar
+      POSTGRES_PASSWORD: "12345678"
+      POSTGRES_DB: horizon
     ports:
       - 5433:5432
 
