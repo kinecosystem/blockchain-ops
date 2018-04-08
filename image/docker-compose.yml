@@ -36,7 +36,7 @@ services:
       context: .
     ports:
       - 8000:8000
-    links: 
+    links:
       - horizon-db
       - stellar-core
       - stellar-core-db
