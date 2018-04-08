@@ -43,9 +43,10 @@ curl -sS localhost:11626/metrics | jq .
 curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
 ```
 
-## Official Resources
+## Resources
+### Official
 
-### Core
+#### Core
 
 1. [Administration](https://www.stellar.org/developers/stellar-core/software/admin.html)
 1. [CLI Commands + HTTP API](https://www.stellar.org/developers/stellar-core/software/commands.html)
@@ -53,7 +54,7 @@ curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&baseres
 1. [github.com/stellar/stellar-core](https://github.com/stellar/stellar-core)
 1. [github.com/stellar/stellar-protocol](https://github.com/stellar/stellar-protocol)
 
-### Horizon
+#### Horizon
 
 1. [Administration](https://www.stellar.org/developers/horizon/reference/admin.html)
 1. [github.com/stellar/horizon](https://github.com/stellar/horizon)
@@ -63,3 +64,7 @@ curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&baseres
     1. New mono-repo
     1. Has v0.12.0 RC
     1. Includes various other tools e.g. archivist, bifrost, hd wallet, etc.
+
+### Other
+
+1. [Stellar Node Performance Tips](https://galactictalk.org/d/279-effectively-run-your-stellar-validator-node-performance-tips)
