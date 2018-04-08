@@ -20,6 +20,10 @@ echo Root account seed: $ROOT_ACCOUNT_SEED
 # https://www.stellar.org/developers/stellar-core/software/testnet.html
 sudo docker-compose up -d stellar-core
 
+# upgrade base reserve balance network setting to 0.5 XLM
+# https://www.stellar.org/developers/stellar-core/software/admin.html#network-configuration
+curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
+
 # setup horizon database
 sudo docker-compose up -d horizon-db
 sleep 2
@@ -31,6 +35,6 @@ sudo docker-compose run horizon db init
 ROOT_ACCOUNT_SEED="$ROOT_ACCOUNT_SEED" sudo -E docker-compose up -d horizon
 
 # start friendbot
-# currenty disabled for horizon v0.11.r1
+# should be disabled for horizon version < 0.12.2
 # see docker-compose comment for more information
-# ROOT_ACCOUNT_SEED="$ROOT_ACCOUNT_SEED" sudo -E docker-compose up -d friendbot
+ROOT_ACCOUNT_SEED="$ROOT_ACCOUNT_SEED" sudo -E docker-compose up -d friendbot

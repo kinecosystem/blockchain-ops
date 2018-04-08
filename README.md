@@ -19,14 +19,19 @@ cd image
 # read logs
 docker-compose logs -f
 
+# upgrade base reserve balance network setting to 0.5 XLM (executed automatically in init.sh)
+# see the following section for more information:
+# https://www.stellar.org/developers/stellar-core/software/admin.html#network-configuration
+curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
+
+# friendbot is available
+curl -sS localhost:8001?addr=MyAddress
+
 # interesting metrics:
 
 # horizon
 curl -sS localhost:8000
 curl -sS localhost:8000/metrics
-
-# friendbot is available
-curl -sS localhost:8000/friendbot?addr=MyAddress
 
 # core
 # https://www.stellar.org/developers/stellar-core/software/commands.html
@@ -36,11 +41,6 @@ curl -sS localhost:11626/peers
 
 # for /metrics, pipe output to jq for easier reading:
 curl -sS localhost:11626/metrics | jq .
-
-# upgrade base reserve balance network setting to 0.5 XLM
-# see the following section for more information:
-# https://www.stellar.org/developers/stellar-core/software/admin.html#network-configuration
-curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
 ```
 
 ## Resources

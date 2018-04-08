@@ -1,20 +1,24 @@
-FROM alpine:3.7
+FROM ubuntu:16.04
 
-ENV HORIZON_VERSION v0.11.1
+# ENV HORIZON_VERSION v0.11.1
+# ENV HORIZON_REPO_PATH horizon/releases/download/
+
+ENV HORIZON_VERSION v0.12.3
+ENV HORIZON_REPO_PATH go/releases/download/horizon-
+
 ENV HORIZON_RELEASE horizon-${HORIZON_VERSION}-linux-amd64
 
-RUN apk add -qU --no-cache -t .fetch-deps curl tar \
+RUN FETCH_DEPS="curl"; \
+    apt-get -qq update && apt-get -qq install $FETCH_DEPS \
     && cd /tmp \
-    && curl -sSL -O https://github.com/stellar/horizon/releases/download/${HORIZON_VERSION}/${HORIZON_RELEASE}.tar.gz \
+    && curl -sSL -O https://github.com/stellar/${HORIZON_REPO_PATH}${HORIZON_VERSION}/${HORIZON_RELEASE}.tar.gz \
     && tar -zxf /tmp/${HORIZON_RELEASE}.tar.gz \
     && mv /tmp/${HORIZON_RELEASE}/horizon /usr/local/bin/ \
     && rm -rf \
         /tmp/${HORIZON_RELEASE}.tar.gz \
         /tmp/${HORIZON_RELEASE} \
-    && apk del -q .fetch-deps
-
-# required for sourcing horizon.env
-RUN apk add -qU --no-cache bash
+    && apt-get -qq autoremove $FETCH_DEPS \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /opt/horizon
 WORKDIR /opt/horizon
@@ -32,6 +36,7 @@ ENV DATABASE_URL= \
     INGEST= \
     PER_HOUR_RATE_LIMIT= \
     NETWORK_PASSPHRASE= \
-    FRIENDBOT_SECRET=
+    FRIENDBOT_SECRET= \
+    FRIENDBOT_URL=
 
 ENTRYPOINT ["/usr/local/bin/horizon"]
