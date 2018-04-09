@@ -26,6 +26,9 @@ RUN apk add -qU --no-cache -t .fetch-deps curl tar git mercurial \
 RUN apk add -qU --no-cache gettext
 
 RUN mkdir -p /opt/friendbot
+
+VOLUME ["/opt/friendbot"]
+
 WORKDIR /opt/friendbot
 
 EXPOSE 8000

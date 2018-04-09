@@ -25,6 +25,8 @@ WORKDIR /opt/horizon
 
 EXPOSE 8000
 
+VOLUME ["/opt/horizon"]
+
 # horizon configuration is done via environment variables
 #
 # available configuration at:
