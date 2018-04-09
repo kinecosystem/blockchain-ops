@@ -1,2 +1,4 @@
 /image/stellar-core/opt/stellar-core/stellar-core.*.log
+/image/stellar-core/opt/stellar-core/buckets/
+/image/stellar-core/tmp/stellar-core/
 /image/friendbot/opt/friendbot/friendbot.cfg

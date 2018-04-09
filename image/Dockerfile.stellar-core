@@ -23,7 +23,12 @@ RUN apt-get -qq update && apt-get -qq install python3-pip \
     && pip3 -qq install awscli \
     && rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /opt/stellar-core
+RUN mkdir -p \
+    /opt/stellar-core \
+    /tmp/stellar-core
+
+VOLUME ["/opt/stellar-core", "/tmp/stellar-core"]
+
 WORKDIR /opt/stellar-core
 
 EXPOSE 11625 11626

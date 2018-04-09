@@ -16,6 +16,13 @@ ROOT_ACCOUNT_SEED=$(sudo docker-compose run stellar-core --newdb --forcescp \
 
 echo Root account seed: $ROOT_ACCOUNT_SEED
 
+# setup cache history archive
+sudo rm -rf \
+    ./stellar-core/opt/stellar-core/buckets \
+    ./stellar-core/opt/stellar-core/*.log \
+    ./stellar-core/tmp/stellar-core
+sudo docker-compose run stellar-core --newhist cache
+
 # start a local private testnet core
 # https://www.stellar.org/developers/stellar-core/software/testnet.html
 sudo docker-compose up -d stellar-core
