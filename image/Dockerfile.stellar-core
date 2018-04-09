@@ -1,8 +1,8 @@
 FROM ubuntu:16.04
 
-ENV STELLAR_CORE_VERSION v9.1.0
+ENV STELLAR_CORE_VERSION v9.2.0
 
-RUN BUILD_DEPS="git build-essential pkg-config autoconf automake libtool bison flex libpq-dev clang++-3.5 gcc-4.9 g++-4.9 cpp-4.9"; \
+RUN BUILD_DEPS="git build-essential pkg-config autoconf automake libtool bison flex libpq-dev clang++-3.5 gcc-4.9 g++-4.9 cpp-4.9 pandoc"; \
     RUN_DEPS="libpq5"; \
     apt-get -qq update && apt-get -qq install $BUILD_DEPS $RUN_DEPS \
     && git clone -q --branch ${STELLAR_CORE_VERSION} --recurse-submodules https://github.com/stellar/stellar-core.git /tmp/stellar-core \
