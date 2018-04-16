@@ -4,32 +4,38 @@ set -e
 
 sudo docker-compose down -v
 
+sudo rm -rf \
+    ./stellar-core-1/opt/stellar-core/buckets ./stellar-core-2/opt/stellar-core/buckets \
+    ./stellar-core-1/opt/stellar-core/*.log ./stellar-core-2/opt/stellar-core/*.log \
+    ./stellar-core-1/tmp/stellar-core ./stellar-core-2/tmp/stellar-core
+
 # setup core database
 # https://www.stellar.org/developers/stellar-core/software/commands.html
 #
 # also, cache root account seed, used by friendbot later on
-sudo docker-compose up -d stellar-core-db
+sudo docker-compose up -d stellar-core-1-db stellar-core-2-db
 sleep 2
 
-ROOT_ACCOUNT_SEED=$(sudo docker-compose run stellar-core --newdb --forcescp \
+ROOT_ACCOUNT_SEED=$(sudo docker-compose run stellar-core-1 --newdb --forcescp \
     | grep "Root account seed" | cut -d ' ' -f 8)
 
 echo Root account seed: $ROOT_ACCOUNT_SEED
 
+sudo docker-compose run stellar-core-2 --newdb --forcescp
+
 # setup cache history archive
-sudo rm -rf \
-    ./stellar-core/opt/stellar-core/buckets \
-    ./stellar-core/opt/stellar-core/*.log \
-    ./stellar-core/tmp/stellar-core
-sudo docker-compose run stellar-core --newhist cache
+
+sudo docker-compose run stellar-core-1 --newhist cache
+sudo docker-compose run stellar-core-2 --newhist cache
 
 # start a local private testnet core
 # https://www.stellar.org/developers/stellar-core/software/testnet.html
-sudo docker-compose up -d stellar-core
+sudo docker-compose up -d stellar-core-1 stellar-core-2
 
 # upgrade base reserve balance network setting to 0.5 XLM
 # https://www.stellar.org/developers/stellar-core/software/admin.html#network-configuration
 curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
+curl 'localhost:11627/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
 
 # setup horizon database
 sudo docker-compose up -d horizon-db
