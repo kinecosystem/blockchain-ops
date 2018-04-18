@@ -120,3 +120,15 @@ services:
       options:
         max-size: 100m
         max-file: "3"
+
+  laboratory:
+    image: kinfoundation/laboratory
+    build:
+      dockerfile: Dockerfile.laboratory
+      context: .
+    ports:
+      - 3002:3000
+    environment:
+      HORIZON_ENDPOINT_TESTNET: http://localhost:8000
+      NETWORK_PASSPHRASE_TESTNET: private testnet
+      FRIENDBOT_ENDPOINT: http://localhost:8001

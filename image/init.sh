@@ -51,3 +51,6 @@ ROOT_ACCOUNT_SEED="$ROOT_ACCOUNT_SEED" sudo -E docker-compose up -d horizon
 # should be disabled for horizon version < 0.12.2
 # see docker-compose comment for more information
 ROOT_ACCOUNT_SEED="$ROOT_ACCOUNT_SEED" sudo -E docker-compose up -d friendbot
+
+# start laboratory
+sudo docker-compose up -d laboratory
