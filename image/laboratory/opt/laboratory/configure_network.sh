@@ -8,6 +8,5 @@ sed -i "s@Networks.TESTNET@'$NETWORK_PASSPHRASE_TESTNET'@g" /opt/laboratory/src/
 # Edit the accountCreator.js file to change the friendbot service used
 sed -i "s@https://friendbot.stellar.org@$FRIENDBOT_ENDPOINT@g" /opt/laboratory/src/actions/accountCreator.js
 
-cd /opt/laboratory
 ./node_modules/.bin/gulp develop
 

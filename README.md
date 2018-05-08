@@ -28,7 +28,7 @@ curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&baseres
 curl -sS localhost:8001?addr=MyAddress
 
 # stellar laboratory is also available
-# open localhost:3002 with a web browser to interact with it
+# open localhost:8002 with a web browser to interact with it
 
 # interesting metrics:
 

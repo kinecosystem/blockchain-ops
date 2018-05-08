@@ -122,13 +122,15 @@ services:
         max-file: "3"
 
   laboratory:
-    image: kinfoundation/laboratory
+    image: kinecosystem/laboratory
     build:
       dockerfile: Dockerfile.laboratory
       context: .
     ports:
-      - 3002:3000
+      - 8002:3000
     environment:
+      # The laboratory runs on client side, you browser cannot access "friendbot:8001" etc,
+      # so we need to use localhost
       HORIZON_ENDPOINT_TESTNET: http://localhost:8000
       NETWORK_PASSPHRASE_TESTNET: private testnet
       FRIENDBOT_ENDPOINT: http://localhost:8001

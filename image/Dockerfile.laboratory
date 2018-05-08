@@ -1,14 +1,11 @@
 FROM node:9.11-alpine
 
-WORKDIR /opt
-
-RUN apk add -qU --no-cache -t .devstuff git \
-    &&  git clone https://github.com/stellar/laboratory.git \
+RUN apk add -qU --no-cache -t .build-deps git \
+    &&  git clone https://github.com/stellar/laboratory.git /opt/laboratory \
     &&  cd /opt/laboratory \
-    &&  npm install \
-    &&  apk del -q .devstuff
+    &&  npm install -s \
+    &&  apk del -q .build-deps
 WORKDIR /opt/laboratory
-COPY /laboratory/configure_network.sh .
-RUN chmod +x configure_network.sh
+COPY ./laboratory/opt/laboratory/configure_network.sh .
 EXPOSE 3000
 ENTRYPOINT ./configure_network.sh
