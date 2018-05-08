@@ -17,6 +17,9 @@ RUN apk add -qU --no-cache -t .fetch-deps curl git mercurial \
     && ./glide -q install \
     && cd tools/stellar-archivist \
     && go build -o stellar-archivist main.go \
+    && cd /go/src/github.com/stellar/go \
+    && ./glide cache-clear \
+    && cd tools/stellar-archivist \
     && mv stellar-archivist /usr/local/bin/ \
     && cd / \
     && rm -rf /go/src/github.com \
