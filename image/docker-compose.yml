@@ -2,7 +2,7 @@ version: "3"
 
 services:
   stellar-core-1:
-    image: kinfoundation/stellar-core
+    image: kinecosystem/stellar-core
     build:
       dockerfile: Dockerfile.stellar-core
       context: .
@@ -29,7 +29,7 @@ services:
       POSTGRES_DB: core
 
   stellar-core-2:
-    image: kinfoundation/stellar-core
+    image: kinecosystem/stellar-core
     build:
       dockerfile: Dockerfile.stellar-core
       context: .
@@ -55,7 +55,7 @@ services:
       POSTGRES_DB: core
 
   horizon:
-    image: kinfoundation/horizon
+    image: kinecosystem/horizon
     build:
       dockerfile: Dockerfile.horizon
       context: .
@@ -102,7 +102,7 @@ services:
   # friendbot was originally part of horizon
   # but extracted to its own microservice since horizon v0.12.2
   friendbot:
-    image: kinfoundation/friendbot
+    image: kinecosystem/friendbot
     build:
       dockerfile: Dockerfile.friendbot
       context: .
@@ -136,7 +136,7 @@ services:
       FRIENDBOT_ENDPOINT: http://localhost:8001
 
   stellar-archivist:
-    image: kinfoundation/stellar-archivist
+    image: kinecosystem/stellar-archivist
     build:
       dockerfile: Dockerfile.stellar-archivist
       context: .
