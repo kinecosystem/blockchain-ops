@@ -129,7 +129,7 @@ services:
     ports:
       - 8002:8080
     environment:
-      # The laboratory runs on client side, you browser cannot access "friendbot:8001" etc,
+      # The laboratory runs on client side, your browser cannot access "friendbot:8001" etc,
       # so we need to use localhost
       HORIZON_ENDPOINT_TESTNET: http://localhost:8000
       NETWORK_PASSPHRASE_TESTNET: private testnet
