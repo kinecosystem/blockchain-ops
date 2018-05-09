@@ -1,0 +1,15 @@
+FROM node:9.11-alpine
+
+ENV LABORATORY_COMMIT 4ae9ca92d74fd8ff0a71889819154f6713d1c4bb
+
+RUN apk add -qU --no-cache -t .build-deps git \
+    &&  git clone https://github.com/stellar/laboratory.git /opt/laboratory \
+    &&  cd /opt/laboratory \
+    &&  git reset --hard $LABORATORY_COMMIT \
+    &&  npm install -s \
+    &&  npm install -g http-server \
+    &&  apk del -q .build-deps
+WORKDIR /opt/laboratory
+COPY ./laboratory/opt/laboratory/configure_network.sh .
+EXPOSE 8080
+ENTRYPOINT ./configure_network.sh
