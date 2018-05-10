@@ -1,0 +1,11 @@
+init_config:
+
+instances:
+  # stellar-core quorum group health check
+  - name: stellar-core
+    url: http://localhost:11626/info
+    timeout: 1
+
+    content_match: 'Synced!'
+    reverse_content_match: '(Booting|Joining SCP|Connected|Catching up|Stopping)'
+    http_response_status_code: 200
