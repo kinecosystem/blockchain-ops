@@ -1,0 +1,8 @@
+dd_url: https://app.datadoghq.com
+api_key: xxx
+tags:
+  - app:stellar-core
+  - env:prod
+collect_ec2_tags: true
+use_dogstatsd: no
+logs_enabled: true
