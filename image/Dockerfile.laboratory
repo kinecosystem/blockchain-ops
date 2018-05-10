@@ -2,14 +2,23 @@ FROM node:9.11-alpine
 
 ENV LABORATORY_COMMIT 4ae9ca92d74fd8ff0a71889819154f6713d1c4bb
 
+RUN mkdir -p /opt/laboratory
+
+COPY ./laboratory/opt/laboratory/configure_network.sh /opt/laboratory
+
 RUN apk add -qU --no-cache -t .build-deps git \
-    &&  git clone https://github.com/stellar/laboratory.git /opt/laboratory \
     &&  cd /opt/laboratory \
+    &&  git init \
+    &&  git remote add origin https://github.com/stellar/laboratory.git \
+    &&  git pull origin master \
     &&  git reset --hard $LABORATORY_COMMIT \
     &&  npm install -s \
     &&  npm install -g http-server \
-    &&  apk del -q .build-deps
-WORKDIR /opt/laboratory
-COPY ./laboratory/opt/laboratory/configure_network.sh .
+    &&  apk del -q .build-deps \
+    &&  ./configure_network.sh \
+    &&  ./node_modules/.bin/gulp build \
+    &&  ls | grep -v dist | xargs rm -r
+
 EXPOSE 8080
-ENTRYPOINT ./configure_network.sh
+
+CMD http-server dist/
