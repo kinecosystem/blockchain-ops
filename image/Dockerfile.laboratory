@@ -3,7 +3,9 @@ FROM node:9.11-alpine
 ENV LABORATORY_COMMIT 4ae9ca92d74fd8ff0a71889819154f6713d1c4bb
 
 RUN mkdir -p /opt/laboratory
+
 COPY ./laboratory/opt/laboratory/configure_network.sh /opt/laboratory
+
 RUN apk add -qU --no-cache -t .build-deps git \
     &&  cd /opt/laboratory \
     &&  git init \
@@ -16,5 +18,7 @@ RUN apk add -qU --no-cache -t .build-deps git \
     &&  ./configure_network.sh \
     &&  ./node_modules/.bin/gulp build \
     &&  ls | grep -v dist | xargs rm -r
+
 EXPOSE 8080
+
 CMD http-server dist/
