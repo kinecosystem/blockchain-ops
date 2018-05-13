@@ -21,4 +21,4 @@ RUN apk add -qU --no-cache -t .build-deps git \
 
 EXPOSE 8080
 
-CMD http-server dist/
+CMD http-server /opt/laboratory/dist/
