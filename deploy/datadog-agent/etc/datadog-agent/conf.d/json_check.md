@@ -19,10 +19,10 @@ Edit the json_check.yaml file to configure the check
 
 ## Events:
 The check will send events in case of a failure  
-* ```request timeout``` - in the event of a timeout  
-* ```Invalid status code for URL``` - for any status code other than 200  
-* ```no matching value``` - when no value was found for the given json path  
-* ```unexpected match``` - when the value found is not a number
+* "request timeout" - in the event of a timeout  
+* "Invalid status code for URL" - for any status code other than 200  
+* "no matching value" - when no value was found for the given json path  
+* "unexpected match" - when the value found is not a number
 
 ## Example
 Get the price of BTC and ETH
