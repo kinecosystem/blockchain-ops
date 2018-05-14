@@ -1,5 +1,5 @@
 # json_check  
-A costume datadog-agent check that gets a json response from a given URL, and extract a specific metric from it based on a given json path
+A custom datadog-agent check that gets a json response from a given URL, and extract a specific metric from it based on a given json path
 
 ## Installation
 
@@ -33,8 +33,8 @@ init_config:
 instances:
     - url: https://api.coinmarketcap.com/v2/ticker
       metrics: 
-      # Numeric key names should be in double quotes, otherwise they will be counted as an array index
-        - usd.price: data."1".quotes.USD.price OR [data]["1"][quotes][USD][price]
-        - eth.price: data."1027".quotes.USD.price
+      # Numeric key names should be in double quotes, otherwise they will be considered as an array index
+        - usd.price: data."1".quotes.USD.price
+        - eth.price: [data]["1027"][quotes][USD][price]
 ```  
 

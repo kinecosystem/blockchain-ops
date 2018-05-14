@@ -1,3 +1,8 @@
+"""
+Custom datadog-agent check that gets a json response from a given URL,
+and extract a specific metric from it based on a given json path.
+"""
+
 import requests
 from hashlib import md5
 import time
