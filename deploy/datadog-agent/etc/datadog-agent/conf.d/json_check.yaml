@@ -1,0 +1,7 @@
+init_config:
+    default_timeout: 5
+
+instances:
+    - url:
+      metrics: 
+        - metric_name: jsonpath
