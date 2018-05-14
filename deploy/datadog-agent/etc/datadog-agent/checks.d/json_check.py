@@ -1,5 +1,4 @@
 import requests
-import json
 from hashlib import md5
 import time
 
@@ -8,7 +7,10 @@ from jsonpath_rw import parse
 
 
 class JsonCheck(AgentCheck):
+    """This class holds the json_check check and all the relevant events."""
+
     def check(self, instance):
+        """Get a specific value from a json."""
         # datadog-agent agent collects values from the corresponding .yaml file
         url = instance['url']
         metrics = instance['metrics']
@@ -20,28 +22,29 @@ class JsonCheck(AgentCheck):
         # Make a get request
         try:
             r = requests.get(url, timeout=default_timeout)
-
-            if r.status_code == 200:
-                data = json.loads(r.text)
-                for metric in metrics:
-                    for name, path in metric.items():
-                        try:
-                            # Get the value from the path in the json file
-                            expression = parse(path)
-                            match = expression.find(data)[0].value
-                            self.gauge(name, float(match))
-                        except IndexError:
-                            # If there is no matching value
-                            self.no_match_event(url, path, aggregation_key)
-                        except ValueError:
-                            # If the matching value is not a number
-                            self.unexpected_match_event(url, path, match, aggregation_key)
-            else:
-                # If the request was not successful
-                self.status_code_event(url, r, aggregation_key)
         except requests.exceptions.Timeout:
-            # If there's a timeout
             self.timeout_event(url, default_timeout, aggregation_key)
+            return
+
+        if not r.ok:
+            # If the request was not successful
+            self.status_code_event(url, r, aggregation_key)
+            return
+
+        data = r.json()
+        for metric in metrics:
+            for name, path in metric.items():
+                try:
+                    # Get the value from the path in the json file
+                    expression = parse(path)
+                    match = expression.find(data)[0].value
+                    self.gauge(name, float(match))
+                except IndexError:
+                    # If there is no matching value
+                    self.no_match_event(url, path, aggregation_key)
+                except ValueError:
+                    # If the matching value is not a number
+                    self.unexpected_match_event(url, path, match, aggregation_key)
 
     def timeout_event(self, url, timeout, aggregation_key):
         self.event({
