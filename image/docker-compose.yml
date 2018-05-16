@@ -125,9 +125,6 @@ services:
 
   stellar-archivist:
     image: kinecosystem/stellar-archivist
-    build:
-      dockerfile: Dockerfile.stellar-archivist
-      context: .
     volumes:
       - ./stellar-archivist/opt/stellar-archivist:/opt/stellar-archivist
 
