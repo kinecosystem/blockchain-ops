@@ -110,7 +110,7 @@ services:
         max-file: "3"
 
   laboratory:
-    image: kinecosystem/laboratory:1
+    image: kinecosystem/laboratory:4ae9ca9
     ports:
       - 8002:8080
     environment:
