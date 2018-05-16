@@ -3,5 +3,5 @@ init_config:
 
 instances:
     - url:
-      metrics: 
+      metrics:
         - metric_name: jsonpath
