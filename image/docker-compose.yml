@@ -3,9 +3,6 @@ version: "3"
 services:
   stellar-core-1:
     image: kinecosystem/stellar-core
-    build:
-      dockerfile: Dockerfile.stellar-core
-      context: .
     ports:
       - 11626:11626
     links:
@@ -30,9 +27,6 @@ services:
 
   stellar-core-2:
     image: kinecosystem/stellar-core
-    build:
-      dockerfile: Dockerfile.stellar-core
-      context: .
     ports:
       - 11627:11626
     links:
@@ -56,9 +50,6 @@ services:
 
   horizon:
     image: kinecosystem/horizon
-    build:
-      dockerfile: Dockerfile.horizon
-      context: .
     ports:
       - 8000:8000
     links:
@@ -103,9 +94,6 @@ services:
   # but extracted to its own microservice since horizon v0.12.2
   friendbot:
     image: kinecosystem/friendbot
-    build:
-      dockerfile: Dockerfile.friendbot
-      context: .
     ports:
       - 8001:8000
     links:
