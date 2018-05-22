@@ -1,0 +1,15 @@
+# The dd-agent user needs to be in the 'docker' unix group to collect logs from docker containers
+# Run 'sudo usermod -aG docker dd-agent' to add it to the group.
+# You should restart your ssh session, or logout/login for this to take effect
+
+# Example:
+#
+# logs:
+#   - type: docker
+#     name: ubuntu_stellar_core_1
+#     service: stellar-core
+
+logs:
+  - type: docker
+    name: #image name
+    service: #service name
