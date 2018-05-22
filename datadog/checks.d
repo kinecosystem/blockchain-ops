@@ -1,0 +1,1 @@
+../deploy/kik-testnet/datadog-agent/etc/datadog-agent/checks.d
