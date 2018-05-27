@@ -2,7 +2,9 @@
 # Run 'sudo usermod -aG docker dd-agent' to add it to the group.
 # You should restart your ssh session, or logout/login for this to take effect
 
-logs:
-  - type: docker
-    name:
-    service:
+# Example:
+#
+# logs:
+#   - type: docker
+#     name: ubuntu_stellar_core_1
+#     service: stellar-core
