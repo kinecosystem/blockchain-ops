@@ -4,8 +4,6 @@ ENV LABORATORY_COMMIT 4ae9ca92d74fd8ff0a71889819154f6713d1c4bb
 
 RUN mkdir -p /opt/laboratory
 
-COPY ./laboratory/opt/laboratory/configure_network.sh /opt/laboratory
-
 RUN apk add -qU --no-cache -t .build-deps git \
     &&  cd /opt/laboratory \
     &&  git init \
@@ -15,10 +13,11 @@ RUN apk add -qU --no-cache -t .build-deps git \
     &&  npm install -s \
     &&  npm install -g http-server \
     &&  apk del -q .build-deps \
-    &&  ./configure_network.sh \
     &&  ./node_modules/.bin/gulp build \
     &&  ls | grep -v dist | xargs rm -r
 
+COPY ./laboratory/opt/laboratory/init.sh /opt/laboratory
+
 EXPOSE 8080
 
-CMD http-server /opt/laboratory/dist/
+CMD /opt/laboratory/init.sh
