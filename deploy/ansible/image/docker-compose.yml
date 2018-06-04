@@ -1,0 +1,21 @@
+---
+version: "3"
+
+services:
+  ubuntu:
+    image: kinecosystem/ubuntu-ansible
+    build: .
+    ports:
+      - 8000:22/tcp
+
+    # systemd is required for simulating a "real" ubuntu 16.04 instance
+    # https://github.com/solita/docker-systemd
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      # enable docker
+      - /var/run/docker.sock:/var/run/docker.sock
+    security_opt:
+      - seccomp:unconfined
+    tmpfs:
+      - /run
+      - /run/lock
