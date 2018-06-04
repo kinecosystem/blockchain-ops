@@ -1,0 +1,23 @@
+---
+- name: create stellar-core mount directory
+  file:
+    path: /opt/stellar-core/volumes/stellar-core
+    state: directory
+    mode: 0655
+
+- name: template stellar-core.cfg
+  template:
+    src: stellar-core.cfg.j2
+    dest: /opt/stellar-core/volumes/stellar-core/stellar-core.cfg
+    mode: 0400
+
+- name: copy docker-compose.yml
+  copy:
+    src: opt/stellar-core/docker-compose.yml
+    dest: /opt/stellar-core/docker-compose.yml
+    mode: 0644
+
+- name: start stellar-core
+  docker_service:
+    project_src: /opt/stellar-core
+    pull: yes

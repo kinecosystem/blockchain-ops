@@ -1,0 +1,28 @@
+---
+- name: create tmp directory
+  local_action:
+    module: tempfile
+    suffix: _stellar-core
+    state: directory
+  register: put_parameter_tmpdir
+
+- name: "compress {{put_parameter.path}} into {{put_parameter_tmpdir.path}}/{{put_parameter.path|basename}}.zip"
+  local_action:
+    module: archive
+    path: "{{put_parameter.path}}"
+    dest: "{{put_parameter_tmpdir.path}}/{{put_parameter.path|basename}}.zip"
+    format: zip
+
+- name: "put parameter in AWS SSM Parameter Store for node {{inventory_hostname}}"
+  local_action:
+    module: aws_ssm_parameter_store
+    name: "{{put_parameter.path|basename}}"
+    value: "{{lookup('file', put_parameter_tmpdir.path + '/' + (put_parameter.path|basename) + '.zip') | b64encode}}"
+    region: "{{put_parameter.region|default('us-east-1')}}"
+    string_type: "{{put_parameter.string_type|default('SecureString')}}"
+
+- name: cleanup tmp directory
+  local_action:
+    module: file
+    path: "{{put_parameter_tmpdir.path}}"
+    state: absent

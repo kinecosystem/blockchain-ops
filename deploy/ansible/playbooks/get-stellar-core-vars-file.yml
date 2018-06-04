@@ -1,0 +1,10 @@
+---
+# get stellar-core vars files from AWS SSM Parameter Store
+- hosts: localhost
+  roles:
+    - role: get-parameter
+      get_parameter:
+        # parameter name to get
+        name: stellar-core.my-network.yml
+        # path to download parameter to
+        path: group_vars/stellar-core/development/stellar-core.cfg.yml

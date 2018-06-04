@@ -1,0 +1,70 @@
+{% set this_node = stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+{% set other_nodes = stellar_core.nodes|rejectattr("name", "equalto", inventory_hostname)|list %}
+
+HTTP_PORT=11626
+PUBLIC_HTTP_PORT=true
+
+LOG_FILE_PATH=""
+
+COMMANDS=["ll?level={{stellar_core.log_level|default("warn")}}"]
+
+DATABASE="postgresql://dbname={{this_node.db.name}} host={{this_node.db.host}} user={{this_node.db.user}} password={{this_node.db.password}}"
+
+NETWORK_PASSPHRASE="{{stellar_core.network_passphrase}}"
+
+TARGET_PEER_CONNECTIONS={{other_nodes|length}}
+
+KNOWN_PEERS=[
+{% for node in other_nodes %}
+ "{{node.host}}"{% if not loop.last %},{% endif %}
+{% endfor %}
+
+]
+
+{% if stellar_core.catchup_complete|default(false) %}
+CATCHUP_COMPLETE=true
+{% else %}
+CATCHUP_RECENT={{stellar_core.catchup_recent|default(8192)}}
+{% endif %}
+
+NODE_SEED="{{this_node.seed}}  {{this_node.name}}"
+
+{% if this_node.is_validator|default(true) %}
+NODE_IS_VALIDATOR=true
+{% else %}
+NODE_IS_VALIDATOR=false
+{% endif %}
+
+NODE_NAMES=[
+{% for node in other_nodes %}
+ "{{node.address}}  {{node.name}}"{% if not loop.last %},{% endif %}
+{% endfor %}
+
+]
+
+[QUORUM_SET]
+THRESHOLD_PERCENT={{stellar_core.threshold_percent|default(66)}}
+VALIDATORS=[
+ "${{this_node.name}}",
+
+{% for node in other_nodes %}
+ "${{node.name}}"{% if not loop.last %},{% endif %}
+{% endfor %}
+
+]
+
+
+[HISTORY.my-bucket]
+get="curl -sf {{this_node.archive.get_address}}{0} -o {1}"
+put="aws s3 cp {0} {{this_node.archive.put_address}}{1}"
+
+{% for node in other_nodes %}
+[HISTORY.{{node.name}}]
+get="curl -sf {{node.archive.get_address}}{0} -o {1}"
+{% endfor %}
+
+
+{#
+vi: ft=toml.jinja2
+#}
+# vi: ft=toml
