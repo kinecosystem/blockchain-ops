@@ -14,7 +14,7 @@ instances:
 #Horizon metrics:
 # - url: https://horizon.stellar.org/metrics
 #   metrics:
-#   # Metrics that include "5_min_rate" report the 5 minute moving avg of this metric
+#   # Metrics that include "5_min_rate" report the 5 minute moving avg pre second of this metric
 #     - horizon.goroutines: goroutines.value # goroutines used by the horizon app
 #     - horizon.elder_ledger: '"history.elder_ledger".value' # oldest ledger in the horizon db
 #     - horizon.latest_ledger: '"history.latest_ledger".value' # ewest ledger in the horizon db
@@ -35,7 +35,7 @@ instances:
 #Core metrics:
 # - url: http://localhost:11626/metrics
 #   metrics:
-#   # All metrics report the 5 minute moving avg of this metric
+#   # All metrics report the 5 minute moving avg per second of this metric
 #     # not sure what this is
 #     - core.crypto_verify_hit: 'metrics."crypto.verify.hit"."5_min_rate"'
 #     - core.crypto_verify_miss: 'metrics."crypto.verify.miss"."5_min_rate"'
