@@ -14,13 +14,13 @@ instances:
 #Horizon metrics:
 # - url: https://horizon.stellar.org/metrics
 #   metrics:
-#   # Metrics that include "5_min_rate" report the 5 minute moving avg pre second of this metric
+#   # Metrics that include "5_min_rate" report the 5 minute moving avg per second of this metric
 #     - horizon.goroutines: goroutines.value # goroutines used by the horizon app
 #     - horizon.elder_ledger: '"history.elder_ledger".value' # oldest ledger in the horizon db
-#     - horizon.latest_ledger: '"history.latest_ledger".value' # ewest ledger in the horizon db
+#     - horizon.latest_ledger: '"history.latest_ledger".value' # newest ledger in the horizon db
 #     - horizon.open_connections: '"history.open_connections".value' # open connections to the horizon database
 #     - horizon.logging_error: '"logging.error"."5_min_rate"' # error logs
-#     - horizon.logging_panic: '"logging.panic"."5_min_rate"' # error logs
+#     - horizon.logging_panic: '"logging.panic"."5_min_rate"' # panic logs
 #     - horizon.logging_warning: '"logging.warning"."5_min_rate"' # warning logs
 #     - horizon.requests_failed: '"requests.failed"."5_min_rate"' # failed requests to horizon (400<= status code < 600)
 #     - horizon.requests_succeeded: '"requests.succeeded"."5_min_rate"' # successful requests to horizon (200<= status code < 400)
@@ -29,17 +29,18 @@ instances:
 #     - horizon.txsub_buffered: '"txsub.buffered".value' # submission buffered in the submission queue
 #     - horizon.txsub_failed: '"txsub.failed"."5_min_rate"' # failed transactions sent from this proccess
 #     - horizon.txsub_open: '"txsub.open".value' # transactions that have yet to be confirmed as successful or failed
-#     - horizon.txsub_succeeded: '"txsub.succeeded"."5_min_rate"' # successfull transactions sent from this proccess
-#     - horizon.txsub_total: '"txsub.total"."5_min_rate"' # total number of transactions sent to this proccess
+#     - horizon.txsub_succeeded: '"txsub.succeeded"."5_min_rate"' # successfull transactions sent from this horizon
+#     - horizon.txsub_total: '"txsub.total"."5_min_rate"' # total number of transactions sent to this horizon
 
 #Core metrics:
 # - url: http://localhost:11626/metrics
 #   metrics:
-#   # All metrics report the 5 minute moving avg per second of this metric
+#   # Metrics that include "5_min_rate" report the 5 minute moving avg per second of this metric
 #     # not sure what this is
 #     - core.crypto_verify_hit: 'metrics."crypto.verify.hit"."5_min_rate"'
 #     - core.crypto_verify_miss: 'metrics."crypto.verify.miss"."5_min_rate"'
 #     - core.crypto_verify_total: 'metrics."crypto.verify.total"."5_min_rate"'
+
 #     # herder metrics are related to implementaion of the SCP
 #     - core.herder_pending-txs_age0: 'metrics."herder.pending-txs.age0".count'
 #     - core.herder_pending-txs_age1: 'metrics."herder.pending-txs.age1".count'
@@ -47,6 +48,7 @@ instances:
 #     - core.herder_pending-txs_age3: 'metrics."herder.pending-txs.age3".count'
 #     - core.herder_state_changes: 'metrics."herder.state.changes"."5_min_rate"'
 #     - core.herder_state_current: 'metrics."herder.state.current".count'
+
 #     # metrics regarding the history archives
 #     - core.history_catchup_failure: 'metrics."history.catchup.failure"."5_min_rate"'
 #     - core.history_catchup_start: 'metrics."history.catchup.start"."5_min_rate"'
@@ -60,6 +62,7 @@ instances:
 #     - core.history_publish_skip: 'metrics."history.publish.skip"."5_min_rate"'
 #     - core.history_publish_start: 'metrics."history.publish.start"."5_min_rate"'
 #     - core.history_publish_success: 'metrics."history.publish.success"."5_min_rate"'
+
 #     # metrics regarding ledger status
 #     - core.ledger_account_add: 'metrics."ledger.account.add"."5_min_rate"'
 #     - core.ledger_account_modify: 'metrics."ledger.account.modify"."5_min_rate"'
@@ -72,6 +75,7 @@ instances:
 #     - core.ledger_transaction_apply: 'metrics."ledger.transaction.apply"."5_min_rate"'
 #     - core.ledger_trust_add: 'metrics."ledger.trust.add"."5_min_rate"'
 #     - core.ledger_trust_modify: 'metrics."ledger.trust.modify"."5_min_rate"'
+
 #     # metrics regarding peer-to-peer connections
 #     - core.overlay_byte_read: 'metrics."overlay.byte.read"."5_min_rate"'
 #     - core.overlay_byte_write: 'metrics."overlay.byte.write"."5_min_rate"'
@@ -140,8 +144,10 @@ instances:
 #     - core.overlay_send_transaction: 'metrics."overlay.send.transaction"."5_min_rate"'
 #     - core.overlay_send_txset: 'metrics."overlay.send.txset"."5_min_rate"'
 #     - core.overlay_timeout_idle: 'metrics."overlay.timeout.idle"."5_min_rate"'
+
 #     # number of running proccesses
 #     - core.process_memory_handles: 'metrics."process.memory.handles".count'
+
 #     # metrics regarding the SCP
 #     - core.scp_ballot_accepted-commit: 'metrics."scp.ballot.accepted-commit"."5_min_rate"'
 #     - core.scp_ballot_accepted-prepared: 'metrics."scp.ballot.accepted-prepared"."5_min_rate"'
@@ -163,6 +169,7 @@ instances:
 #     - core.scp_value_invalid: 'metrics."scp.value.invalid"."5_min_rate"'
 #     - core.scp_value_nominating: 'metrics."scp.value.nominating"."5_min_rate"'
 #     - core.scp_value_valid: 'metrics."scp.value.valid"."5_min_rate"'
+
 #     # Works are async or long activities that may fail and require retrying
 #     - core.work_root_success: 'metrics."work.root.success"."5_min_rate"'
 #     - core.work_unit_failure: 'metrics."work.unit.failure"."5_min_rate"'
