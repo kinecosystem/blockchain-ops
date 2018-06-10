@@ -62,13 +62,16 @@ services:
       # available configuration visible at:
       # https://github.com/stellar/horizon/blob/v0.11.1/src/github.com/stellar/horizon/cmd/horizon/main.go#L33
       #
+      NETWORK_PASSPHRASE: private testnet
       DATABASE_URL: postgres://stellar:12345678@horizon-db/horizon?sslmode=disable
       STELLAR_CORE_DATABASE_URL: postgres://stellar:12345678@stellar-core-1-db/core?sslmode=disable
       STELLAR_CORE_URL: http://stellar-core-1:11626
+
       LOG_LEVEL: info
       INGEST: "true"
       PER_HOUR_RATE_LIMIT: "999999"
-      NETWORK_PASSPHRASE: private testnet
+      # https://www.stellar.org/developers/horizon/reference/admin.html#managing-storage-for-historical-data
+      HISTORY_RETENTION_COUNT: "200000"
 
       # versions < 0.12.2
       # FRIENDBOT_SECRET: "${ROOT_ACCOUNT_SEED}"
