@@ -35,5 +35,5 @@ instances:
       metrics:
       # Numeric key names should be in double quotes, otherwise they will be considered as an array index
         - usd.price: data."1".quotes.USD.price
-        - eth.price: [data]["1027"][quotes][USD][price]
+        - eth.price: '[data]["1027"][quotes][USD][price]'
 ```
