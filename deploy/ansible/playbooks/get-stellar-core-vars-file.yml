@@ -1,5 +1,5 @@
 ---
-# get stellar-core vars files from AWS SSM Parameter Store
+# get stellar-core group_vars from AWS SSM Parameter Store
 - hosts: localhost
   roles:
     - role: get-parameter

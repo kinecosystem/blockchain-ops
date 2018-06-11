@@ -1,5 +1,5 @@
 ---
-# save stellar-core vars files to aWS SSM Parameter Store
+# save stellar-core group_vars to AWS SSM Parameter Store
 - hosts: localhost
   roles:
     - role: put-parameter

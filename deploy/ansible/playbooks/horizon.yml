@@ -1,4 +1,5 @@
 ---
+# deploy horizons on your network of choice
 # use with ubuntu 16.04
 
 # - hosts: production

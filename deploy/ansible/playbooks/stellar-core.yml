@@ -1,4 +1,6 @@
 ---
+# deploy stellar-core on you network of choice
+
 # use with ubuntu 16.04
 
 # - hosts: production
