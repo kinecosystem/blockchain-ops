@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+invoke = "==1.0.0"
+"jinja2" = "*"
+pyyaml = "*"
+
+[dev-packages]
+pylint = "*"
+pycodestyle = "*"
+pydocstyle = "*"
+
+[requires]
+python_version = "3.6"
