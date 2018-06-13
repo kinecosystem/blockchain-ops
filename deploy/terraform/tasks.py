@@ -24,32 +24,12 @@ def install(c, version=TERRAFORM_VERSION):
 
 
 @task
-def init(c): c.run('./terraform init')
-
-
-@task
-def modules(c):
-    print('Downloading Terraform modules')
-    c.run('./terraform get')
-
-
-@task
-def plan(c): c.run('./terraform plan')
-
-
-@task
-def apply(c): c.run('./terraform apply')
-
-
-@task
-def destroy(c): c.run('./terraform destroy')
-
-
-@task
 def template(c,
              template_file='stellar-network.tf.j2',
              vars_file='vars.yml',
              out_file='stellar-network.tf'):
+
+    print('generating terraform file from template')
 
     with open(vars_file) as f:
         vars = yaml.load(f)
@@ -63,3 +43,33 @@ def template(c,
         f.write(out)
 
     c.run(f'./terraform fmt {out_file}')
+
+
+@task(template)
+def init(c):
+    print('initializing')
+    c.run('./terraform init')
+
+
+@task(init)
+def modules(c):
+    print('getting modules')
+    c.run('./terraform get')
+
+
+@task(modules, template)
+def plan(c):
+    print('planning')
+    c.run('./terraform plan')
+
+
+@task(modules, template)
+def apply(c):
+    print('applying')
+    c.run('./terraform apply')
+
+
+@task(modules, template)
+def destroy(c):
+    print('destroying')
+    c.run('./terraform destroy')
