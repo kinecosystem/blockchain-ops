@@ -8,6 +8,8 @@ stellar:
 
   instance_type: t2.medium
 
+  tld: mydomain.com
+
   nodes:
     - zone: us-east-1a
     - zone: us-east-1b

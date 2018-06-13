@@ -1,19 +1,25 @@
 module "ec2" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
-  name                    = "${local.name}"
-  key_name                = "${var.key_name}"
-  vpc_security_group_ids  = ["${module.security-group.this_security_group_id}"]
-  subnet_id               = "${data.aws_subnet.default.id}"
-  ami                     = "${data.aws_ami.ubuntu.id}"
-  instance_type           = "${var.instance_type}"
-  disable_api_termination = false
+  name                        = "${local.name}"
+  key_name                    = "${var.key_name}"
+  vpc_security_group_ids      = ["${module.security-group.this_security_group_id}"]
+  subnet_id                   = "${data.aws_subnet.default.id}"
+  ami                         = "${data.aws_ami.ubuntu.id}"
+  instance_type               = "${var.instance_type}"
+  associate_public_ip_address = true
+  disable_api_termination     = false
 
   tags = {
     Name = "${local.name}"
     Type = "stelar-core"
   }
 }
+
+# resource "aws_eip" "this" {
+#   vpc      = true
+#   instance = "${module.ec2.id[0]}"
+# }
 
 module "security-group" {
   source = "terraform-aws-modules/security-group/aws"

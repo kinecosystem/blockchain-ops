@@ -1,4 +1,4 @@
-# data sources to get vpc, subnet, and ami details
+# data sources to get vpc, subnet, ami, route53 details
 
 data "aws_vpc" "default" {
   default = true
@@ -22,4 +22,8 @@ data "aws_ami" "ubuntu" {
       "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*",
     ]
   }
+}
+
+data "aws_route53_zone" "kin" {
+  name = "kininfrastructure.com."
 }

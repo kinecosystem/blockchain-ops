@@ -7,9 +7,9 @@ module "stellar-core-{{node.zone}}" {
   key_name   = "{{env_vars['AWS_KEY_NAME']}}"
 
   stellar_network_name = "{{stellar.network_name}}"
-
-  zone          = "{{node.zone}}"
-  instance_type = "{{stellar.instance_type}}"
+  tld                  = "{{stellar.tld}}"
+  zone                 = "{{node.zone}}"
+  instance_type        = "{{stellar.instance_type}}"
 }
 {%endfor%}
 

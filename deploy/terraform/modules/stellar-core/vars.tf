@@ -6,6 +6,8 @@ variable "zone" {}
 variable "key_name" {}
 variable "instance_type" {}
 
+variable "tld" {}
+
 locals {
   # used to name ec2 and rds instances, security groups, etc.
   name = "stellar-core-${var.zone}-${var.stellar_network_name}"
