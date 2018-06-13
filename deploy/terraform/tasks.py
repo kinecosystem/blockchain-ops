@@ -1,6 +1,9 @@
+import os
 import os.path
 
 from invoke import task
+import jinja2
+import yaml
 
 
 TERRAFORM_VERSION = '0.11.7'
@@ -43,6 +46,20 @@ def apply(c):
         c.run('./terraform apply')
 
 @task
-def destroy(c):
-    with c.cd('deploy/terraform'):
-        c.run('./terraform destroy')
+def template(c,
+             template_file='stellar-network.tf.j2',
+             vars_file='vars.yml',
+             out_file='stellar-network.tf'):
+
+    with open(vars_file) as f:
+        vars = yaml.load(f)
+
+    with open(template_file) as f:
+        t = jinja2.Template(f.read())
+
+    out = t.render(vars, env_vars=os.environ)
+
+    with open(out_file, 'w') as f:
+        f.write(out)
+
+    c.run(f'./terraform fmt {out_file}')

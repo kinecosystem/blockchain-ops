@@ -1,0 +1,18 @@
+{%for node in stellar.nodes%}
+module "stellar-core-{{node.zone}}" {
+  source = "modules/stellar-core"
+
+  access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
+  secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
+  key_name   = "{{env_vars['AWS_KEY_NAME']}}"
+
+  stellar_network_name = "{{stellar.network_name}}"
+
+  zone          = "{{node.zone}}"
+  instance_type = "{{stellar.instance_type}}"
+}
+{%endfor%}
+
+{#
+# vi: ft=terraform.jinja2
+#}

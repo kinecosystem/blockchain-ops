@@ -1,0 +1,13 @@
+---
+stellar:
+  # unique name for the stellar network,
+  # used for naming aws resources
+  #
+  # NOTE this is NOT the stellar network passphrase!
+  network_name: terraform-test
+
+  instance_type: t2.medium
+
+  nodes:
+    - zone: us-east-1a
+    - zone: us-east-1b
