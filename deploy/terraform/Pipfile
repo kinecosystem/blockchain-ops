@@ -5,8 +5,8 @@ name = "pypi"
 
 [packages]
 invoke = "==1.0.0"
-"jinja2" = "*"
-pyyaml = "*"
+"jinja2" = "2.10"
+pyyaml = "3.12"
 
 [dev-packages]
 pylint = "*"
