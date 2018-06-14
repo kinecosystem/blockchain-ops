@@ -19,10 +19,10 @@ module "ec2" {
   }
 }
 
-# resource "aws_eip" "this" {
-#   vpc      = true
-#   instance = "${module.ec2.id[0]}"
-# }
+resource "aws_eip" "this" {
+  vpc      = true
+  instance = "${module.ec2.id[0]}"
+}
 
 module "security-group" {
   source = "terraform-aws-modules/security-group/aws"
