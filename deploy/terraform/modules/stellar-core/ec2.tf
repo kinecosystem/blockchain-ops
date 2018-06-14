@@ -7,8 +7,11 @@ module "ec2" {
   subnet_id                   = "${data.aws_subnet.default.id}"
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "${var.instance_type}"
+  iam_instance_profile        = "${aws_iam_instance_profile.this.id}"
   associate_public_ip_address = true
   disable_api_termination     = false
+
+  # TODO control elb type, size (20GB, magnetic)
 
   tags = {
     Name = "${local.name}"
