@@ -1,5 +1,8 @@
 {%for node in stellar.nodes%}
-module "stellar-core-{{node.zone}}" {
+
+{% set module_name = 'stellar-core-{}-{}'.format(stellar.network_name, node.zone) %}
+
+module "{{module_name}}" {
   source = "modules/stellar-core"
 
   access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
@@ -11,7 +14,24 @@ module "stellar-core-{{node.zone}}" {
   zone                 = "{{node.zone}}"
   instance_type        = "{{stellar.instance_type}}"
 }
+
+output "instance_route53_fqdn-{{module_name}}" {
+  description = "Route53 FQDN name assigned to the EC2 instance"
+  value       = "${module.{{module_name}}.instance_route53_fqdn}"
+}
+
+output "instance_tags-{{module_name}}" {
+  description = "List of tags"
+  value       = "${module.{{module_name}}.instance_tags}"
+}
+
+output "s3-bucket-{{module_name}}" {
+  description = "S3 bucket name"
+  value       = "${module.{{module_name}}.s3}"
+}
+
 {%endfor%}
+
 
 {#
 # vi: ft=terraform.jinja2
