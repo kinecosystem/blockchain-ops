@@ -1,15 +1,12 @@
 ---
 stellar:
-  # unique name for the stellar network,
-  # used for naming aws resources
-  #
+  # unique name for the stellar network, used for naming aws resources.
   # NOTE this is NOT the stellar network passphrase!
   network_name: terraform-test
-
-  instance_type: t2.medium
-
-  tld: mydomain.com
-
-  nodes:
+  instance_type: t2.medium  # ec2 instance type to use
+  tld: mydomain.com  # route53 top level domain
+  nodes:  # TODO support more than one node in an availability zone
     - zone: us-east-1a
     - zone: us-east-1b
+    - zone: us-east-1c
+    - zone: us-west-2c
