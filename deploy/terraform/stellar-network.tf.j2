@@ -30,6 +30,11 @@ output "s3-{{module_name}}" {
   value       = "${module.{{module_name}}.s3}"
 }
 
+output "rds-{{module_name}}" {
+  description = "RDS address"
+  value       = "${module.{{module_name}}.rds}"
+}
+
 {%endfor%}
 
 

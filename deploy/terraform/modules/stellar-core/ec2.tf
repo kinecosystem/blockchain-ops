@@ -3,7 +3,7 @@ module "ec2" {
 
   name                   = "${local.name}"
   key_name               = "${var.key_name}"
-  vpc_security_group_ids = ["${module.security-group.this_security_group_id}"]
+  vpc_security_group_ids = ["${module.ec2-security-group.this_security_group_id}"]
   subnet_id              = "${data.aws_subnet.default.id}"
   ami                    = "${data.aws_ami.ubuntu.id}"
   instance_type          = "${var.instance_type}"
@@ -31,7 +31,7 @@ resource "aws_eip" "this" {
   instance = "${module.ec2.id[0]}"
 }
 
-module "security-group" {
+module "ec2-security-group" {
   source = "terraform-aws-modules/security-group/aws"
 
   name        = "${local.name}-common"
