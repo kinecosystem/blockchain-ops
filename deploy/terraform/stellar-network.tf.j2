@@ -36,6 +36,16 @@ output "rds-{{module_name}}" {
   value       = "${module.{{module_name}}.rds}"
 }
 
+output "horizon_route53-{{module_name}}" {
+  description = "Route53 FQDN name assigned to the EC2 instance"
+  value       = "${module.{{module_name}}.horizon_route53}"
+}
+
+output "horizon_ec2-{{module_name}}" {
+  description = "EC2 public DNS name"
+  value       = "${module.{{module_name}}.horizon_ec2}"
+}
+
 {%endfor%}
 
 {# define one provider + create one ssh key per region #}

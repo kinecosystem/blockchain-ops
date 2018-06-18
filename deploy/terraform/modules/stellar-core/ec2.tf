@@ -1,9 +1,9 @@
-module "ec2" {
+module "stellar_core_ec2" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
   name                   = "${local.stellar_core_name}"
   key_name               = "${var.ssh_public_key_name}"
-  vpc_security_group_ids = ["${module.ec2-security-group.this_security_group_id}"]
+  vpc_security_group_ids = ["${module.stellar_core_ec2_security_group.this_security_group_id}"]
   subnet_id              = "${data.aws_subnet.default.id}"
   ami                    = "${data.aws_ami.ubuntu.id}"
   instance_type          = "${var.instance_type}"
@@ -28,10 +28,10 @@ module "ec2" {
 
 resource "aws_eip" "this" {
   vpc      = true
-  instance = "${module.ec2.id[0]}"
+  instance = "${module.stellar_core_ec2.id[0]}"
 }
 
-module "ec2-security-group" {
+module "stellar_core_ec2_security_group" {
   source = "terraform-aws-modules/security-group/aws"
 
   name        = "${local.stellar_core_name}-common"

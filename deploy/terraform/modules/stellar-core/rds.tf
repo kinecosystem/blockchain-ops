@@ -1,4 +1,4 @@
-module "rds" {
+module "stellar_core_rds" {
   source = "terraform-aws-modules/rds/aws"
 
   identifier = "${local.stellar_core_name}"
@@ -8,7 +8,7 @@ module "rds" {
   parameter_group_name = "default.postgres9.6"
   option_group_name    = "default:postgres-9-6"
 
-  vpc_security_group_ids = ["${module.rds-security-group.this_security_group_id}"]
+  vpc_security_group_ids = ["${module.stellar_core_rds_security_group.this_security_group_id}"]
 
   subnet_ids             = ["${data.aws_subnet.default.id}"]
   availability_zone      = "${data.aws_subnet.default.availability_zone}"
@@ -16,7 +16,7 @@ module "rds" {
 
   instance_class    = "db.t2.medium"
   storage_type      = "standard"     # magnetic
-  allocated_storage = 100
+  allocated_storage = 20
 
   name     = "core"
   username = "stellar"
@@ -33,7 +33,7 @@ module "rds" {
   }
 }
 
-module "rds-security-group" {
+module "stellar_core_rds_security_group" {
   source = "terraform-aws-modules/security-group/aws"
 
   name                = "${local.stellar_core_name}-rds"
