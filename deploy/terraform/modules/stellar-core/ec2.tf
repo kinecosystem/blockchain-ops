@@ -1,8 +1,8 @@
 module "ec2" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
-  name                   = "${local.name}"
-  key_name               = "${aws_key_pair.this.key_name}"
+  name                   = "${local.stellar_core_name}"
+  key_name               = "${var.ssh_public_key_name}"
   vpc_security_group_ids = ["${module.ec2-security-group.this_security_group_id}"]
   subnet_id              = "${data.aws_subnet.default.id}"
   ami                    = "${data.aws_ami.ubuntu.id}"
@@ -21,8 +21,8 @@ module "ec2" {
   ]
 
   tags = {
-    Name = "${local.name}"
-    Type = "stelar-core"
+    Name = "${local.stellar_core_name}"
+    Type = "stellar-core"
   }
 }
 
@@ -34,8 +34,8 @@ resource "aws_eip" "this" {
 module "ec2-security-group" {
   source = "terraform-aws-modules/security-group/aws"
 
-  name        = "${local.name}-common"
-  description = "Stellar Core requires ports: stellar-core P2P, PostgreSQL, HTTP/S"
+  name        = "${local.stellar_core_name}-common"
+  description = "Stellar Core required ports: stellar-core P2P, PostgreSQL, HTTP/S"
 
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["0.0.0.0/0"]
@@ -69,11 +69,6 @@ module "ec2-security-group" {
       cidr_blocks = "0.0.0.0/0"
     },
   ]
-}
-
-resource "aws_key_pair" "this" {
-  key_name   = "${local.ssh_public_key_name}"
-  public_key = "${var.ssh_public_key}"
 }
 
 # data sources to get vpc, subnet, ami, route53 details

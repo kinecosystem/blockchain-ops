@@ -1,13 +1,14 @@
 {%for node in stellar.nodes%}
 
-{% set module_name = 'stellar-core-{}-{}'.format(stellar.network_name, node.zone) %}
+{%set module_name = 'stellar-core-{}-{}'.format(stellar.network_name, node.zone)%}
 
 module "{{module_name}}" {
   source = "modules/stellar-core"
+  providers = {
+    "aws" = "aws.{{node.region}}"
+  }
 
-  access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
-  secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
-  ssh_public_key   = "{{env_vars['SSH_PUBLIC_KEY']}}"
+  ssh_public_key_name= "${aws_key_pair.{{node.region}}.key_name}"
 
   stellar_network_name = "{{stellar.network_name}}"
   tld                  = "{{stellar.tld}}"
@@ -37,6 +38,29 @@ output "rds-{{module_name}}" {
 
 {%endfor%}
 
+{# define one provider + create one ssh key per region #}
+{%for region in stellar.nodes|map(attribute="region")|unique%}
+provider "aws" {
+  alias = "{{region}}"
+
+  access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
+  secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
+  region     = "{{region}}"
+}
+
+resource "aws_key_pair" "{{region}}" {
+  provider = "aws.{{region}}"
+
+  key_name   = "${local.ssh_public_key_name}"
+  public_key = "{{env_vars['SSH_PUBLIC_KEY']}}"
+}
+{%endfor%}
+
+
+locals {
+  # ssh key to create for accessing ec2 instances
+  ssh_public_key_name = "stellar-core-{{stellar.network_name}}"
+}
 
 {#
 # vi: ft=terraform.jinja2

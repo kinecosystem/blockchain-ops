@@ -1,7 +1,7 @@
 module "rds" {
   source = "terraform-aws-modules/rds/aws"
 
-  identifier = "${local.name}"
+  identifier = "${local.stellar_core_name}"
 
   engine               = "postgres"
   engine_version       = "9.6.6"
@@ -36,7 +36,7 @@ module "rds" {
 module "rds-security-group" {
   source = "terraform-aws-modules/security-group/aws"
 
-  name                = "${local.name}-rds"
+  name                = "${local.stellar_core_name}-rds"
   description         = "RDS access for all instances in the VPC"
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["${data.aws_vpc.default.cidr_block}"]

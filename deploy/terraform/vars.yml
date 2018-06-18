@@ -6,7 +6,14 @@ stellar:
   instance_type: t2.medium  # ec2 instance type to use
   tld: mydomain.com  # route53 top level domain
   nodes:  # TODO support more than one node in an availability zone
-    - zone: us-east-1a
-    - zone: us-east-1b
-    - zone: us-east-1c
-    - zone: us-west-2c
+    - region: us-east-1
+      zone: us-east-1a
+
+    - region: us-east-1
+      zone: us-east-1b
+
+    - region: us-east-1
+      zone: us-east-1c
+
+    - region: us-west-2
+      zone: us-west-2c
