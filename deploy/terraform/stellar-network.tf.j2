@@ -7,7 +7,7 @@ module "{{module_name}}" {
 
   access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
   secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
-  key_name   = "{{env_vars['AWS_KEY_NAME']}}"
+  ssh_public_key   = "{{env_vars['SSH_PUBLIC_KEY']}}"
 
   stellar_network_name = "{{stellar.network_name}}"
   tld                  = "{{stellar.tld}}"

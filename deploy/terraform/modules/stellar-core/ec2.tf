@@ -2,7 +2,7 @@ module "ec2" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
   name                   = "${local.name}"
-  key_name               = "${var.key_name}"
+  key_name               = "${aws_key_pair.this.key_name}"
   vpc_security_group_ids = ["${module.ec2-security-group.this_security_group_id}"]
   subnet_id              = "${data.aws_subnet.default.id}"
   ami                    = "${data.aws_ami.ubuntu.id}"
@@ -69,6 +69,11 @@ module "ec2-security-group" {
       cidr_blocks = "0.0.0.0/0"
     },
   ]
+}
+
+resource "aws_key_pair" "this" {
+  key_name   = "${local.ssh_public_key_name}"
+  public_key = "${var.ssh_public_key}"
 }
 
 # data sources to get vpc, subnet, ami, route53 details
