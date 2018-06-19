@@ -1,0 +1,17 @@
+horizon:
+  network_passphrase: xxx
+
+  nodes:
+    - name: local
+      db:
+        name: xxx
+        user: stellar
+        password: xxx
+        host: xxx
+      stellar_core:
+        url: xxx
+        db:
+          name: xxx
+          user: stellar
+          password: xxx
+          host: xxx

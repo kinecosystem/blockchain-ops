@@ -1,0 +1,17 @@
+---
+# deploy stellar-core on you network of choice
+
+# use with ubuntu 16.04
+
+# - hosts: production
+- hosts: development
+  roles:
+    - sync-clock
+    - apt-get-update
+    - common-packages
+    - awscli
+
+    - role: docker
+      start_docker_daemon: false  # development only, use with ../image/docker-compose.yml
+
+    - stellar-core

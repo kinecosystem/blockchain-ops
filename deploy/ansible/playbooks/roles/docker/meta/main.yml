@@ -1,0 +1,6 @@
+---
+dependencies:
+  - role: angstwad.docker_ubuntu
+    # docker_pkg_name: "docker-engine={{ docker_version }}-*"
+    # docker_opts: "{{ docker_options }}"
+    docker_aufs_enabled: false

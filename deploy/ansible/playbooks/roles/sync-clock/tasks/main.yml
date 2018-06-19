@@ -1,0 +1,19 @@
+- name: copy /etc/systemd/timesyncd.conf
+  copy:
+    src: etc/systemd/timesyncd.conf
+    dest: /etc/systemd/timesyncd.conf
+    mode: 0644
+    owner: root
+    group: root
+  register: timesyncd
+
+- name: enable and restart systemd-timesyncd
+  systemd:
+    name: systemd-timesyncd
+    state: restarted
+    enabled: true
+  when: timesyncd.changed
+
+- name: enable system ntp clock sync
+  command: /usr/bin/timedatectl set-ntp true
+  when: timesyncd.changed

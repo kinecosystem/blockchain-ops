@@ -1,0 +1,11 @@
+- name: install common packages
+  apt:
+    name: "{{item}}"
+  with_items:
+    - curl
+    - jq
+    - tree
+
+- name: install lnav
+  apt:
+    deb: https://github.com/tstack/lnav/releases/download/v0.8.3/lnav_0.8.3_amd64.deb

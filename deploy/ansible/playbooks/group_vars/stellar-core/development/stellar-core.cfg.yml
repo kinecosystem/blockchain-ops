@@ -1,0 +1,30 @@
+---
+stellar_core:
+  network_passphrase: xxx
+
+  nodes:
+    - name: local
+      host: localhost:11626
+      seed: xxx
+      address: xxx
+      db:
+        name: xxx
+        host: stellar
+        user: stellar
+        password: xxx
+      archive:
+        get_address: https://s3.amazonaws.com/my-bucket/
+        put_address: s3://my-bucket/
+
+    - name: us-east-1
+      host: us-east-1.my-network.com:11626
+      seed: yyy
+      address: yyy
+      db:
+        name: yyy
+        host: stellar
+        user: stellar
+        password: yyy
+      archive:
+        get_address: https://s3.amazonaws.com/my-network/
+        put_address: s3://my-network-us-east-1/

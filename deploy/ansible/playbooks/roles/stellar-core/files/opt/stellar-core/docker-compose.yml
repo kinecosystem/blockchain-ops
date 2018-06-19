@@ -1,0 +1,16 @@
+version: "3"
+
+services:
+  stellar-core:
+    image: kinecosystem/stellar-core:9.2.0
+    ports:
+      - 11625:11625
+      - 11626:11626
+    volumes:
+      - ./volumes/stellar-core:/opt/stellar-core
+    restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"

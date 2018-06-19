@@ -1,0 +1,25 @@
+---
+- name: create tmp directory
+  local_action:
+    module: tempfile
+    suffix: _stellar-core
+    state: directory
+  register: get_parameter_tmpdir
+
+- name: "get parameter into {{get_parameter_tmpdir.path}}/{{get_parameter.name}}.zip"
+  local_action:
+    module: copy
+    dest: "{{get_parameter_tmpdir.path}}/{{get_parameter.name}}.zip"
+    content: "{{lookup('aws_ssm', get_parameter.name) | b64decode}}"
+
+- name: unarchive file
+  local_action:
+    module: unarchive
+    src: "{{get_parameter_tmpdir.path}}/{{get_parameter.name}}.zip"
+    dest: "{{get_parameter.path}}"
+
+- name: cleanup tmp directory
+  local_action:
+    module: file
+    path: "{{get_parameter_tmpdir.path}}"
+    state: absent
