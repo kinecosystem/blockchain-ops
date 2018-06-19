@@ -1,13 +1,16 @@
 {%for node in stellar.nodes%}
 
 {%set module_name_suffix = '{}_{}'.format(stellar.network_name, node.zone)%}
-{%set module_name = 'stellar_node_{}'.format(module_name_suffix)%}
+{%set stellar_core_module = 'stellar_core_{}'.format(module_name_suffix)%}
+{%set horizon_module = 'horizon_{}'.format(module_name_suffix)%}
 
-module "{{module_name}}" {
-  source = "modules/stellar-node"
+module "{{stellar_core_module}}" {
+  source = "modules/stellar-core"
   providers = {
     "aws" = "aws.{{node.region}}"
   }
+
+  name = "${local.{{stellar_core_module}}_name}"
 
   instance_key_pair_name = "${aws_key_pair.{{node.region}}.key_name}"
   ssh_private_key = "{{stellar.ssh.private_key}}"
@@ -20,35 +23,73 @@ module "{{module_name}}" {
   rds_password         = "{{env_vars['RDS_PASSWORD']}}"
 }
 
-output "route53_stellar_core_{{module_name_suffix}}" {
-  description = "Route53 FQDN name assigned to the EC2 instance"
-  value       = "${module.{{module_name}}.route53_stellar_core}"
+locals {
+  # used to name ec2 and rds instances, security groups, etc.
+  {{stellar_core_module}}_name = "stellar-core-{{stellar.network_name}}-${random_id.{{stellar_core_module}}_name_suffix.hex}"
 }
 
-output "s3_bucket_stellar_core_{{module_name_suffix}}" {
+resource "random_id" "{{stellar_core_module}}_name_suffix" {
+  byte_length = 2
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+output "route53_{{stellar_core_module}}" {
+  description = "Route53 FQDN name assigned to the EC2 instance"
+  value       = "${module.{{stellar_core_module}}.route53}"
+}
+
+output "s3_bucket_{{stellar_core_module}}" {
   description = "S3 bucket name"
-  value       = "${module.{{module_name}}.s3_bucket_stellar_core}"
+  value       = "${module.{{stellar_core_module}}.s3}"
 }
 
-output "rds_stellar_core_{{module_name_suffix}}" {
+output "rds_{{stellar_core_module}}" {
   description = "RDS address"
-  value       = "${module.{{module_name}}.rds_stellar_core}"
+  value       = "${module.{{stellar_core_module}}.rds}"
 }
 
-output "route53_horizon_{{module_name_suffix}}" {
+{%if node.horizon%}
+module "{{horizon_module}}" {
+  source = "modules/horizon"
+  providers = {
+    "aws" = "aws.{{node.region}}"
+  }
+
+  name = "${local.{{horizon_module}}_name}"
+
+  instance_key_pair_name = "${aws_key_pair.{{node.region}}.key_name}"
+  ssh_private_key = "{{stellar.ssh.private_key}}"
+
+  stellar_network_name = "{{stellar.network_name}}"
+  tld                  = "{{stellar.tld}}"
+  zone                 = "{{node.zone}}"
+  instance_type        = "{{stellar.instance_type}}"
+
+  rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+}
+
+locals {
+  {{horizon_module}}_name = "horizon-{{stellar.network_name}}-${random_id.{{stellar_core_module}}_name_suffix.hex}"
+}
+
+output "route53_{{horizon_module}}" {
   description = "Route53 FQDN name assigned to the EC2 instance"
-  value       = "${module.{{module_name}}.route53_horizon}"
+  value       = "${module.{{horizon_module}}.route53}"
 }
 
-output "ec2_horizon_{{module_name_suffix}}" {
+output "ec2_horizon_{{horizon_module}}" {
   description = "EC2 public DNS name"
-  value       = "${module.{{module_name}}.ec2_horizon}"
+  value       = "${module.{{horizon_module}}.ec2}"
 }
 
-output "rds_horizon_{{module_name_suffix}}" {
+output "rds_horizon_{{horizon_module}}" {
   description = "RDS address"
-  value       = "${module.{{module_name}}.rds_horizon}"
+  value       = "${module.{{horizon_module}}.rds}"
 }
+{%endif%}
 
 {%endfor%}
 
@@ -70,7 +111,6 @@ resource "aws_key_pair" "{{region}}" {
   public_key = "${file("{{stellar.ssh.public_key}}")}"
 }
 {%endfor%}
-
 
 {#
 # vi: ft=terraform.jinja2

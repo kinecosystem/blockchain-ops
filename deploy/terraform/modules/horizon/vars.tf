@@ -10,4 +10,3 @@ variable "rds_password" {}
 variable "tld" {}
 
 variable "name" {}
-variable "elb_name" {}
