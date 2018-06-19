@@ -89,6 +89,13 @@ module "ec2_security_group" {
       description = "DataDog logs intake"
       cidr_blocks = "0.0.0.0/0"
     },
+    {
+      from_port   = 11371
+      to_port     = 11371
+      protocol    = "tcp"
+      description = "apt repository key server"
+      cidr_blocks = "0.0.0.0/0"
+    },
   ]
 }
 
