@@ -20,7 +20,7 @@ module "stellar_core_rds" {
 
   name     = "core"
   username = "stellar"
-  password = "YourPwdShouldBeLongAndSecure!" # TODO
+  password = "${var.rds_password}"
   port     = "5432"
 
   maintenance_window      = "Mon:00:00-Mon:03:00"

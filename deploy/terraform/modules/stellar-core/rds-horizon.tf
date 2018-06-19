@@ -14,7 +14,7 @@ module "horizon_rds" {
   allocated_storage       = 100
   name                    = "core"
   username                = "stellar"
-  password                = "YourPwdShouldBeLongAndSecure!"                                 # TODO
+  password                = "${var.rds_password}"
   port                    = "5432"
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_retention_period = 0

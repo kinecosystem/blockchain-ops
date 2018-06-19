@@ -4,6 +4,8 @@ variable "stellar_network_name" {}
 variable "zone" {}
 variable "instance_type" {}
 
+variable "rds_password" {}
+
 variable "tld" {}
 
 locals {

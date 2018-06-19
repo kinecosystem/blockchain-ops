@@ -14,6 +14,8 @@ module "{{module_name}}" {
   tld                  = "{{stellar.tld}}"
   zone                 = "{{node.zone}}"
   instance_type        = "{{stellar.instance_type}}"
+
+  rds_password         = "{{env_vars['RDS_PASSWORD']}}"
 }
 
 output "route53-{{module_name}}" {
