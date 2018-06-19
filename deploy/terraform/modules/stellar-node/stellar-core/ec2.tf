@@ -112,6 +112,7 @@ data "aws_ami" "ubuntu" {
   filter {
     name = "name"
 
+    # latest image
     values = [
       "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*",
     ]
