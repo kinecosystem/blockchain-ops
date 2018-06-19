@@ -1,4 +1,5 @@
-variable "ssh_public_key_name" {}
+variable "instance_key_pair_name" {}
+variable "ssh_private_key" {}
 
 variable "stellar_network_name" {}
 variable "zone" {}

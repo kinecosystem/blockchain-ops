@@ -1,5 +1,5 @@
 resource "aws_instance" "this" {
-  key_name                    = "${var.ssh_public_key_name}"
+  key_name                    = "${var.instance_key_pair_name}"
   vpc_security_group_ids      = ["${module.ec2_security_group.this_security_group_id}"]
   subnet_id                   = "${data.aws_subnet.default.id}"
   ami                         = "${data.aws_ami.ubuntu.id}"
@@ -27,6 +27,18 @@ resource "aws_instance" "this" {
   volume_tags = {
     Name = "${var.name}"
     Type = "stellar-core"
+  }
+
+  # ansible requirement
+  provisioner "remote-exec" {
+    inline = ["sudo apt-get install -qq python"]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = "${file(var.ssh_private_key)}"
+      timeout     = "90s"
+    }
   }
 }
 
