@@ -1,8 +1,8 @@
-module "horizon_ec2" {
+module "ec2" {
   source                  = "terraform-aws-modules/ec2-instance/aws"
-  name                    = "${local.horizon_name}"
+  name                    = "${var.name}"
   key_name                = "${var.ssh_public_key_name}"
-  vpc_security_group_ids  = ["${module.horizon_security_group.this_security_group_id}"]
+  vpc_security_group_ids  = ["${module.security_group.this_security_group_id}"]
   subnet_id               = "${data.aws_subnet.default.id}"
   ami                     = "${data.aws_ami.ubuntu.id}"
   instance_type           = "${var.instance_type}"
@@ -18,14 +18,14 @@ module "horizon_ec2" {
   ]
 
   tags = {
-    Name = "${local.horizon_name}"
+    Name = "${var.name}"
     Type = "horizon"
   }
 }
 
-module "horizon_security_group" {
+module "security_group" {
   source              = "terraform-aws-modules/security-group/aws"
-  name                = "${local.horizon_name}-common"
+  name                = "${var.name}"
   description         = "Horizon required ports: PostgreSQL, HTTP/S"
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["0.0.0.0/0"]
@@ -44,7 +44,37 @@ module "horizon_security_group" {
   ]
 }
 
-output "horizon_ec2" {
+output "ec2" {
   description = "EC2 public DNS name"
-  value       = "${module.horizon_ec2.public_dns[0]}"
+  value       = "${module.ec2.public_dns[0]}"
+}
+
+# data sources to get vpc, subnet, ami, route53 details
+
+data "aws_vpc" "default" {
+  default = true
+}
+
+data "aws_subnet" "default" {
+  vpc_id            = "${data.aws_vpc.default.id}"
+  availability_zone = "${var.zone}"
+  default_for_az    = true
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  owners = ["099720109477"] # canonical/ubuntu
+
+  filter {
+    name = "name"
+
+    values = [
+      "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*",
+    ]
+  }
+}
+
+data "aws_route53_zone" "kin" {
+  name = "kininfrastructure.com."
 }

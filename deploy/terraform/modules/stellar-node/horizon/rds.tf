@@ -1,16 +1,16 @@
-module "horizon_rds" {
+module "rds" {
   source                  = "terraform-aws-modules/rds/aws"
-  identifier              = "${local.horizon_name}"
+  identifier              = "${var.name}"
   engine                  = "postgres"
   engine_version          = "9.6.6"
   parameter_group_name    = "default.postgres9.6"
   option_group_name       = "default:postgres-9-6"
-  vpc_security_group_ids  = ["${module.horizon_rds_security_group.this_security_group_id}"]
+  vpc_security_group_ids  = ["${module.rds_security_group.this_security_group_id}"]
   subnet_ids              = ["${data.aws_subnet.default.id}"]
   availability_zone       = "${data.aws_subnet.default.availability_zone}"
-  create_db_subnet_group  = false                                                           # use default
+  create_db_subnet_group  = false                                                   # use default
   instance_class          = "db.t2.medium"
-  storage_type            = "standard"                                                      # magnetic
+  storage_type            = "standard"                                              # magnetic
   allocated_storage       = 100
   name                    = "core"
   username                = "stellar"
@@ -26,16 +26,16 @@ module "horizon_rds" {
   }
 }
 
-module "horizon_rds_security_group" {
+module "rds_security_group" {
   source              = "terraform-aws-modules/security-group/aws"
-  name                = "${local.horizon_name}-rds"
+  name                = "${var.name}-rds"
   description         = "RDS access for all instances in the VPC"
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["${data.aws_vpc.default.cidr_block}"]
   ingress_rules       = ["postgresql-tcp"]
 }
 
-output "horizon_rds" {
+output "rds" {
   description = "RDS address"
-  value       = "${module.horizon_rds.this_db_instance_address}"
+  value       = "${module.rds.this_db_instance_address}"
 }

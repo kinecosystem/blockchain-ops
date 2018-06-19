@@ -10,5 +10,5 @@ output "s3" {
 
 output "rds" {
   description = "RDS address"
-  value       = "${module.stellar_core_rds.this_db_instance_address}"
+  value       = "${module.rds.this_db_instance_address}"
 }

@@ -1,9 +1,10 @@
 {%for node in stellar.nodes%}
 
-{%set module_name = 'stellar-core-{}-{}'.format(stellar.network_name, node.zone)%}
+{%set module_name_suffix = '{}_{}'.format(stellar.network_name, node.zone)%}
+{%set module_name = 'stellar_node_{}'.format(module_name_suffix)%}
 
 module "{{module_name}}" {
-  source = "modules/stellar-core"
+  source = "modules/stellar-node"
   providers = {
     "aws" = "aws.{{node.region}}"
   }
@@ -18,34 +19,34 @@ module "{{module_name}}" {
   rds_password         = "{{env_vars['RDS_PASSWORD']}}"
 }
 
-output "route53-{{module_name}}" {
+output "route53_stellar_core_{{module_name_suffix}}" {
   description = "Route53 FQDN name assigned to the EC2 instance"
-  value       = "${module.{{module_name}}.route53}"
+  value       = "${module.{{module_name}}.route53_stellar_core}"
 }
 
-output "s3-{{module_name}}" {
+output "s3_bucket_stellar_core_{{module_name_suffix}}" {
   description = "S3 bucket name"
-  value       = "${module.{{module_name}}.s3}"
+  value       = "${module.{{module_name}}.s3_bucket_stellar_core}"
 }
 
-output "rds-{{module_name}}" {
+output "rds_stellar_core_{{module_name_suffix}}" {
   description = "RDS address"
-  value       = "${module.{{module_name}}.rds}"
+  value       = "${module.{{module_name}}.rds_stellar_core}"
 }
 
-output "horizon_route53-{{module_name}}" {
+output "route53_horizon_{{module_name_suffix}}" {
   description = "Route53 FQDN name assigned to the EC2 instance"
-  value       = "${module.{{module_name}}.horizon_route53}"
+  value       = "${module.{{module_name}}.route53_horizon}"
 }
 
-output "horizon_ec2-{{module_name}}" {
+output "ec2_horizon_{{module_name_suffix}}" {
   description = "EC2 public DNS name"
-  value       = "${module.{{module_name}}.horizon_ec2}"
+  value       = "${module.{{module_name}}.ec2_horizon}"
 }
 
-output "horizon_rds-{{module_name}}" {
+output "rds_horizon_{{module_name_suffix}}" {
   description = "RDS address"
-  value       = "${module.{{module_name}}.horizon_rds}"
+  value       = "${module.{{module_name}}.rds_horizon}"
 }
 
 {%endfor%}
@@ -71,7 +72,7 @@ resource "aws_key_pair" "{{region}}" {
 
 locals {
   # ssh key to create for accessing ec2 instances
-  ssh_public_key_name = "stellar-core-{{stellar.network_name}}"
+  ssh_public_key_name = "stellar-{{stellar.network_name}}"
 }
 
 {#

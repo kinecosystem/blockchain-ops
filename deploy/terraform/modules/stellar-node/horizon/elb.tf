@@ -1,8 +1,8 @@
-resource "aws_elb" "horizon" {
-  name            = "${local.horizon_elb_name}"
-  instances       = ["${module.horizon_ec2.id[0]}"]
+resource "aws_elb" "this" {
+  name            = "${var.elb_name}"
+  instances       = ["${module.ec2.id[0]}"]
   subnets         = ["${data.aws_subnet.default.id}"]
-  security_groups = ["${module.horizon_elb_security_group.this_security_group_id}"]
+  security_groups = ["${module.elb_security_group.this_security_group_id}"]
 
   listener = [
     {
@@ -29,9 +29,9 @@ resource "aws_elb" "horizon" {
   }
 }
 
-module "horizon_elb_security_group" {
+module "elb_security_group" {
   source              = "terraform-aws-modules/security-group/aws"
-  name                = "${local.horizon_name}-elb"
+  name                = "${var.name}-elb"
   description         = "Horizon required ports: PostgreSQL, HTTP/S"
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["0.0.0.0/0"]

@@ -1,9 +1,9 @@
-module "stellar_core_ec2" {
+module "ec2" {
   source = "terraform-aws-modules/ec2-instance/aws"
 
-  name                   = "${local.stellar_core_name}"
+  name                   = "${var.name}"
   key_name               = "${var.ssh_public_key_name}"
-  vpc_security_group_ids = ["${module.stellar_core_ec2_security_group.this_security_group_id}"]
+  vpc_security_group_ids = ["${module.ec2_security_group.this_security_group_id}"]
   subnet_id              = "${data.aws_subnet.default.id}"
   ami                    = "${data.aws_ami.ubuntu.id}"
   instance_type          = "${var.instance_type}"
@@ -21,20 +21,20 @@ module "stellar_core_ec2" {
   ]
 
   tags = {
-    Name = "${local.stellar_core_name}"
+    Name = "${var.name}"
     Type = "stellar-core"
   }
 }
 
 resource "aws_eip" "this" {
   vpc      = true
-  instance = "${module.stellar_core_ec2.id[0]}"
+  instance = "${module.ec2.id[0]}"
 }
 
-module "stellar_core_ec2_security_group" {
+module "ec2_security_group" {
   source = "terraform-aws-modules/security-group/aws"
 
-  name        = "${local.stellar_core_name}-common"
+  name        = "${var.name}-common"
   description = "Stellar Core required ports: stellar-core P2P, PostgreSQL, HTTP/S"
 
   vpc_id              = "${data.aws_vpc.default.id}"

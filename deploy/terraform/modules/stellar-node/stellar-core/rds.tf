@@ -1,14 +1,14 @@
-module "stellar_core_rds" {
+module "rds" {
   source = "terraform-aws-modules/rds/aws"
 
-  identifier = "${local.stellar_core_name}"
+  identifier = "${var.name}"
 
   engine               = "postgres"
   engine_version       = "9.6.6"
   parameter_group_name = "default.postgres9.6"
   option_group_name    = "default:postgres-9-6"
 
-  vpc_security_group_ids = ["${module.stellar_core_rds_security_group.this_security_group_id}"]
+  vpc_security_group_ids = ["${module.rds_security_group.this_security_group_id}"]
 
   subnet_ids             = ["${data.aws_subnet.default.id}"]
   availability_zone      = "${data.aws_subnet.default.availability_zone}"
@@ -33,10 +33,10 @@ module "stellar_core_rds" {
   }
 }
 
-module "stellar_core_rds_security_group" {
+module "rds_security_group" {
   source = "terraform-aws-modules/security-group/aws"
 
-  name                = "${local.stellar_core_name}-rds"
+  name                = "${var.name}-rds"
   description         = "RDS access for all instances in the VPC"
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["${data.aws_vpc.default.cidr_block}"]
