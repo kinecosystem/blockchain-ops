@@ -5,7 +5,7 @@ stellar:
   network_name: terraform-test
   instance_type: t2.medium  # ec2 instance type to use
   tld: mydomain.com  # route53 top level domain
-  nodes:  # TODO support more than one node in an availability zone
+  nodes:
     - region: us-east-1
       zone: us-east-1a
 
