@@ -1,7 +1,11 @@
 ---
 stellar:
   # unique name for the stellar network, used for naming aws resources.
+  #
   # NOTE this is NOT the stellar network passphrase!
+  #
+  # NOTE try to keep the network name short as some aws resource have a name
+  # length limit e.g. elb name length must be less than 32 characters
   network_name: terraform-test
   instance_type: t2.medium  # ec2 instance type to use
   tld: mydomain.com  # route53 top level domain
