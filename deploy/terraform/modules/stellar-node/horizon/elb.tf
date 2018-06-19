@@ -1,6 +1,6 @@
 resource "aws_elb" "this" {
   name            = "${var.name}"
-  instances       = ["${module.ec2.id[0]}"]
+  instances       = ["${aws_instance.this.id}"]
   subnets         = ["${data.aws_subnet.default.id}"]
   security_groups = ["${module.elb_security_group.this_security_group_id}"]
 

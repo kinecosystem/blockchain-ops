@@ -1,15 +1,10 @@
-module "ec2" {
-  source = "terraform-aws-modules/ec2-instance/aws"
-
-  name                   = "${var.name}"
-  key_name               = "${var.ssh_public_key_name}"
-  vpc_security_group_ids = ["${module.ec2_security_group.this_security_group_id}"]
-  subnet_id              = "${data.aws_subnet.default.id}"
-  ami                    = "${data.aws_ami.ubuntu.id}"
-  instance_type          = "${var.instance_type}"
-
-  iam_instance_profile = "${aws_iam_instance_profile.this.id}"
-
+resource "aws_instance" "this" {
+  key_name                    = "${var.ssh_public_key_name}"
+  vpc_security_group_ids      = ["${module.ec2_security_group.this_security_group_id}"]
+  subnet_id                   = "${data.aws_subnet.default.id}"
+  ami                         = "${data.aws_ami.ubuntu.id}"
+  instance_type               = "${var.instance_type}"
+  iam_instance_profile        = "${aws_iam_instance_profile.this.id}"
   associate_public_ip_address = true
   disable_api_termination     = false
 
@@ -20,7 +15,16 @@ module "ec2" {
     },
   ]
 
+  lifecycle {
+    ignore_changes = ["private_ip", "root_block_device"]
+  }
+
   tags = {
+    Name = "${var.name}"
+    Type = "stellar-core"
+  }
+
+  volume_tags = {
     Name = "${var.name}"
     Type = "stellar-core"
   }
@@ -28,7 +32,12 @@ module "ec2" {
 
 resource "aws_eip" "this" {
   vpc      = true
-  instance = "${module.ec2.id[0]}"
+  instance = "${aws_instance.this.id}"
+
+  tags = {
+    Name = "${var.name}"
+    Type = "stellar-core"
+  }
 }
 
 module "ec2_security_group" {

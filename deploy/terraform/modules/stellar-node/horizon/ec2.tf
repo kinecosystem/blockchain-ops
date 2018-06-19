@@ -1,8 +1,6 @@
-module "ec2" {
-  source                  = "terraform-aws-modules/ec2-instance/aws"
-  name                    = "${var.name}"
+resource "aws_instance" "this" {
   key_name                = "${var.ssh_public_key_name}"
-  vpc_security_group_ids  = ["${module.security_group.this_security_group_id}"]
+  vpc_security_group_ids  = ["${module.ec2_security_group.this_security_group_id}"]
   subnet_id               = "${data.aws_subnet.default.id}"
   ami                     = "${data.aws_ami.ubuntu.id}"
   instance_type           = "${var.instance_type}"
@@ -17,13 +15,22 @@ module "ec2" {
     },
   ]
 
+  lifecycle {
+    ignore_changes = ["private_ip", "root_block_device"]
+  }
+
   tags = {
+    Name = "${var.name}"
+    Type = "horizon"
+  }
+
+  volume_tags = {
     Name = "${var.name}"
     Type = "horizon"
   }
 }
 
-module "security_group" {
+module "ec2_security_group" {
   source              = "terraform-aws-modules/security-group/aws"
   name                = "${var.name}"
   description         = "Horizon required ports: PostgreSQL, HTTP/S"
@@ -46,7 +53,7 @@ module "security_group" {
 
 output "ec2" {
   description = "EC2 public DNS name"
-  value       = "${module.ec2.public_dns[0]}"
+  value       = "${aws_instance.this.public_dns}"
 }
 
 # data sources to get vpc, subnet, ami, route53 details

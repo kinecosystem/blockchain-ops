@@ -1,7 +1,7 @@
 resource "aws_route53_record" "this" {
   zone_id = "${data.aws_route53_zone.kin.zone_id}"
   name    = "${var.name}.${var.tld}"
-  records = ["${module.ec2.public_dns[0]}"]
+  records = ["${aws_instance.this.public_dns}"]
   type    = "CNAME"
   ttl     = "300"
 }
