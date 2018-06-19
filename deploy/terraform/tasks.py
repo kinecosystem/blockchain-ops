@@ -29,10 +29,7 @@ MAIN_TF_FILE = 'stellar-network.tf'
 
 
 @task
-def template(c,
-             template_file=f'{MAIN_TF_FILE}.j2',
-             vars_file='vars.yml',
-             out_file=MAIN_TF_FILE):
+def template(c, vars_file='vars.yml'):
     """Process Terraform file taht require templating.
 
     Terraform and HCL has limitations that can be easily solved using template
@@ -41,20 +38,29 @@ def template(c,
     For example, avoiding redundancy when calling a module multiple times with
     just a single different variable value every time.
     """
-    print('generating terraform file from template')
+    print('generating terraform files from templates')
 
     with open(vars_file) as f:
         variables = yaml.load(f)
 
-    with open(template_file) as f:
-        tmplate = jinja2.Template(f.read())
+    for root, dir, files in os.walk("."):
+        for file in files:
+            stripped_file, ext = os.path.splitext(file)
 
-    out = tmplate.render(variables, env_vars=os.environ)
+            if ext != '.j2':
+                continue
 
-    with open(out_file, 'w') as f:
-        f.write(out)
+            out_file = f'{root}/{stripped_file}'
+            print(f'processing file {root}/{file} into {out_file}')
 
-    c.run(f'./terraform fmt {out_file}')
+            with open(f'{root}/{file}') as f:
+                tmplate = jinja2.Template(f.read())
+
+            out = tmplate.render(variables, env_vars=os.environ)
+            with open(out_file, 'w') as f:
+                f.write(out)
+
+        c.run(f'./terraform fmt {out_file}')
 
 
 @task(template)
