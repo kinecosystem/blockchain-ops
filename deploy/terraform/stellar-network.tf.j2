@@ -23,11 +23,6 @@ output "route53-{{module_name}}" {
   value       = "${module.{{module_name}}.route53}"
 }
 
-output "instance_tags-{{module_name}}" {
-  description = "List of tags"
-  value       = "${module.{{module_name}}.instance_tags}"
-}
-
 output "s3-{{module_name}}" {
   description = "S3 bucket name"
   value       = "${module.{{module_name}}.s3}"
