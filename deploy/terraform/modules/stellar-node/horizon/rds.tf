@@ -12,7 +12,7 @@ module "rds" {
   instance_class          = "db.t2.medium"
   storage_type            = "standard"                                              # magnetic
   allocated_storage       = 100
-  name                    = "core"
+  name                    = "horizon"
   username                = "stellar"
   password                = "${var.rds_password}"
   port                    = "5432"
