@@ -42,3 +42,8 @@ module "rds_security_group" {
   ingress_cidr_blocks = ["${data.aws_vpc.default.cidr_block}"]
   ingress_rules       = ["postgresql-tcp"]
 }
+
+output "rds" {
+  description = "RDS address"
+  value       = "${module.rds.this_db_instance_address}"
+}
