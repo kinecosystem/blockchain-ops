@@ -43,6 +43,11 @@ output "horizon_ec2-{{module_name}}" {
   value       = "${module.{{module_name}}.horizon_ec2}"
 }
 
+output "horizon_rds-{{module_name}}" {
+  description = "RDS address"
+  value       = "${module.{{module_name}}.horizon_rds}"
+}
+
 {%endfor%}
 
 {# define one provider + create one ssh key per region #}

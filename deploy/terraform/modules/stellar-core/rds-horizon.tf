@@ -34,3 +34,8 @@ module "horizon_rds_security_group" {
   ingress_cidr_blocks = ["${data.aws_vpc.default.cidr_block}"]
   ingress_rules       = ["postgresql-tcp"]
 }
+
+output "horizon_rds" {
+  description = "RDS address"
+  value       = "${module.horizon_rds.this_db_instance_address}"
+}
