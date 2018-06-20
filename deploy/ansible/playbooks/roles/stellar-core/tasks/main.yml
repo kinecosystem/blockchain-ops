@@ -17,7 +17,17 @@
     dest: /opt/stellar-core/docker-compose.yml
     mode: 0644
 
-- name: start stellar-core
+- name: pull docker image
   docker_service:
     project_src: /opt/stellar-core
+    state: absent
     pull: yes
+
+- name: initialize scp, databsae, and history archive
+  command: docker-compose run --rm stellar-core --forcescp --newdb --newhist my-bucket
+  args:
+    chdir: /opt/stellar-core
+
+- name: start stellar-core
+  docker_service:
+    project_src: /opt/stellar-coore
