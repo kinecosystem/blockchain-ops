@@ -17,6 +17,7 @@ TARGET_PEER_CONNECTIONS={{other_nodes|length}}
 KNOWN_PEERS=[
 {% for node in other_nodes %}
  "{{node.host}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
@@ -38,6 +39,7 @@ NODE_IS_VALIDATOR=false
 NODE_NAMES=[
 {% for node in other_nodes %}
  "{{node.address}}  {{node.name}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
@@ -49,6 +51,7 @@ VALIDATORS=[
 
 {% for node in other_nodes %}
  "${{node.name}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
