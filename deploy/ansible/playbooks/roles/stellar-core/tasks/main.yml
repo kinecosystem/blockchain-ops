@@ -30,4 +30,4 @@
 
 - name: start stellar-core
   docker_service:
-    project_src: /opt/stellar-coore
+    project_src: /opt/stellar-core
