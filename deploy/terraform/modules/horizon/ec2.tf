@@ -50,7 +50,7 @@ module "ec2_security_group" {
   description         = "Horizon required ports: PostgreSQL, HTTP/S"
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["ssh-tcp"]
+  ingress_rules       = ["ssh-tcp", "http-80-tcp"]
   egress_cidr_blocks  = ["0.0.0.0/0"]
   egress_rules        = ["postgresql-tcp", "http-80-tcp", "https-443-tcp"]
 
