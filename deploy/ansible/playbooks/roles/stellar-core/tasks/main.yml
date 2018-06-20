@@ -23,8 +23,18 @@
     state: absent
     pull: yes
 
-- name: initialize scp, databsae, and history archive
-  command: docker-compose run --rm stellar-core --forcescp --newdb --newhist my-bucket
+- name: initialize database
+  command: docker-compose run --rm stellar-core --newdb
+  args:
+    chdir: /opt/stellar-core
+
+- name: initialize scp
+  command: docker-compose run --rm stellar-core --forcescp
+  args:
+    chdir: /opt/stellar-core
+
+- name: initialize history archive
+  command: docker-compose run --rm stellar-core --newhist my-bucket
   args:
     chdir: /opt/stellar-core
 
