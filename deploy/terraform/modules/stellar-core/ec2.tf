@@ -71,7 +71,14 @@ module "ec2_security_group" {
       from_port   = 11625
       to_port     = 11625
       protocol    = "tcp"
-      description = "Stellar Core P2P IPv4"
+      description = "Stellar Core P2P"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
+      from_port   = 11626
+      to_port     = 11626
+      protocol    = "tcp"
+      description = "Stellar Core Control"
       cidr_blocks = "0.0.0.0/0"
     },
   ]
@@ -81,7 +88,7 @@ module "ec2_security_group" {
       from_port   = 11625
       to_port     = 11625
       protocol    = "tcp"
-      description = "Stellar Core P2P IPv4"
+      description = "Stellar Core P2P"
       cidr_blocks = "0.0.0.0/0"
     },
     {

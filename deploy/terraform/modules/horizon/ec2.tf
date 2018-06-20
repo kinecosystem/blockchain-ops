@@ -56,6 +56,13 @@ module "ec2_security_group" {
 
   egress_with_cidr_blocks = [
     {
+      from_port   = 11626
+      to_port     = 11626
+      protocol    = "tcp"
+      description = "Stellar Core control"
+      cidr_blocks = "0.0.0.0/0"
+    },
+    {
       from_port   = 10516
       to_port     = 10516
       protocol    = "tcp"
