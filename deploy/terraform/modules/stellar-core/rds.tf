@@ -28,8 +28,8 @@ module "rds" {
   backup_window           = "03:00-06:00"
 
   tags = {
-    Type    = "stellar-core"
-    network = "${var.stellar_network_name}"
+    Type            = "stellar-core"
+    stellar-network = "${var.stellar_network_name}"
   }
 }
 

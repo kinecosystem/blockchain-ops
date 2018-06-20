@@ -27,6 +27,10 @@ resource "aws_elb" "this" {
     unhealthy_threshold = 2
     timeout             = 5
   }
+
+  tags = {
+    stellar-network = "${var.stellar_network_name}"
+  }
 }
 
 module "elb_security_group" {

@@ -20,13 +20,15 @@ resource "aws_instance" "this" {
   }
 
   tags = {
-    Name = "${var.name}"
-    Type = "stellar-core"
+    Name            = "${var.name}"
+    Type            = "stellar-core"
+    stellar-network = "${var.stellar_network_name}"
   }
 
   volume_tags = {
-    Name = "${var.name}"
-    Type = "stellar-core"
+    Name            = "${var.name}"
+    Type            = "stellar-core"
+    stellar-network = "${var.stellar_network_name}"
   }
 
   # ansible requirement
