@@ -54,7 +54,7 @@ def template(c, vars_file='vars.yml'):
             print(f'processing file {root}/{file} into {out_file}')
 
             with open(f'{root}/{file}') as f:
-                tmplate = jinja2.Template(f.read())
+                tmplate = jinja2.Template(f.read(), extensions=['jinja2.ext.do'])
 
             out = tmplate.render(variables, env_vars=os.environ)
             with open(out_file, 'w') as f:
