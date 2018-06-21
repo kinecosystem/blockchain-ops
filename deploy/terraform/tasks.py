@@ -71,27 +71,51 @@ def init(c):
 
 
 @task(init)
+def new_workspace(c, vars_file='vars.yml'):
+    """Set terraform workspace."""
+    print('setting workspace')
+
+    with open(vars_file) as f:
+        variables = yaml.load(f)
+
+    workspace = variables['stellar']['network_name']
+    c.run(f'./terraform workspace new {workspace}')
+
+
+@task(init)
+def workspace(c, vars_file='vars.yml'):
+    """Set terraform workspace."""
+    print('setting workspace')
+
+    with open(vars_file) as f:
+        variables = yaml.load(f)
+
+    workspace = variables['stellar']['network_name']
+    c.run(f'./terraform workspace select {workspace}')
+
+
+@task(workspace)
 def modules(c):
     """Call terraform get."""
     print('getting modules')
     c.run('./terraform get')
 
 
-@task(modules, template)
+@task(modules)
 def plan(c, destroy=False):
     """Call terraform plan."""
     print('planning')
     c.run('./terraform plan {}'.format('-destroy' if destroy else ''))
 
 
-@task(modules, template)
+@task(modules)
 def apply(c, yes=False):
     """Call terraform destroy."""
     print('applying')
     c.run('./terraform apply {}'.format('-auto-approve' if yes else ''))
 
 
-@task(modules, template)
+@task(modules)
 def destroy(c, yes=False):
     """Call terraform destroy."""
     print('destroying')
