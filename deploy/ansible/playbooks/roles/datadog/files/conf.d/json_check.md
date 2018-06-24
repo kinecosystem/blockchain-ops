@@ -1,31 +1,41 @@
 # json_check
-A custom datadog-agent check that gets a json response from a given URL, and extract a specific metric from it based on a given json path
 
-## Installation
+A custom datadog-agent check that gets a json response from a given URL,
+and extracts a specific metric from it based on a given JSON path.
 
-To use the json_check check, you will need to install the "jsonpath-rw" package
-Remember the datadog-agent uses his own copy of python and pip so use them
+## Install
+
+To use the `json_check` check, you will need to install the "jsonpath-rw" Python package.
+
+NOTE datadog-agent uses his own copies of python and pip.
 
 ```bash
-/opt/datadog-agent/embedded/bin/pip install jsonpath-rw
+$ /opt/datadog-agent/embedded/bin/pip install jsonpath-rw
 ```
 
-## Configurations:
-Edit the json_check.yaml file to configure the check
+## Configurations
 
-* ```default_timout``` - how long to wait for the GET request to complete
-* ```url``` - the URL to send the request to
-* ```metrics``` - the name of the metric to send, and the json path it should be in. [Syntax for json path](https://github.com/kennknowles/python-jsonpath-rw#jsonpath-syntax)
+Edit `json_check.yaml`:
 
-## Events:
-The check will send events in case of a failure
-* "request timeout" - in the event of a timeout
-* "Invalid status code for URL" - for any status code other than 200
-* "no matching value" - when no value was found for the given json path
-* "unexpected match" - when the value found is not a number
+- default_timout: how long to wait for the GET request to complete
+- url: the URL to send the request to
+- metrics: the name of the metrics to send to datadog,
+and the JSON path the metric value should be fetched from.
+See [Syntax for JSON path](https://github.com/kennknowles/python-jsonpath-rw#jsonpath-syntax) for additional information.
+
+## Events
+
+The check will send the following events in case of a failure:
+
+- Request timeout: In the event of a timeout.
+- Invalid status code for URL: For any status code other than HTTP 200.
+- No matching value: When no value was found for the given JSON path.
+- Unexpected match: When the value found is not a number.
 
 ## Example
+
 Get the price of BTC and ETH
+
 ```yaml
 init_config:
     default_timeout: 5
