@@ -45,6 +45,11 @@ module "elb_security_group" {
   egress_rules        = ["http-80-tcp"]
 }
 
+output "elb" {
+  description = "ELB DNS name"
+  value       = "${aws_elb.this.dns_name}"
+}
+
 data "aws_acm_certificate" "kininfrastructure" {
   domain   = "*.kininfrastructure.com"
   statuses = ["ISSUED"]
