@@ -1,0 +1,167 @@
+provider "aws" {
+  alias = "backend-us-east-1"
+
+  access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
+  secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
+  region     = "{{stellar.nodes|map(attribute="region")|first}}"
+}
+
+terraform {
+  provider = "aws.backend-us-east-1"
+
+  backend "s3" {
+    bucket = "terraform-state-stellar"
+    key    = "terraform.tfstate"
+    region = "us-east-1" # consistent across all workspaces
+
+    encrypt = true
+  }
+}
+
+{%set horizon_modules = [] %}
+
+{%for node in stellar.nodes%}
+
+{%set module_name_suffix = '{}_{}'.format(stellar.network_name, node.zone)%}
+{%set stellar_core_module = 'stellar_core_{}'.format(module_name_suffix)%}
+{%set horizon_module = 'horizon_{}'.format(module_name_suffix)%}
+
+module "{{stellar_core_module}}" {
+  source = "modules/stellar-core"
+  providers = {
+    "aws" = "aws.{{node.region}}"
+  }
+
+  name = "${local.{{stellar_core_module}}_name}"
+
+  instance_key_pair_name = "${aws_key_pair.{{node.region}}.key_name}"
+  ssh_private_key = "{{stellar.ssh.private_key}}"
+
+  stellar_network_name = "{{stellar.network_name}}"
+  tld                  = "{{stellar.tld}}"
+  zone                 = "{{node.zone}}"
+  instance_type        = "{{stellar.instance_type}}"
+
+  rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+}
+
+locals {
+  # used to name ec2 and rds instances, security groups, etc.
+  {{stellar_core_module}}_name = "stellar-core-{{stellar.network_name}}-${random_id.{{stellar_core_module}}_name_suffix.hex}"
+}
+
+resource "random_id" "{{stellar_core_module}}_name_suffix" {
+  byte_length = 2
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+output "route53_{{stellar_core_module}}" {
+  description = "Route53 FQDN name assigned to the EC2 instance"
+  value       = "${module.{{stellar_core_module}}.route53}"
+}
+
+output "s3_bucket_{{stellar_core_module}}" {
+  description = "S3 bucket name"
+  value       = "${module.{{stellar_core_module}}.s3}"
+}
+
+output "rds_{{stellar_core_module}}" {
+  description = "RDS address"
+  value       = "${module.{{stellar_core_module}}.rds}"
+}
+
+{%if node.horizon%}
+
+{%do horizon_modules.append({"name": horizon_module, "region": node.region})%}
+
+module "{{horizon_module}}" {
+  source = "modules/horizon"
+  providers = {
+    "aws" = "aws.{{node.region}}"
+  }
+
+  name = "${local.{{horizon_module}}_name}"
+
+  instance_key_pair_name = "${aws_key_pair.{{node.region}}.key_name}"
+  ssh_private_key = "{{stellar.ssh.private_key}}"
+
+  stellar_network_name = "{{stellar.network_name}}"
+  tld                  = "{{stellar.tld}}"
+  zone                 = "{{node.zone}}"
+  instance_type        = "{{stellar.instance_type}}"
+
+  rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+}
+
+locals {
+  {{horizon_module}}_name = "horizon-{{stellar.network_name}}-${random_id.{{stellar_core_module}}_name_suffix.hex}"
+}
+
+output "route53_{{horizon_module}}" {
+  description = "Route53 FQDN name assigned to the EC2 instance"
+  value       = "${module.{{horizon_module}}.route53}"
+}
+
+output "ec2_horizon_{{horizon_module}}" {
+  description = "EC2 public DNS name"
+  value       = "${module.{{horizon_module}}.ec2}"
+}
+
+output "rds_horizon_{{horizon_module}}" {
+  description = "RDS address"
+  value       = "${module.{{horizon_module}}.rds}"
+}
+{%endif%}
+
+{%endfor%}
+
+{%for module in horizon_modules%}
+resource "aws_route53_record" "horizon-{{module.name}}" {
+  provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
+
+  zone_id = "${data.aws_route53_zone.kin.zone_id}"
+  name    = "horizon-{{stellar.network_name}}.{{stellar.tld}}"
+  records = [
+    "${module.{{module.name}}.elb}"
+  ]
+  type    = "CNAME"
+  ttl     = "300"
+
+  set_identifier = "{{module.name}}"
+  latency_routing_policy = {
+    region = "{{module.region}}"
+  }
+}
+{%endfor%}
+
+data "aws_route53_zone" "kin" {
+  provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
+
+  name = "kininfrastructure.com."
+}
+
+{# define one provider + create one ssh key per region #}
+{%for region in stellar.nodes|map(attribute="region")|unique%}
+provider "aws" {
+  alias = "{{region}}"
+
+  access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
+  secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
+  region     = "{{region}}"
+}
+
+# ssh key to create for accessing ec2 instances
+resource "aws_key_pair" "{{region}}" {
+  provider = "aws.{{region}}"
+
+  key_name   = "stellar-{{stellar.network_name}}"
+  public_key = "${file("{{stellar.ssh.public_key}}")}"
+}
+{%endfor%}
+
+{#
+# vi: ft=terraform.jinja2
+#}

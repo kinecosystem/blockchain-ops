@@ -1,0 +1,8 @@
+.terraform/
+/terraform
+.terraform.*
+
+*.tfstate
+*.tfstate.backup
+
+/stellar-network.tf

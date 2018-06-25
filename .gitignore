@@ -1,10 +1,7 @@
 /image/stellar-core-1/opt/stellar-core/stellar-core.*.log
 /image/stellar-core-2/opt/stellar-core/stellar-core.*.log
-
 /image/stellar-core-1/opt/stellar-core/buckets/
 /image/stellar-core-2/opt/stellar-core/buckets/
-
 /image/stellar-core-1/tmp/stellar-core/
 /image/stellar-core-2/tmp/stellar-core/
-
 /image/friendbot/opt/friendbot/friendbot.cfg
