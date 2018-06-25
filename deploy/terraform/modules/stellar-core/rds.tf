@@ -28,7 +28,7 @@ module "rds" {
   backup_window           = "03:00-06:00"
 
   tags = {
-    Type            = "stellar-core"
+    type            = "stellar-core"
     stellar-network = "${var.stellar_network_name}"
   }
 }

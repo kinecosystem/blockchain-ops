@@ -29,6 +29,7 @@ resource "aws_elb" "this" {
   }
 
   tags = {
+    type            = "horizon"
     stellar-network = "${var.stellar_network_name}"
   }
 }

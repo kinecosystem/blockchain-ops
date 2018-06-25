@@ -21,13 +21,13 @@ resource "aws_instance" "this" {
 
   tags = {
     Name            = "${var.name}"
-    Type            = "horizon"
+    type            = "horizon"
     stellar-network = "${var.stellar_network_name}"
   }
 
   volume_tags = {
     Name            = "${var.name}"
-    Type            = "horizon"
+    type            = "horizon"
     stellar-network = "${var.stellar_network_name}"
   }
 
