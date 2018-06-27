@@ -26,7 +26,7 @@ def check_core():
     # Check if the stellar core is synced
     global health
     try:
-        r = requests.get(config.CORE_INFO_URL)
+        r = requests.get(config.CORE_INFO_URL, timeout=config.REQUEST_TIMEOUT)
         r.raise_for_status()
 
         health = (r.json()['info']['state'] == 'Synced!')
@@ -42,7 +42,7 @@ def check_horizon():
     # Check if the ratio of failed/total requests is < 0.1
     global health
     try:
-        r = requests.get(config.HORIZON_METRICS_URL)
+        r = requests.get(config.HORIZON_METRICS_URL, timeout=config.REQUEST_TIMEOUT)
         r.raise_for_status()
 
         data = r.json()
@@ -67,7 +67,7 @@ def make_reply(msg, code):
         'status': 'Healthy' if code == 200 else 'Unhealthy',
         'description': msg,
         'start_timestamp': start_timestamp,
-        'build': config.BUILD_VER
+        'build': config.BUILD_VERSION
     }
 
     return json.dumps(reply), code
