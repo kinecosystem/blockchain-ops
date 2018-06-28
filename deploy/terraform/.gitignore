@@ -2,6 +2,9 @@
 /terraform
 .terraform.*
 
+*.pem
+*.pem.pub
+
 *.tfstate
 *.tfstate.backup
 
