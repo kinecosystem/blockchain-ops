@@ -114,10 +114,11 @@ output "rds_horizon_{{horizon_module}}" {
 {%endfor%}
 
 {%for module in horizon_modules%}
-resource "aws_route53_record" "horizon-{{module.name}}" {
+resource "aws_route53_record" "{{module.name}}" {
   provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
 
   zone_id = "${data.aws_route53_zone.kin.zone_id}"
+
   name    = "horizon-{{stellar.network_name}}.{{stellar.tld}}"
   type    = "CNAME"
   ttl     = "300"
