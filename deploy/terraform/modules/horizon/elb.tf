@@ -1,8 +1,9 @@
 resource "aws_elb" "this" {
-  name            = "${var.name}"
-  instances       = ["${aws_instance.this.id}"]
-  subnets         = ["${data.aws_subnet.default.id}"]
-  security_groups = ["${module.elb_security_group.this_security_group_id}"]
+  name                      = "${var.name}"
+  instances                 = ["${aws_instance.this.id}"]
+  subnets                   = ["${data.aws_subnet.default.id}"]
+  security_groups           = ["${module.elb_security_group.this_security_group_id}"]
+  cross_zone_load_balancing = false
 
   listener = [
     {
