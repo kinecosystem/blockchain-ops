@@ -119,15 +119,37 @@ resource "aws_route53_record" "horizon-{{module.name}}" {
 
   zone_id = "${data.aws_route53_zone.kin.zone_id}"
   name    = "horizon-{{stellar.network_name}}.{{stellar.tld}}"
+  type    = "CNAME"
+  ttl     = "300"
+
   records = [
     "${module.{{module.name}}.elb}"
   ]
-  type    = "CNAME"
-  ttl     = "300"
+
+  health_check_id = "${aws_route53_health_check.{{module.name}}.id}"
 
   set_identifier = "{{module.name}}"
   latency_routing_policy = {
     region = "{{module.region}}"
+  }
+}
+
+resource "aws_route53_health_check" "{{module.name}}" {
+  provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
+
+  fqdn              = "${module.{{module.name}}.elb}"
+  type              = "HTTP"
+  port              = 80
+  resource_path     = "/"
+  # port              = 8000
+  # resource_path     = "/status"
+  failure_threshold = "1"
+  request_interval  = "30"
+
+  tags = {
+    Name = "${local.{{module.name}}_name}"
+    type = "horizon"
+    stellar-network = "{{stellar.network_name}}"
   }
 }
 {%endfor%}
