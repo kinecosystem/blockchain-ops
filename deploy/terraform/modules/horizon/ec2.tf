@@ -54,6 +54,16 @@ module "ec2_security_group" {
   egress_cidr_blocks  = ["0.0.0.0/0"]
   egress_rules        = ["postgresql-tcp", "http-80-tcp", "https-443-tcp"]
 
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 8000
+      to_port     = 8000
+      protocol    = "tcp"
+      description = "ELB Horizon health check"
+      cidr_blocks = "0.0.0.0/0"
+    },
+  ]
+
   egress_with_cidr_blocks = [
     {
       from_port   = 11626

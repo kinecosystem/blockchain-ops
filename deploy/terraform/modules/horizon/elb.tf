@@ -43,6 +43,16 @@ module "elb_security_group" {
   ingress_rules       = ["http-80-tcp", "https-443-tcp"]
   egress_cidr_blocks  = ["0.0.0.0/0"]
   egress_rules        = ["http-80-tcp"]
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 8000
+      to_port     = 8000
+      protocol    = "tcp"
+      description = "Horizon health check"
+      cidr_blocks = "0.0.0.0/0"
+    },
+  ]
 }
 
 output "elb" {
