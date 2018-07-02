@@ -8,4 +8,4 @@
 *.tfstate
 *.tfstate.backup
 
-/stellar-network.tf
+/*.tf

@@ -1,0 +1,16 @@
+terraform {
+  provider = "aws.backend-us-east-1"
+
+  backend "s3" {
+    bucket = "terraform-state-stellar"
+    key    = "terraform.tfstate"
+    region = "us-east-1" # consistent across all workspaces
+
+    encrypt = true
+  }
+}
+
+
+{#
+# vi: ft=terraform.jinja2
+#}
