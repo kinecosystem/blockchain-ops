@@ -1,10 +1,18 @@
+provider "aws" {
+  alias = "backend-us-east-1"
+
+  access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
+  secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
+  region     = "us-east-1"  # consistent across all workspaces
+}
+
 terraform {
   provider = "aws.backend-us-east-1"
 
   backend "s3" {
     bucket = "terraform-state-stellar"
     key    = "terraform.tfstate"
-    region = "us-east-1" # consistent across all workspaces
+    region = "us-east-1"  # consistent across all workspaces
 
     encrypt = true
   }
