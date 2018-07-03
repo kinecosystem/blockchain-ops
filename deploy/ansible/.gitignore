@@ -1,3 +1,6 @@
 /ansible-playbook.log
 /playbooks/*.retry
 /playbooks/galaxy
+
+*.pem
+*.pem.pub
