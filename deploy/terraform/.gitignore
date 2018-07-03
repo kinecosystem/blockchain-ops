@@ -9,3 +9,4 @@
 *.tfstate.backup
 
 /*.tf
+/vars.yml
