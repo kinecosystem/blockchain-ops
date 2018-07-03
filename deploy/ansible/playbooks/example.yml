@@ -1,0 +1,23 @@
+---
+# deploy stellar-core and horizon
+
+- hosts: example-stellar-core
+  roles:
+    - sync-clock
+    - apt-get-update
+    - common-packages
+    - awscli
+    - docker
+
+    - datadog-stellar-core
+    - stellar-core
+
+- hosts: example-horizon
+  roles:
+    - sync-clock
+    - apt-get-update
+    - common-packages
+    - docker
+
+    - datadog-horizon
+    - horizon

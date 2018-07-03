@@ -1,5 +1,8 @@
+---
 horizon:
-  network_passphrase: xxx
+  network:
+    name: my-network
+    passphrase: xxx
 
   nodes:
     - name: local
