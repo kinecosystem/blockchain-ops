@@ -1,0 +1,57 @@
+---
+dependencies:
+  - role: Datadog.datadog
+    datadog_api_key: "{{datadog.api_key}}"
+    datadog_agent_version: '1:6.3.0-1'
+
+    datadog_config:
+      tags:
+        - app:horizon
+        - env:prod
+        - stellar-network:{{horizon.network.name}}
+      collect_ec2_tags: true
+      use_dogstatsd: no
+      logs_enabled: true
+
+    datadog_checks:
+
+      ntp:
+        init_config:
+
+        instances:
+          - offset_threshold: 60
+            host: 169.254.169.123  # amazon ntp
+
+      docker:
+        logs:
+          - type: docker
+            name: horizon
+            service: horizon
+
+      json_check:
+        init_config:
+          default_timeout: 5
+
+        instances:
+          - url: http://localhost:80/metrics
+            metrics:
+              # Metrics that include "5m.rate" report the 5 minute moving avg per second of this metric
+
+              - horizon.goroutines: goroutines.value                                 # goroutines used by the horizon app
+              - horizon.elder_ledger: '"history.elder_ledger".value'                 # oldest ledger in the horizon db
+              - horizon.latest_ledger: '"history.latest_ledger".value'               # newest ledger in the horizon db
+              - horizon.open_connections: '"history.open_connections".value'         # open connections to the horizon database
+              - horizon.logging_error: '"logging.error"."5m.rate"'                   # error logs
+              - horizon.logging_panic: '"logging.panic"."5m.rate"'                   # panic logs
+              - horizon.logging_warning: '"logging.warning"."5m.rate"'               # warning logs
+              - horizon.requests_failed: '"requests.failed"."5m.rate"'               # failed requests to horizon (400<= status code < 600)
+              - horizon.requests_succeeded: '"requests.succeeded"."5m.rate"'         # successful requests to horizon (200<= status code < 400)
+              - horizon.requests_total: '"requests.total"."5m.rate"'                 # total requests to this horizon
+              - horizon.core_open_connections: '"stellar_core.latest_ledger".value'  # open connections to the stellar core database
+              - horizon.txsub_buffered: '"txsub.buffered".value'                     # submission buffered in the submission queue
+              - horizon.txsub_failed: '"txsub.failed"."5m.rate"'                     # failed transactions sent from this proccess
+              - horizon.txsub_open: '"txsub.open".value'                             # transactions that have yet to be confirmed as successful or failed
+              - horizon.txsub_succeeded: '"txsub.succeeded"."5m.rate"'               # successfull transactions sent from this horizon
+              - horizon.txsub_total: '"txsub.total"."5m.rate"'                       # total number of transactions sent to this horizon
+
+  - role: datadog-json-check

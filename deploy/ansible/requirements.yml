@@ -1,2 +1,5 @@
 - src: angstwad.docker_ubuntu
   version: v3.5.0
+
+- src: Datadog.datadog
+  version: 2.2.0
