@@ -25,7 +25,7 @@ instances:
 #     - horizon.requests_failed: '"requests.failed"."5m.rate"' # failed requests to horizon (400<= status code < 600)
 #     - horizon.requests_succeeded: '"requests.succeeded"."5m.rate"' # successful requests to horizon (200<= status code < 400)
 #     - horizon.requests_total: '"requests.total"."5m.rate"' # total requests to this horizon
-#     - horizon.core_open_connections: '"stellar_core.latest_ledger".value' # open connections to the stellar core database
+#     - horizon.core_open_connections: '"stellar_core.open_connections".value' # open connections to the stellar core database
 #     - horizon.txsub_buffered: '"txsub.buffered".value' # submission buffered in the submission queue
 #     - horizon.txsub_failed: '"txsub.failed"."5m.rate"' # failed transactions sent from this proccess
 #     - horizon.txsub_open: '"txsub.open".value' # transactions that have yet to be confirmed as successful or failed
