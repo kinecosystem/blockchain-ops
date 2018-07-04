@@ -10,13 +10,14 @@ COMMANDS=["ll?level={{stellar_core.log_level|default("warn")}}"]
 
 DATABASE="postgresql://dbname={{this_node.db.name}} host={{this_node.db.host}} user={{this_node.db.user}} password={{this_node.db.password}}"
 
-NETWORK_PASSPHRASE="{{stellar_core.network_passphrase}}"
+NETWORK_PASSPHRASE="{{stellar_core.network.passphrase}}"
 
 TARGET_PEER_CONNECTIONS={{other_nodes|length}}
 
 KNOWN_PEERS=[
 {% for node in other_nodes %}
  "{{node.host}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
@@ -38,6 +39,7 @@ NODE_IS_VALIDATOR=false
 NODE_NAMES=[
 {% for node in other_nodes %}
  "{{node.address}}  {{node.name}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
@@ -49,6 +51,7 @@ VALIDATORS=[
 
 {% for node in other_nodes %}
  "${{node.name}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]

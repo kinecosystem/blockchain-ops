@@ -1,0 +1,15 @@
+---
+- name: copy json_check.py
+  copy:
+    src: json_check.py
+    dest: /etc/datadog-agent/checks.d/
+    mode: 0644
+
+- name: install jsonpath-rw
+  pip:
+    name: jsonpath-rw
+    version: 1.4.0
+    # datadog's python
+    executable: /opt/datadog-agent/embedded/bin/pip
+
+  notify: restart datadog-agent

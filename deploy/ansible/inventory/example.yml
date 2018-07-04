@@ -1,0 +1,19 @@
+---
+all:
+  vars:
+    ansible_become: yes
+    ansible_user: ubuntu
+    ansible_ssh_private_key_file: my-key.pem
+    ansible_ssh_common_args: -o IdentitiesOnly=yes
+
+  children:
+    my-network:
+      children:
+        my-network-stellar-core:
+          hosts:
+            stellar-core-1111: {ansible_host: host1.com}
+            stellar-core-2222: {ansible_host: host2.com}
+
+        my-network-horizon:
+          hosts:
+            horizon-1111: {ansible_host: host.com}

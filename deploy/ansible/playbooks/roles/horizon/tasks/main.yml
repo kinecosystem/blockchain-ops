@@ -11,7 +11,17 @@
     dest: /opt/horizon/docker-compose.yml
     mode: 0400
 
+- name: pull docker image
+  docker_service:
+    project_src: /opt/horizon
+    stopped: yes
+    pull: yes
+
+- name: initialize database
+  command: docker-compose run --rm horizon db init
+  args:
+    chdir: /opt/horizon
+
 - name: start horizon
   docker_service:
     project_src: /opt/horizon
-    pull: yes
