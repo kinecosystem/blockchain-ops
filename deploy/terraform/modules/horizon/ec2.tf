@@ -6,7 +6,7 @@ resource "aws_instance" "this" {
   instance_type           = "${var.instance_type}"
   disable_api_termination = false
 
-  associate_public_ip_address = true # TODO unncessary, behind elb
+  associate_public_ip_address = true # TODO unncessary, behind ALB
 
   root_block_device = [
     {
@@ -59,7 +59,7 @@ module "ec2_security_group" {
       from_port   = 8000
       to_port     = 8000
       protocol    = "tcp"
-      description = "ELB Horizon health check"
+      description = "ALB Horizon health check"
       cidr_blocks = "0.0.0.0/0"
     },
   ]
@@ -119,8 +119,4 @@ data "aws_ami" "ubuntu" {
       "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-amd64-server-*",
     ]
   }
-}
-
-data "aws_route53_zone" "kin" {
-  name = "kininfrastructure.com."
 }

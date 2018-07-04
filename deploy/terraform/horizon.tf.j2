@@ -47,14 +47,14 @@ resource "aws_route53_record" "{{module.name}}" {
   provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
 
   zone_id = "${data.aws_route53_zone.kin.zone_id}"
-
   name    = "horizon-{{stellar.network_name}}.{{stellar.tld}}"
-  type    = "CNAME"
-  ttl     = "300"
+  type    = "A"
 
-  records = [
-    "${module.{{module.name}}.elb}"
-  ]
+  alias = {
+    name                   = "${module.{{module.name}}.alb_dns_name}"
+    zone_id                = "${module.{{module.name}}.alb_zone_id}"
+    evaluate_target_health = false
+  }
 
   health_check_id = "${aws_route53_health_check.{{module.name}}.id}"
 
@@ -67,7 +67,7 @@ resource "aws_route53_record" "{{module.name}}" {
 resource "aws_route53_health_check" "{{module.name}}" {
   provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
 
-  fqdn              = "${module.{{module.name}}.elb}"
+  fqdn              = "${module.{{module.name}}.alb_dns_name}"
   type              = "HTTP"
   port              = 80
   resource_path     = "/"
@@ -83,12 +83,13 @@ resource "aws_route53_health_check" "{{module.name}}" {
   }
 }
 
+{%endfor%}
+
 data "aws_route53_zone" "kin" {
   provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
 
   name = "kininfrastructure.com."
 }
-{%endfor%}
 
 
 {#
