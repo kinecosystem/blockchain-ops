@@ -15,12 +15,14 @@ stellar:
   nodes:
     - region: us-east-1
       zone: us-east-1a
+      horizon: true
 
     - region: us-east-1
       zone: us-east-1b
 
     - region: us-east-1
       zone: us-east-1c
+      horizon: true
 
     - region: us-west-2
       zone: us-west-2c

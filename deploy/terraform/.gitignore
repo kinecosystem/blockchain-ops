@@ -2,7 +2,11 @@
 /terraform
 .terraform.*
 
+*.pem
+*.pem.pub
+
 *.tfstate
 *.tfstate.backup
 
-/stellar-network.tf
+/*.tf
+/vars.yml

@@ -16,7 +16,7 @@ resource "aws_instance" "this" {
   ]
 
   lifecycle {
-    ignore_changes = ["private_ip", "root_block_device"]
+    ignore_changes = ["private_ip", "ami", "root_block_device"]
   }
 
   tags = {
@@ -53,6 +53,16 @@ module "ec2_security_group" {
   ingress_rules       = ["ssh-tcp", "http-80-tcp"]
   egress_cidr_blocks  = ["0.0.0.0/0"]
   egress_rules        = ["postgresql-tcp", "http-80-tcp", "https-443-tcp"]
+
+  ingress_with_cidr_blocks = [
+    {
+      from_port   = 8000
+      to_port     = 8000
+      protocol    = "tcp"
+      description = "ELB Horizon health check"
+      cidr_blocks = "0.0.0.0/0"
+    },
+  ]
 
   egress_with_cidr_blocks = [
     {

@@ -1,0 +1,57 @@
+{%for node in stellar.nodes%}
+
+{%set stellar_core_module = 'stellar_core_{}_{}'.format(stellar.network_name, node.zone)%}
+
+module "{{stellar_core_module}}" {
+  source = "modules/stellar-core"
+  providers = {
+    "aws" = "aws.{{node.region}}"
+  }
+
+  name = "${local.{{stellar_core_module}}_name}"
+
+  instance_key_pair_name = "${aws_key_pair.{{node.region}}.key_name}"
+  ssh_private_key = "{{stellar.ssh.private_key}}"
+
+  stellar_network_name = "{{stellar.network_name}}"
+  tld                  = "{{stellar.tld}}"
+  zone                 = "{{node.zone}}"
+  instance_type        = "{{stellar.instance_type}}"
+
+  rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+}
+
+output "route53_{{stellar_core_module}}" {
+  description = "Route53 FQDN name assigned to the EC2 instance"
+  value       = "${module.{{stellar_core_module}}.route53}"
+}
+
+output "s3_bucket_{{stellar_core_module}}" {
+  description = "S3 bucket name"
+  value       = "${module.{{stellar_core_module}}.s3}"
+}
+
+output "rds_{{stellar_core_module}}" {
+  description = "RDS address"
+  value       = "${module.{{stellar_core_module}}.rds}"
+}
+
+locals {
+  # used to name ec2 and rds instances, security groups, etc.
+  {{stellar_core_module}}_name = "stellar-core-{{stellar.network_name}}-${random_id.{{stellar_core_module}}_name_suffix.hex}"
+}
+
+resource "random_id" "{{stellar_core_module}}_name_suffix" {
+  byte_length = 2
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+{%endfor%}
+
+
+{#
+# vi: ft=terraform.jinja2
+#}

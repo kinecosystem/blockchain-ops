@@ -43,7 +43,7 @@ def template(c, vars_file='vars.yml'):
     with open(vars_file) as f:
         variables = yaml.load(f)
 
-    for root, dir, files in os.walk("."):
+    for root, _, files in os.walk("."):
         for file in files:
             stripped_file, ext = os.path.splitext(file)
 
@@ -51,7 +51,7 @@ def template(c, vars_file='vars.yml'):
                 continue
 
             out_file = f'{root}/{stripped_file}'
-            print(f'processing file {root}/{file} into {out_file}')
+            print(f'processing file {root}/{file}')
 
             with open(f'{root}/{file}') as f:
                 tmplate = jinja2.Template(f.read(), extensions=['jinja2.ext.do'])
@@ -60,7 +60,7 @@ def template(c, vars_file='vars.yml'):
             with open(out_file, 'w') as f:
                 f.write(out)
 
-        c.run(f'./terraform fmt {out_file}')
+            c.run(f'./terraform fmt {out_file}')
 
 
 @task(template)
