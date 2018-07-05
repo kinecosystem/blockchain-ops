@@ -54,6 +54,11 @@ resource "aws_eip" "this" {
   }
 }
 
+output "ec2" {
+  description = "EC2 public DNS name"
+  value       = "${aws_instance.this.public_dns}"
+}
+
 module "ec2_security_group" {
   source = "terraform-aws-modules/security-group/aws"
 

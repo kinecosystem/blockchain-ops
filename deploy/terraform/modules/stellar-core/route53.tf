@@ -5,8 +5,3 @@ resource "aws_route53_record" "this" {
   type    = "A"
   ttl     = "300"
 }
-
-output "route53" {
-  description = "Route53 FQDN name assigned to the EC2 instance"
-  value       = "${aws_route53_record.this.fqdn}"
-}
