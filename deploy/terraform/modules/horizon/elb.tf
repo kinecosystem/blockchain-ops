@@ -14,7 +14,7 @@ module "alb" {
   #  - pick the second item, which must be another subnet id
   subnets = ["${data.aws_subnet.default.id}", "${element(distinct(concat(list(data.aws_subnet.default.id), data.aws_subnet_ids.default.ids)), 1)}"]
 
-  security_groups = ["${module.elb_security_group.this_security_group_id}"]
+  security_groups = ["${module.alb_security_group.this_security_group_id}"]
 
   http_tcp_listeners = [
     {
@@ -71,9 +71,9 @@ resource "aws_lb_target_group_attachment" "this" {
   port             = 80
 }
 
-module "elb_security_group" {
+module "alb_security_group" {
   source              = "terraform-aws-modules/security-group/aws"
-  name                = "${var.name}-elb"
+  name                = "${var.name}-alb"
   description         = "Horizon required ports: PostgreSQL, HTTP/S"
   vpc_id              = "${data.aws_vpc.default.id}"
   ingress_cidr_blocks = ["0.0.0.0/0"]
@@ -92,9 +92,14 @@ module "elb_security_group" {
   ]
 }
 
-output "elb" {
-  description = "ELB DNS name"
+output "alb_dns_name" {
+  description = "ALB DNS name"
   value       = "${module.alb.dns_name}"
+}
+
+output "alb_zone_id" {
+  description = "ALB Zone ID"
+  value       = "${module.alb.load_balancer_zone_id}"
 }
 
 data "aws_acm_certificate" "kininfrastructure" {
