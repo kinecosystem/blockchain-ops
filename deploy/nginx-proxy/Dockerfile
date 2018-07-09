@@ -4,4 +4,4 @@ COPY ./nginx.conf.tmpl /etc/nginx/
 
 EXPOSE 80
 
-CMD envsubst '$PROXY_READ_TIMEOUT $PROXY_PASS_URL' < /etc/nginx/nginx.conf.tmpl > /etc/nginx/nginx.conf && cat /etc/nginx/nginx.conf && exec nginx
+CMD envsubst '$PROXY_READ_TIMEOUT $PROXY_PASS_URL' < /etc/nginx/nginx.conf.tmpl > /etc/nginx/nginx.conf && exec nginx
