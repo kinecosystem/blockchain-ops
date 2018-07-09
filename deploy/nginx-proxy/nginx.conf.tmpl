@@ -22,7 +22,8 @@ http {
         server{
 
           listen 80;
-          proxy_read_timeout ${PROXY_READ_TIMEOUT};
+          listen 443 ssl;
+	  proxy_read_timeout ${PROXY_READ_TIMEOUT};
           location / {
 	    # If the request is for SSE, return 200 instead of 504
 	    if ($http_accept = "text/event-stream"){

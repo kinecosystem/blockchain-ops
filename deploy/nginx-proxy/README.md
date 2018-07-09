@@ -20,9 +20,10 @@ In docker-compose:
 
 
   nginx:
-    image: kinecosystem/nginx-proxy:981a50e
+    image: kinecosystem/nginx-proxy:67910b1
     ports:
       - 80:80
+      - 443:443
     environment:
       PROXY_READ_TIMEOUT: 10
       PROXY_PASS_URL: http://horizon:8000
