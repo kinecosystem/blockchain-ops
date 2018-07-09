@@ -13,10 +13,10 @@
     dest: "{{put_parameter_tmpdir.path}}/{{put_parameter.path|basename}}.zip"
     format: zip
 
-- name: "put parameter in AWS SSM Parameter Store for node {{inventory_hostname}}"
+- name: put parameter in AWS SSM Parameter Store
   local_action:
     module: aws_ssm_parameter_store
-    name: "{{put_parameter.path|basename}}"
+    name: "{{put_parameter.name}}"
     value: "{{lookup('file', put_parameter_tmpdir.path + '/' + (put_parameter.path|basename) + '.zip') | b64encode}}"
     region: "{{put_parameter.region|default('us-east-1')}}"
     string_type: "{{put_parameter.string_type|default('SecureString')}}"

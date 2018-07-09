@@ -1,6 +1,54 @@
 ---
 # deploy stellar-core and horizon
 
+# download inventory and group vars
+#
+# NOTE no need to execute this more than once
+- hosts: localhost
+  gather_facts: no
+  roles:
+    - role: get-parameter
+      get_parameter:
+        name: example.inventory.yml
+        path: ../inventory
+
+    - role: get-parameter
+      get_parameter:
+        name: example.group_vars.horizon.yml
+        path: group_vars/example
+
+    - role: get-parameter
+      get_parameter:
+        name: example.group_vars.stellar-core.cfg.yml
+        path: group_vars/example
+
+    - role: get-parameter
+      get_parameter:
+        name: datadog.yml
+        path: group_vars/example
+
+# upload (save) inventory and group vars in AWS SSM Parameter Store
+#
+# NOTE no need to execute this more than once
+- hosts: localhost
+  gather_facts: no
+  roles:
+    # upload parameters to ssm
+    - role: put-parameter
+      put_parameter:
+        name: example.inventory.yml
+        path: ../inventory/example.yml
+
+    - role: put-parameter
+      put_parameter:
+        name: example.group_vars.horizon.yml
+        path: group_vars/example/horizon.yml
+
+    - role: put-parameter
+      put_parameter:
+        name: example.group_vars.stellar-core.cfg.yml
+        path: group_vars/example/stellar-core.cfg.yml
+
 - hosts: example-stellar-core
   roles:
     - sync-clock

@@ -1,3 +1,4 @@
+/inventory
 /ansible-playbook.log
 /playbooks/*.retry
 /playbooks/galaxy

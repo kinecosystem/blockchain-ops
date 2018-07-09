@@ -6,6 +6,12 @@
     state: directory
   register: get_parameter_tmpdir
 
+- name: create "{{get_parameter.path}}"
+  local_action:
+    module: file
+    path: "{{get_parameter.path}}"
+    state: directory
+
 - name: "get parameter into {{get_parameter_tmpdir.path}}/{{get_parameter.name}}.zip"
   local_action:
     module: copy
