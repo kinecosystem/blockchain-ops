@@ -1,0 +1,49 @@
+daemon off;  # run in foreground because docker
+pid /run/nginx.pid;
+worker_processes auto;
+events {
+  worker_connections 768;  # default
+}
+
+http {
+  # https://t37.net/nginx-optimization-understanding-sendfile-tcp_nodelay-and-tcp_nopush.html
+  sendfile on;
+  tcp_nopush on;
+  tcp_nodelay on;
+
+  types_hash_max_size 2048;
+  server_tokens off;
+
+  include /etc/nginx/mime.types;
+  default_type application/octet-stream;
+
+  access_log /dev/stdout;
+  error_log /dev/stderr;
+
+  server {
+    listen 80;
+
+    proxy_read_timeout ${PROXY_READ_TIMEOUT};
+
+    location / {
+      # http://nginx.org/en/docs/http/ngx_http_upstream_module.html#keepalive
+      proxy_http_version 1.1;
+      proxy_set_header Connection "";
+      proxy_pass ${PROXY_PASS_URL};
+
+      # if the request is for sse, return 200 instead of 504
+      #
+      # we identify sse by looking for "text/event-stream" header
+      if ($http_accept = "text/event-stream"){
+        error_page 504 = @sse_response;
+      }
+    }
+
+    location @sse_response {
+      return 200;
+    }
+  }
+}
+
+
+# vi: ft=nginx

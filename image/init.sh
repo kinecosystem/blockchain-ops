@@ -46,6 +46,7 @@ sudo docker-compose run horizon db init
 # envsubst leaves windows carriage return "^M" artifacts when called by docker
 # this fixes it
 ROOT_ACCOUNT_SEED="$ROOT_ACCOUNT_SEED" sudo -E docker-compose up -d horizon
+sudo docker-compose up -d horizon-nginx-proxy
 
 # start friendbot
 # should be disabled for horizon version < 0.12.2
