@@ -6,8 +6,7 @@ services:
   horizon:
     image: kinecosystem/horizon:0.12.3
     container_name: horizon
-    ports:
-      - 80:8000
+    network_mode: host  # listens on port 8000
     volumes:
       - ./volumes/horizon:/opt/horizon
     environment:
