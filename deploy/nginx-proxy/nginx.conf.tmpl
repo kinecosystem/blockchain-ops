@@ -21,7 +21,7 @@ http {
   error_log /dev/stderr;
 
   server {
-    listen 80;
+    listen ${PROXY_LISTEN_PORT};
 
     proxy_read_timeout ${PROXY_READ_TIMEOUT};
 

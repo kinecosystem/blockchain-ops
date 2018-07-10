@@ -26,6 +26,7 @@ horizon-nginx-proxy:
   ports:
     - 8000:8000
   environment:
+    PROXY_LISTEN_PORT: 8000
     PROXY_READ_TIMEOUT: 10
     PROXY_PASS_URL: http://horizon:8000
 ```
