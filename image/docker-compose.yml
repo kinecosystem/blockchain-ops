@@ -50,8 +50,9 @@ services:
 
   horizon:
     image: kinecosystem/horizon
-    ports:
-      - 8000:8000
+    # using nginx-proxy
+    # ports:
+    #   - 8000:8000
     links:
       - horizon-db
       - stellar-core-1
@@ -92,6 +93,16 @@ services:
       POSTGRES_USER: stellar
       POSTGRES_PASSWORD: "12345678"
       POSTGRES_DB: horizon
+
+  horizon-nginx-proxy:
+    image: kinecosystem/horizon-nginx-proxy:latest
+    ports:
+      - 8000:80
+    links:
+      - horizon
+    environment:
+      PROXY_READ_TIMEOUT: 10
+      PROXY_PASS_URL: http://horizon:8000
 
   # friendbot was originally part of horizon
   # but extracted to its own microservice since horizon v0.12.2
