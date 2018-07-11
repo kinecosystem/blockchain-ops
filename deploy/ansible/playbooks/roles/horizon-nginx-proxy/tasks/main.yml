@@ -1,0 +1,22 @@
+---
+- name: create /opt/horizon-nginx-proxy directory
+  file:
+    path: /opt/horizon-nginx-proxy
+    state: directory
+    mode: 0655
+
+- name: cp docker-compose.yml
+  copy:
+    src: docker-compose.yml
+    dest: /opt/horizon-nginx-proxy/docker-compose.yml
+    mode: 0400
+
+- name: pull docker image
+  docker_service:
+    project_src: /opt/horizon-nginx-proxy
+    stopped: yes
+    pull: yes
+
+- name: start horizon-nginx-proxy
+  docker_service:
+    project_src: /opt/horizon-nginx-proxy

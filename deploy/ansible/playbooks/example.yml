@@ -69,3 +69,4 @@
 
     - datadog-horizon
     - horizon
+    - horizon-nginx-proxy
