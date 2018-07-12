@@ -68,5 +68,9 @@
     - docker
 
     - datadog-horizon
-    - horizon
+
+    - horizon-setup
+    - horizon-init
+    - horizon-start
+
     - horizon-nginx-proxy

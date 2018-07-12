@@ -1,0 +1,6 @@
+---
+
+- name: initialize database
+  command: docker-compose run --rm horizon db init
+  args:
+    chdir: /opt/horizon
