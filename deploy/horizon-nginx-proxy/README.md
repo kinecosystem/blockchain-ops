@@ -30,3 +30,10 @@ horizon-nginx-proxy:
     PROXY_READ_TIMEOUT: 10
     PROXY_PASS_URL: http://horizon:8000
 ```
+
+## TODO
+Change server parameters:  
+https://serverfault.com/questions/787919/optimal-value-for-nginx-worker-connections  
+https://stackoverflow.com/questions/11342167/how-to-increase-ulimit-on-amazon-ec2-instance  
+https://serverfault.com/questions/48717/practical-maximum-open-file-descriptors-ulimit-n-for-a-high-volume-system  
+ubik/blob/master/playbooks/roles/network-server/files/etc/sysctl.conf  
