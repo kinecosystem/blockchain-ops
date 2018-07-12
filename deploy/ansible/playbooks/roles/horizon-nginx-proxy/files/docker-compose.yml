@@ -3,7 +3,7 @@ version: "3"
 
 services:
   horizon-nginx-proxy:
-    image: kinecosystem/horizon-nginx-proxy:c2bf889
+    image: kinecosystem/horizon-nginx-proxy:705f69d
     container_name: horizon-nginx-proxy
 
     network_mode: host
