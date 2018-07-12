@@ -8,7 +8,7 @@ See the following issue for more information: [stellar/go/issues/154](https://gi
 
 With this docker image we can proxy requests to Horizon,
 timeout requests on our own instead or letting ELB do it,
-and send 200 instead of 504 for SSE reqests.
+and send 200 instead of 504 for SSE reqests (only requests with the header "text/event-stream" will return as 200 instead of 504)
 
 ## Usage
 
