@@ -1,0 +1,11 @@
+---
+
+- name: pull docker image
+  docker_service:
+    project_src: /opt/horizon
+    stopped: yes
+    pull: yes
+
+- name: start horizon
+  docker_service:
+    project_src: /opt/horizon

@@ -1,0 +1,13 @@
+---
+
+- name: create horizon mount directory
+  file:
+    path: /opt/horizon/volumes/horizon
+    state: directory
+    mode: 0655
+
+- name: template docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/horizon/docker-compose.yml
+    mode: 0400
