@@ -28,6 +28,14 @@ dependencies:
             name: horizon
             service: horizon
 
+      http_check:
+        instances:
+          - name: horizon-health-check
+            url: http://localhost:8001/status
+            timeout: 5
+
+            http_response_status_code: 200
+
       json_check:
         init_config:
           default_timeout: 5

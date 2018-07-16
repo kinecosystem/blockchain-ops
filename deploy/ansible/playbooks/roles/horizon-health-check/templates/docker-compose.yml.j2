@@ -1,0 +1,30 @@
+{% set this_node = horizon.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+
+---
+version: "3"
+
+services:
+  horizon-health-check:
+    image: kinecosystem/horizon-health-check:d54af56
+    container_name: horizon-health-check
+
+    ports:
+      - 8001:8000
+
+    environment:
+      BUILD_VERSION: d54af56
+      REQUEST_TIMEOUT: 2
+      CORE_INFO_URL: {{this_node.stellar_core.url}}/info
+
+    restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
+
+
+{#
+vi: ft=yaml.jinja2
+#}
+# vi: ft=yaml
