@@ -5,9 +5,10 @@ WORKDIR /opt/horizon-health-check
 
 # Install dependencies
 RUN pip install pipenv \
-    &&  apk add -qU --no-cache -t .build-deps gcc musl-dev git \
-    &&  pipenv install \
-    &&  apk del -q .build-deps
+    && apk add -qU --no-cache -t .build-deps gcc musl-dev git \
+    && pipenv sync --bare --clear \
+    && apk del -q .build-deps
+
 EXPOSE 8000
 
 CMD pipenv run gunicorn -b 0.0.0.0:8000 main:APP
