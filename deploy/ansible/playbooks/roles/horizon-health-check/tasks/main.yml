@@ -1,0 +1,22 @@
+---
+- name: create /opt/horizon-health-check directory
+  file:
+    path: /opt/horizon-health-check
+    state: directory
+    mode: 0655
+
+- name: template docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/horizon-health-check/docker-compose.yml
+    mode: 0400
+
+- name: pull docker image
+  docker_service:
+    project_src: /opt/horizon-health-check
+    stopped: yes
+    pull: yes
+
+- name: start horizon-health-check
+  docker_service:
+    project_src: /opt/horizon-health-check
