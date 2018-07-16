@@ -24,7 +24,7 @@ REQUEST_TIMEOUT = float(os.environ['REQUEST_TIMEOUT'])
 
 
 def make_reply(msg, code):
-    """ Create a json reply for /status."""
+    """Create a JSON reply for /status."""
     reply = {
         'status': 'Healthy' if code == 200 else 'Unhealthy',
         'description': msg,

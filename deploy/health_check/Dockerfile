@@ -1,9 +1,7 @@
 FROM python:alpine3.6
 
-# Copy the project
-COPY . /opt/health_check
-
-WORKDIR /opt/health_check
+COPY . /opt/horizon-health-check
+WORKDIR /opt/horizon-health-check
 
 # Install dependencies
 RUN pip install pipenv \
@@ -11,4 +9,5 @@ RUN pip install pipenv \
     &&  pipenv install \
     &&  apk del -q .build-deps
 EXPOSE 8000
+
 CMD pipenv run gunicorn -b 0.0.0.0:8000 main:APP
