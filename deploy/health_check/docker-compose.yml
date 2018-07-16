@@ -2,7 +2,7 @@
 version: "3"
 
 services:
-  health_check:
+  horizon_health_check:
     image: kinecosystem/horizon-health-check:d54af56
     ports:
       - 8000:8000
