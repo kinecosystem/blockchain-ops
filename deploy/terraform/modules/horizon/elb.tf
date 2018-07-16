@@ -56,7 +56,7 @@ module "alb" {
       health_check_port = "80"
 
       # health_check_path                = "/status"
-      # health_check_port                = "8000"
+      # health_check_port                = "8001"
     },
   ]
 
@@ -86,8 +86,8 @@ module "alb_security_group" {
 
   egress_with_cidr_blocks = [
     {
-      from_port   = 8000
-      to_port     = 8000
+      from_port   = 8001
+      to_port     = 8001
       protocol    = "tcp"
       description = "Horizon health check"
       cidr_blocks = "0.0.0.0/0"

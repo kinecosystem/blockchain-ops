@@ -56,8 +56,8 @@ module "ec2_security_group" {
 
   ingress_with_cidr_blocks = [
     {
-      from_port   = 8000
-      to_port     = 8000
+      from_port   = 8001
+      to_port     = 8001
       protocol    = "tcp"
       description = "ALB Horizon health check"
       cidr_blocks = "0.0.0.0/0"
