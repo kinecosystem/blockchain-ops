@@ -1,6 +1,6 @@
 FROM python:alpine3.6
 
-COPY . /opt/horizon-health-check
+COPY main.py Pipfile Pipfile.lock /opt/horizon-health-check/
 WORKDIR /opt/horizon-health-check
 
 # Install dependencies
