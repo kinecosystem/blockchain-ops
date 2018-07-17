@@ -52,11 +52,8 @@ module "alb" {
       stickiness_enabled               = true
       target_type                      = "instance"
 
-      health_check_path = "/"
-      health_check_port = "80"
-
-      # health_check_path                = "/status"
-      # health_check_port                = "8001"
+      health_check_path = "/status"
+      health_check_port = "8001"
     },
   ]
 
