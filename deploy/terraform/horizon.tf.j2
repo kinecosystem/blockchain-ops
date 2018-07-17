@@ -53,31 +53,12 @@ resource "aws_route53_record" "{{module.name}}" {
   alias = {
     name                   = "${module.{{module.name}}.alb_dns_name}"
     zone_id                = "${module.{{module.name}}.alb_zone_id}"
-    evaluate_target_health = false
+    evaluate_target_health = true
   }
-
-  health_check_id = "${aws_route53_health_check.{{module.name}}.id}"
 
   set_identifier = "{{module.name}}"
   latency_routing_policy = {
     region = "{{module.region}}"
-  }
-}
-
-resource "aws_route53_health_check" "{{module.name}}" {
-  provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
-
-  fqdn              = "${module.{{module.name}}.alb_dns_name}"
-  type              = "HTTP"
-  port              = 80
-  resource_path     = "/"
-  failure_threshold = "1"
-  request_interval  = "30"
-
-  tags = {
-    Name = "${local.{{module.name}}_name}"
-    type = "horizon"
-    stellar-network = "{{stellar.network_name}}"
   }
 }
 
