@@ -3,7 +3,7 @@ version: "3"
 
 services:
   horizon-nginx-proxy:
-    image: kinecosystem/horizon-nginx-proxy:705f69d
+    image: kinecosystem/horizon-nginx-proxy:34300
     container_name: horizon-nginx-proxy
 
     network_mode: host
@@ -13,6 +13,9 @@ services:
       PROXY_READ_TIMEOUT: 60
       # horizon listens on port 8000
       PROXY_PASS_URL: http://localhost:8000
+      # Set host for Horizon's response links, leave as $$host for the links to show the original request host(localhost)
+      HOST: $$host
+
 
     restart: on-failure
     logging:
