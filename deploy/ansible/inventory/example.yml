@@ -9,6 +9,12 @@ all:
         ansible_ssh_common_args: -o IdentitiesOnly=yes
 
       children:
+        example-localhost:
+          vars:
+            ansible_connection: local
+          hosts:
+            example-local: {ansible_host: localhost}
+
         example-stellar-core:
           hosts:
             stellar-core-1111: {ansible_host: host1.com}

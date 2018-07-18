@@ -1,9 +1,6 @@
 provider "aws" {
-  alias = "backend-us-east-1"
-
-  access_key = "{{env_vars['AWS_ACCESS_KEY']}}"
-  secret_key = "{{env_vars['AWS_SECRET_KEY']}}"
-  region     = "us-east-1"  # consistent across all workspaces
+  alias  = "backend-us-east-1"
+  region = "us-east-1"  # consistent across all workspaces
 }
 
 terraform {

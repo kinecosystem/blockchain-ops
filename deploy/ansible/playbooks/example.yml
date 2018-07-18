@@ -4,7 +4,7 @@
 # download inventory and group vars
 #
 # NOTE no need to execute this more than once
-- hosts: localhost
+- hosts: example-localhost
   gather_facts: no
   roles:
     - role: get-parameter
@@ -30,7 +30,7 @@
 # upload (save) inventory and group vars in AWS SSM Parameter Store
 #
 # NOTE no need to execute this more than once
-- hosts: localhost
+- hosts: example-localhost
   gather_facts: no
   roles:
     # upload parameters to ssm

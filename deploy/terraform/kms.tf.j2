@@ -1,0 +1,27 @@
+resource "aws_kms_key" "this" {
+  provider = "aws.us-east-1"
+
+  description = "{{stellar.network_name}} KMS key"
+}
+
+resource "aws_kms_alias" "this" {
+  provider = "aws.us-east-1"
+
+  name = "alias/{{stellar.network_name}}"
+  target_key_id = "${aws_kms_key.this.key_id}"
+}
+
+output "kms_key_id" {
+  description = "AWS KMS CMK Key ID for this network"
+  value       = "${aws_kms_alias.this.target_key_id}"
+}
+
+output "kms_key_alias" {
+  description = "AWS KMS CMK Key alias for this network"
+  value       = "${aws_kms_alias.this.name}"
+}
+
+
+{#
+# vi: ft=terraform.jinja2
+#}
