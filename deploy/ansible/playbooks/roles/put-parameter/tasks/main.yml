@@ -18,8 +18,13 @@
     module: aws_ssm_parameter_store
     name: "{{put_parameter.name}}"
     value: "{{lookup('file', put_parameter_tmpdir.path + '/' + (put_parameter.path|basename) + '.zip') | b64encode}}"
+
+    # secure string with custom key created by terraform for each network
     region: "{{put_parameter.region|default('us-east-1')}}"
     string_type: "{{put_parameter.string_type|default('SecureString')}}"
+    key_id: "{{kms.key_id}}"
+    # you have to set your AWS_PROFILE when using this role
+    profile: "{{lookup('env', 'AWS_PROFILE')}}"
 
 - name: cleanup tmp directory
   local_action:
