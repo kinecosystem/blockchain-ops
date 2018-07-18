@@ -26,12 +26,12 @@ module "{{horizon_module}}" {
   rds_password         = "{{env_vars['RDS_PASSWORD']}}"
 }
 
-output "ec2_horizon_{{horizon_module}}" {
+output "ec2_{{horizon_module}}" {
   description = "EC2 public DNS name"
   value       = "${module.{{horizon_module}}.ec2}"
 }
 
-output "rds_horizon_{{horizon_module}}" {
+output "rds_{{horizon_module}}" {
   description = "RDS address"
   value       = "${module.{{horizon_module}}.rds}"
 }

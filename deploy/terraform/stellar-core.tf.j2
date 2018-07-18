@@ -1,6 +1,11 @@
 {%for node in stellar.nodes%}
 
-{%set stellar_core_module = 'stellar_core_{}_{}'.format(stellar.network_name, node.zone)%}
+{%set module_name_suffix = '{}_{}'.format(stellar.network_name, node.zone)%}
+{%set stellar_core_module = 'stellar_core_{}'.format(module_name_suffix)%}
+
+{%if node.horizon%}
+{%set horizon_module = 'horizon_{}'.format(module_name_suffix)%}
+{%endif%}
 
 module "{{stellar_core_module}}" {
   source = "modules/stellar-core"
@@ -19,11 +24,17 @@ module "{{stellar_core_module}}" {
   instance_type        = "{{stellar.instance_type}}"
 
   rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+
+  {%if node.horizon%}
+  horizon_security_group_id = "${module.{{horizon_module}}.ec2_security_group_id[0]}"
+  {%else%}
+  horizon_security_group_id = ""
+  {%endif%}
 }
 
-output "route53_{{stellar_core_module}}" {
-  description = "Route53 FQDN name assigned to the EC2 instance"
-  value       = "${module.{{stellar_core_module}}.route53}"
+output "ec2_{{stellar_core_module}}" {
+  description = "EC2 public DNS name"
+  value       = "${module.{{stellar_core_module}}.ec2}"
 }
 
 output "s3_bucket_{{stellar_core_module}}" {

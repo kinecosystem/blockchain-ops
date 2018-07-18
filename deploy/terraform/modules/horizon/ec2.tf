@@ -94,6 +94,11 @@ output "ec2" {
   value       = "${aws_instance.this.public_dns}"
 }
 
+output "ec2_security_group_id" {
+  description = "EC2 security group id"
+  value       = ["${module.ec2_security_group.this_security_group_id}"]
+}
+
 # data sources to get vpc, subnet, ami, route53 details
 
 data "aws_vpc" "default" {

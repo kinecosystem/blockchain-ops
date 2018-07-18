@@ -1,6 +1,6 @@
 resource "aws_instance" "this" {
   key_name                    = "${var.instance_key_pair_name}"
-  vpc_security_group_ids      = ["${module.ec2_security_group.this_security_group_id}"]
+  vpc_security_group_ids      = ["${aws_security_group.this.id}"]
   subnet_id                   = "${data.aws_subnet.default.id}"
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "${var.instance_type}"
@@ -54,58 +54,116 @@ resource "aws_eip" "this" {
   }
 }
 
-module "ec2_security_group" {
-  source = "terraform-aws-modules/security-group/aws"
+output "ec2" {
+  description = "EC2 public DNS name"
+  value       = "${aws_instance.this.public_dns}"
+}
 
-  name        = "${var.name}-common"
+resource "aws_security_group" "this" {
+  name        = "${var.name}-common-new"
   description = "Stellar Core required ports: stellar-core P2P, PostgreSQL, HTTP/S"
+  vpc_id      = "${data.aws_vpc.default.id}"
 
-  vpc_id              = "${data.aws_vpc.default.id}"
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["ssh-tcp"]
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["postgresql-tcp", "http-80-tcp", "https-443-tcp"]
+  tags = {
+    Name = "${var.name}-common-new"
+  }
+}
 
-  ingress_with_cidr_blocks = [
-    {
-      from_port   = 11625
-      to_port     = 11625
-      protocol    = "tcp"
-      description = "Stellar Core P2P"
-      cidr_blocks = "0.0.0.0/0"
-    },
-    {
-      from_port   = 11626
-      to_port     = 11626
-      protocol    = "tcp"
-      description = "Stellar Core Control"
-      cidr_blocks = "0.0.0.0/0"
-    },
-  ]
+resource "aws_security_group_rule" "ingress_ssh" {
+  type        = "ingress"
+  from_port   = 22
+  to_port     = 22
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
 
-  egress_with_cidr_blocks = [
-    {
-      from_port   = 11625
-      to_port     = 11625
-      protocol    = "tcp"
-      description = "Stellar Core P2P"
-      cidr_blocks = "0.0.0.0/0"
-    },
-    {
-      from_port   = 10516
-      to_port     = 10516
-      protocol    = "tcp"
-      description = "DataDog logs intake"
-      cidr_blocks = "0.0.0.0/0"
-    },
-    {
-      from_port   = 11371
-      to_port     = 11371
-      protocol    = "tcp"
-      description = "apt repository key server"
-      cidr_blocks = "0.0.0.0/0"
-    },
-  ]
+  security_group_id = "${aws_security_group.this.id}"
+}
+
+resource "aws_security_group_rule" "ingress_stellar_core_p2p" {
+  type        = "ingress"
+  from_port   = 11625
+  to_port     = 11625
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Stellar Core P2P"
+
+  security_group_id = "${aws_security_group.this.id}"
+}
+
+resource "aws_security_group_rule" "ingress_stellar_core_control" {
+  type              = "ingress"
+  from_port         = 11626
+  to_port           = 11626
+  protocol          = "tcp"
+  description       = "Stellar Core control"
+  security_group_id = "${aws_security_group.this.id}"
+
+  # optionally omit this resource if there is not attached horizon to this stellar-core node
+  count                    = "${var.horizon_security_group_id != "" ? 1 : 0}"
+  source_security_group_id = "${var.horizon_security_group_id}"
+}
+
+resource "aws_security_group_rule" "egress_postgresql" {
+  type        = "egress"
+  from_port   = 5432
+  to_port     = 5432
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.this.id}"
+}
+
+resource "aws_security_group_rule" "egress_http" {
+  type        = "egress"
+  from_port   = 80
+  to_port     = 80
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.this.id}"
+}
+
+resource "aws_security_group_rule" "egress_https" {
+  type        = "egress"
+  from_port   = 443
+  to_port     = 443
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+
+  security_group_id = "${aws_security_group.this.id}"
+}
+
+resource "aws_security_group_rule" "egress_stellar_core_p2p" {
+  type        = "egress"
+  from_port   = 11625
+  to_port     = 11625
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "Stellar Core P2P"
+
+  security_group_id = "${aws_security_group.this.id}"
+}
+
+resource "aws_security_group_rule" "egress_datadog" {
+  type        = "egress"
+  from_port   = 10516
+  to_port     = 10516
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "DataDog logs intake"
+
+  security_group_id = "${aws_security_group.this.id}"
+}
+
+resource "aws_security_group_rule" "egress_apt_key_server" {
+  type        = "egress"
+  from_port   = 11371
+  to_port     = 11371
+  protocol    = "tcp"
+  cidr_blocks = ["0.0.0.0/0"]
+  description = "apt repository key server"
+
+  security_group_id = "${aws_security_group.this.id}"
 }
 
 # data sources to get vpc, subnet, ami, route53 details

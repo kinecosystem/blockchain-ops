@@ -120,3 +120,10 @@ def destroy(c, yes=False):
     """Call terraform destroy."""
     print('destroying')
     c.run('./terraform destroy {}'.format('-auto-approve' if yes else ''))
+
+
+@task(modules)
+def output(c):
+    """Call terraform output."""
+    print('printing output')
+    c.run('./terraform output')
