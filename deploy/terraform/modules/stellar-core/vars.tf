@@ -9,3 +9,5 @@ variable "rds_password" {}
 
 variable "tld" {}
 variable "name" {}
+
+variable "horizon_security_group_id" {}
