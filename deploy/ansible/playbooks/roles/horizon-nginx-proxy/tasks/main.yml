@@ -6,8 +6,8 @@
     mode: 0655
 
 - name: cp docker-compose.yml
-  copy:
-    src: docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
     dest: /opt/horizon-nginx-proxy/docker-compose.yml
     mode: 0400
 
