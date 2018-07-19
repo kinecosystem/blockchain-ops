@@ -1,0 +1,7 @@
+---
+- name: add datadog user to docker group
+  user:
+    name: dd-agent
+    group: docker
+    append: yes
+  notify: restart datadog-agent
