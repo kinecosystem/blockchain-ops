@@ -14,7 +14,7 @@ services:
       # horizon listens on port 8000
       PROXY_PASS_URL: http://localhost:8000
       # Set host for Horizon's response links, leave as $$host for the links to show the original request host(localhost)
-      HOST: $$host
+      HOST: "horizon-{{horizon.network.name}}.kininfrastructure.com"
 
 
     restart: on-failure
@@ -23,3 +23,9 @@ services:
       options:
         max-size: 100m
         max-file: "3"
+
+
+{#
+vi: ft=yaml.jinja2
+#}
+# vi: ft=yaml
