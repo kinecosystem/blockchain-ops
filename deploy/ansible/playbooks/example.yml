@@ -69,10 +69,14 @@
 
     - datadog-horizon
 
-    - horizon-setup
-    - horizon-init
-    - horizon-start
-
+    # NOTE must come before horizon-start because of a bug that overrides
+    # horizon group_var after calling docker_service
+    #
+    # https://github.com/ansible/ansible/issues/33960
     - horizon-nginx-proxy
 
     - horizon-health-check
+
+    - horizon-setup
+    - horizon-init
+    - horizon-start
