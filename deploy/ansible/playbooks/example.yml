@@ -64,6 +64,7 @@
   roles:
     - sync-clock
     - apt-get-update
+    - optimize-network
     - common-packages
     - docker
 
