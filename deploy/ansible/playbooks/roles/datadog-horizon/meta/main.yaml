@@ -17,7 +17,6 @@ dependencies:
 
       ntp:
         init_config:
-
         instances:
           - offset_threshold: 60
             host: 169.254.169.123  # amazon ntp
@@ -27,6 +26,11 @@ dependencies:
           - type: docker
             name: horizon
             service: horizon
+
+      nginx:
+        init_config:
+        instances:
+          - nginx_status_url: http://localhost:80/nginx_status/
 
       http_check:
         instances:
