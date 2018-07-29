@@ -19,10 +19,6 @@ http {
   access_log /dev/stdout;
   error_log /dev/stderr;
 
-  # for metrics
-  allow 127.0.0.1;
-  deny all;
-
   server {
     listen ${PROXY_LISTEN_PORT};
 
@@ -49,6 +45,8 @@ http {
 
     # metrics
     location /nginx_status {
+      allow 127.0.0.1;
+      deny all;
       stub_status;
     }
   }
