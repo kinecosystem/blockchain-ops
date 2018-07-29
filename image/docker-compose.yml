@@ -95,7 +95,7 @@ services:
       POSTGRES_DB: horizon
 
   horizon-nginx-proxy:
-    image: kinecosystem/horizon-nginx-proxy:34300
+    image: kinecosystem/horizon-nginx-proxy:885282e
     ports:
       - 8008:80
     links:
