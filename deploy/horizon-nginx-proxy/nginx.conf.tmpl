@@ -19,6 +19,10 @@ http {
   access_log /dev/stdout;
   error_log /dev/stderr;
 
+  # for metrics
+  allow 127.0.0.1;
+  deny all;
+
   server {
     listen ${PROXY_LISTEN_PORT};
 
@@ -41,6 +45,11 @@ http {
 
     location @sse_response {
       return 200;
+    }
+
+    # metrics
+    location /nginx_status {
+      stub_status;
     }
   }
 }
