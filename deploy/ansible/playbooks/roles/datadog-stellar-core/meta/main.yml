@@ -47,6 +47,20 @@ dependencies:
           # select this node's variables from group_vars according to it's hostname
           - url: '{{(stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first).archive.get_address}}.well-known/stellar-history.json'
             metrics:
-              - archive.latest_ledger: currentLedger  # Latest ledger updated in the history archive
+              # latest ledger updated in the history archive
+              - archive.latest_ledger: currentLedger
+
+          - url: http://localhost:11626/metrics
+            metrics:
+              # ledger close times
+              - core.ledger_age_closed: 'metrics."ledger.age.closed"."mean"'
+              - core.ledger_ledger_close: 'metrics."ledger.ledger.close"."mean"'
+
+              # time to apply a transaction to ledger
+              - core.ledger_transaction_apply: 'metrics."ledger.transaction.apply"."mean"'
+
+              # count of scp sync losts
+              - core.scp_sync_lost: 'metrics."scp.sync.lost"."5_min_rate"'
+
 
   - role: datadog-json-check
