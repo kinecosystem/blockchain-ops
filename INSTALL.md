@@ -33,7 +33,7 @@ Before launching a group of nodes, it is important to decide on the following:
 1. Launch an EC2 and RDS instance, similar to the above.
 1. [Configure Horizon](https://www.stellar.org/developers/horizon/reference/admin.html#configuring)
     - Similar to Core, we run Horizon using Docker.
-    - See [image/Dockerfile.Horizon](image/Dockerfile.horizon) and [image/docker-compose.yml](image/docker-compose.yml)
+    - See [images/Dockerfile.Horizon](images/Dockerfile.horizon) and [images/docker-compose.yml](images/docker-compose.yml)
 as an example on how to build and configure Horizon on Ubuntu 16.04.
 1. Finally, see Horizon's [Administration Guide](https://www.stellar.org/developers/horizon/reference/admin.html).
 

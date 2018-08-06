@@ -5,7 +5,7 @@ This includes infrastructure automation and orchestration to launch and manage t
 
 ## Directory Structure
 
-- [image/](image) - Docker images for running all the various apps in the Kin network i.e. Validator, HTTP API Frontend, etc.
+- [images/](images) - Docker images for running all the various apps in the Kin network i.e. Validator, HTTP API Frontend, etc.
 Also includes automation for running a test network on your local machine for testing purposes.
 - [deploy/terraform/](deploy/terraform) - Automation code for launching Kin network infrastructure.
 - [deploy/ansible/](deploy/ansible) - Orchestration for deploying and managing Kin blockchain apps in production.
