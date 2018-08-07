@@ -32,7 +32,7 @@ and have the root account master key burnt (have its weight set from 1 to 0).
 
 Core exposes two ports: P2P (11525) and control (11626).
 
-1. P2P port should be publicly open.
+1. The P2P port should be publicly open.
 1. The control port should be private and accessible only to Core's related Horizon.
 
 ### RDS
@@ -54,5 +54,5 @@ Horizon's RDS should have a single user set up:
 
 ### S3
 
-1. History archive should be publicly readable globally, and specifically available for other nodes to catch up.
-1. Wriet access should only be given to the Core instance managing the archive.
+1. The history archive should be publicly readable globally, and specifically available for other nodes to catch up.
+1. Write access should only be given to the Core instance managing the archive.
