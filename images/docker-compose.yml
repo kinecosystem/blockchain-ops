@@ -9,8 +9,8 @@ services:
       - stellar-core-1-db
       - stellar-core-2
     volumes:
-      - ./stellar-core-1/opt/stellar-core:/opt/stellar-core
-      - ./stellar-core-1/tmp/stellar-core:/tmp/stellar-core
+      - ./volumes/stellar-core-1/opt/stellar-core:/opt/stellar-core
+      - ./volumes/stellar-core-1/tmp/stellar-core:/tmp/stellar-core
     restart: on-failure
     logging:
       driver: json-file
@@ -32,8 +32,8 @@ services:
     links:
       - stellar-core-2-db
     volumes:
-      - ./stellar-core-2/opt/stellar-core:/opt/stellar-core
-      - ./stellar-core-2/tmp/stellar-core:/tmp/stellar-core
+      - ./volumes/stellar-core-2/opt/stellar-core:/opt/stellar-core
+      - ./volumes/stellar-core-2/tmp/stellar-core:/tmp/stellar-core
     restart: on-failure
     logging:
       driver: json-file
@@ -58,7 +58,7 @@ services:
       - stellar-core-1
       - stellar-core-1-db
     volumes:
-      - ./horizon/opt/horizon:/opt/horizon
+      - ./volumes/horizon/opt/horizon:/opt/horizon
     environment:
       # available configuration visible at:
       # https://github.com/stellar/horizon/blob/v0.11.1/src/github.com/stellar/horizon/cmd/horizon/main.go#L33
@@ -116,7 +116,7 @@ services:
     links:
       - horizon
     volumes:
-      - ./friendbot/opt/friendbot:/opt/friendbot
+      - ./volumes/friendbot/opt/friendbot:/opt/friendbot
     environment:
       ROOT_ACCOUNT_SEED: "${ROOT_ACCOUNT_SEED}"
     restart: on-failure
@@ -140,5 +140,5 @@ services:
   stellar-archivist:
     image: kinecosystem/stellar-archivist
     volumes:
-      - ./stellar-archivist/opt/stellar-archivist:/opt/stellar-archivist
+      - ./volumes/stellar-archivist/opt/stellar-archivist:/opt/stellar-archivist
 

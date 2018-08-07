@@ -1,12 +1,11 @@
-# Stellar Network Infrastructure Orchestartion
+# Infrastructure Automation
 
-This directory is responsible for launching a new Stellar network from scratch.
-At Kin TLV we are using Terraform with a bit of Jinja2 templating to achieve this,
-so being familiar with the above is a requirement.
+This directory is responsible for launching a new Kin network from scratch.
+At Kin we are using Terraform with a bit of Jinja2 templating to automate and manage this process.
 
 ## Executing Actions
 
-Terraform is a complex tool, and its HCL language has some limitation,
+Terraform is a complex tool, and its HCL language has some limitations,
 most specfically looping over modules.
 To solve this we are using pyinvoke and Jinja2 templates to generate Terraform `.tf` files
 before calling the `terraform ...` command.
@@ -41,5 +40,5 @@ RDS_PASSWORD='xxx' invoke plan
 ## Input for Ansible
 
 After launching the infrastructure, Terraform will output a list of addresses and other information.
-This is required for Ansible to deploy Stellar Core and Horizon on the newly launched infrastructure.
+This is required for Ansible to deploy Core and Horizon on the newly launched infrastructure.
 See documentation in (../ansible/](../ansible) for additional information.

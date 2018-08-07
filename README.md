@@ -1,74 +1,53 @@
-# Stellar Operations
+# Blockchain Operations
 
-Devops repository for Stellar Core and Horizon.
+This repository contains all operational code for Kin blockchain.
+This includes infrastructure automation and orchestration to launch and manage the Kin blockchain.
 
-## Local Private Testnet
+## Directory Structure
 
-- The [examples/](examples) directory consists of pubnet configuration files
-  for Stellar Core and Horizon.
-- The [image/](image) directory consists of Docker + Compose files for setting up a local testnet.
-    The fiels there also serve as a hands-on tutorial for using Stellar Core and Horizon.
+- [images/](images) - Docker images for running all the various apps in the Kin network i.e. Validator, HTTP API Frontend, etc.
+Also includes automation for running a test network on your local machine for testing purposes.
+- [deploy/terraform/](deploy/terraform) - Automation code for launching Kin network infrastructure.
+- [deploy/ansible/](deploy/ansible) - Orchestration for deploying and managing Kin blockchain apps in production.
 
-```bash
-# initialize a new local test network with single core + horizon instances
-# see the steps in init.sh for further details
-# and also see docker-compose.yml for listening ports
-cd image
-./init.sh
+## Stack
 
-# read logs
-docker-compose logs -f
+The Kin network is made up of the following applications:
 
-# upgrade base reserve balance network setting to 0.5 XLM (executed automatically in init.sh)
-# see the following section for more information:
-# https://www.stellar.org/developers/stellar-core/software/admin.html#network-configuration
-curl 'localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=5000000'
+### Core
 
-# friendbot is available
-curl -sS localhost:8001?addr=MyAddress
+Core is a validator and history archiver. This is the primary app that operates the network and takes part in consensus.
+Its primary responsibilities are:
 
-# stellar laboratory is also available
-# open localhost:8002 with a web browser to interact with it
+1. **Participate** in consensus, **validate** and add new ledgers and transactions.
+1. **Submit** and **relay** transactions to other nodes.
+1. **Store** and **archive** ledger information. This allows other nodes to catch-up on ledger information and join the network.
 
-# interesting metrics:
+A core node can be configured to participate only in part of the above actions.
+If it participates in all of these - it is considered a Full node.
 
-# horizon
-curl -sS localhost:8000
-curl -sS localhost:8000/metrics
+### Horizon
 
-# core
-# https://www.stellar.org/developers/stellar-core/software/commands.html
-curl -sS localhost:11626/info
-curl -sS localhost:11626/quorum
-curl -sS localhost:11626/peers
+Horizon is an HTTP API frontend app that makes it easier on clients to access the network.
+It abstracts the asynchronous nature of the blockchain from clients wishing to submit transactions or fetch account information.
 
-# for /metrics, pipe output to jq for easier reading:
-curl -sS localhost:11626/metrics | jq .
-```
+### Laboratory
 
-## Resources
-### Official
+Laboratory is a web application that allows to construct and submit transactions on the network.
 
-#### Core
+### Testnet Applications
 
-1. [Administration](https://www.stellar.org/developers/stellar-core/software/admin.html)
-1. [CLI Commands + HTTP API](https://www.stellar.org/developers/stellar-core/software/commands.html)
-1. [Setup a Private Network](https://www.stellar.org/developers/stellar-core/software/testnet.html)
-1. [github.com/stellar/stellar-core](https://github.com/stellar/stellar-core)
-1. [github.com/stellar/stellar-protocol](https://github.com/stellar/stellar-protocol)
+The following are applications only available on a test network, and are irrelevant for a production environment.
 
-#### Horizon
+#### Friendbot (XLM Faucet)
 
-1. [Administration](https://www.stellar.org/developers/horizon/reference/admin.html)
-1. [github.com/stellar/horizon](https://github.com/stellar/horizon)
-    1. Deprecated repo
-    1. Has latest stable release v0.11.1
-1. [github.com/stellar/go](https://github.com/stellar/go)
-    1. New mono-repo
-    1. Has v0.12.0 RC
-    1. Includes various other tools e.g. archivist, bifrost, hd wallet, etc.
-1. [github.com/stellar/laboratory](https://github.com/stellar/laboratory)
+Friendbot is a web application that creates and funds accounts with native (XLM) tokens.
 
-### Other
+#### [Kin Faucet](https://github.com/kinecosystem/stellar-faucet)
 
-1. [Stellar Node Performance Tips](https://galactictalk.org/d/279-effectively-run-your-stellar-validator-node-performance-tips)
+Kin Faucet, similar to friendbot, is a web application the funds accounts with KIN tokens.
+
+## Launch a Network
+
+1. Read the [instalation guide](INSTALL.md).
+1. Go through the [security checklist](SECURITY.md).

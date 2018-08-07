@@ -1,3 +1,10 @@
+{# examples:
+
+https://github.com/stellar/stellar-core/blob/master/docs/stellar-core_example.cfg
+https://github.com/stellar/stellar-core/blob/master/docs/stellar-core_standalone.cfg
+https://github.com/stellar/stellar-core/blob/master/docs/stellar-core_testnet.cfg
+#}
+
 {% set this_node = stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
 {% set other_nodes = stellar_core.nodes|rejectattr("name", "equalto", inventory_hostname)|list %}
 
