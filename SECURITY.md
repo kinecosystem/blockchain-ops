@@ -6,7 +6,9 @@ The following is a security checklist of issues that should be taken into accoun
 
 Start by reading through Stellar's [security guide](https://www.stellar.org/developers/guides/security.html).
 
-## Core Seed Management
+## Seed Management
+
+### Core
 
 The seed of every core node is the most critical information to secure.
 If a seed is compromised, an attacker could impersonate the Core node whose seed belongs to.
@@ -16,6 +18,13 @@ If a seed is compromised, an attacker could impersonate the Core node whose seed
     1. Backups should have very limited access.
         - At Kin we store the seed backups using AWS [SSM Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-paramstore.html)
 using very limited permissions.
+
+### Root Account
+
+When a new network is started up from scratch, all initial XLM is deposited in a single account, called the *root account*.
+The root account's seed is deterministically derived from the network passphrase, meaning it is accessible to everyone.
+Thus, before exposing the network to the public, it is vital that the root account funds be transferred out to another account,
+and have the root account master key burnt (have its weight set from 1 to 0).
 
 ## Network Access
 

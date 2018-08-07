@@ -9,7 +9,7 @@ Kin Foundation are currently using AWS for managing its infrastructure, though o
 Before launching a group of nodes, it is important to decide on the following:
 
 1. How many nodes to run, keeping in mind high-availabiltiy considerations:
-    1. We recommend the network size include at least a total 7 nodes, to allow for more than one node to fail.
+    1. We recommend the network be comprised of at least 7 nodes in total, to allow for more than one node to fail.
     1. Nodes should be deployed on different cloud regions e.g. AWS us-east-1 and us-west-1. Prefer a separate region for each node.
 1. Decide on your [quorum set and safety threshold percentage](https://www.stellar.org/developers/stellar-core/software/admin.html#crafting-a-quorum-set).
 
@@ -39,7 +39,7 @@ as an example on how to build and configure Horizon on Ubuntu 16.04.
 
 ## Automation
 
-At Kin we use Ansible for orchestration and Terraform for infrastructure automation.
+At Kin Foundation we use Ansible for orchestration and Terraform for infrastructure automation.
 
 ### Ansible
 

@@ -35,6 +35,18 @@ It abstracts the asynchronous nature of the blockchain from clients wishing to s
 
 Laboratory is a web application that allows to construct and submit transactions on the network.
 
+### Testnet Applications
+
+The following are applications only available on a test network, and are irrelevant for a production environment.
+
+#### Friendbot (XLM Faucet)
+
+Friendbot is a web application that creates and funds accounts with native (XLM) tokens.
+
+#### [Kin Faucet](https://github.com/kinecosystem/stellar-faucet)
+
+Kin Faucet, similar to friendbot, is a web application the funds accounts with KIN tokens.
+
 ## Launch a Network
 
 1. Read the [instalation guide](INSTALL.md).
