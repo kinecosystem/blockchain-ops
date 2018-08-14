@@ -24,8 +24,14 @@ dependencies:
       docker:
         logs:
           - type: docker
-            name: horizon
+            image: kinecosystem/horizon
             service: horizon
+            source: go
+
+          - type: docker
+            image: kinecosystem/horizon-nginx-proxy
+            service: horizon-nginx-proxy
+            source: nginx
 
       nginx:
         init_config:
