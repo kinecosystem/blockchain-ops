@@ -1,0 +1,13 @@
+# image used to build kinecosystem/horizon
+# kinecosystem/go repo should be mounted into a container,
+# then you can execute the build
+
+FROM golang:1.8-stretch
+
+RUN BUILD_DEPS="build-essential git mercurial"; \
+    apt-get -qq update && apt-get -qq install $BUILD_DEPS
+
+ENV HORIZON_VERSION kinecosystem/horizon-v0.12.3-psql-optimization
+RUN mkdir -p /go/src/github.com/kinecosystem/go
+WORKDIR "/go/src/github.com/kinecosystem/go"
+VOLUME ["/go/src/github.com/kinecosystem/go"]
