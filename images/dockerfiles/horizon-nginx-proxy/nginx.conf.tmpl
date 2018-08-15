@@ -2,7 +2,7 @@ daemon off;  # run in foreground because docker
 pid /run/nginx.pid;
 worker_processes auto;
 events {
-  worker_connections 10000;
+  worker_connections 50000;
 }
 
 http {
