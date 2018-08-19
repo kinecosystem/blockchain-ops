@@ -10,6 +10,7 @@ EXPOSE 8000
 # available configuration at:
 # https://github.com/kinecosystem/go/blob/horizon-v0.12.3/services/horizon/main.go#L29
 ENV DATABASE_URL= \
+    HORIZON_DB_MAX_OPEN_CONNECTIONS= \
     STELLAR_CORE_DATABASE_URL= \
     STELLAR_CORE_URL= \
     LOG_LEVEL= \

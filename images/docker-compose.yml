@@ -65,6 +65,7 @@ services:
       #
       NETWORK_PASSPHRASE: private testnet
       DATABASE_URL: postgres://stellar:12345678@horizon-db/horizon?sslmode=disable
+      HORIZON_DB_MAX_OPEN_CONNECTIONS: 24
       STELLAR_CORE_DATABASE_URL: postgres://stellar:12345678@stellar-core-1-db/core?sslmode=disable
       STELLAR_CORE_URL: http://stellar-core-1:11626
 
