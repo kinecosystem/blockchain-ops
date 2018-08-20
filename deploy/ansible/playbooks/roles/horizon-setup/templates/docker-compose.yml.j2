@@ -4,13 +4,14 @@ version: "3"
 
 services:
   horizon:
-    image: kinecosystem/horizon:v0.12.3-psql-optimization
+    image: kinecosystem/horizon:v0.12.3-control-db-connection-count
     container_name: horizon
     network_mode: host  # listens on port 8000
     volumes:
       - ./volumes/horizon:/opt/horizon
     environment:
       DATABASE_URL: "postgres://{{this_node.db.user}}:{{this_node.db.password}}@{{this_node.db.host}}/{{this_node.db.name}}?sslmode={{this_node.db.ssl_mode|default('disable')}}"
+      HORIZON_DB_MAX_OPEN_CONNECTIONS: "24"
       STELLAR_CORE_DATABASE_URL: "postgres://{{this_node.stellar_core.db.user}}:{{this_node.stellar_core.db.password}}@{{this_node.stellar_core.db.host}}/{{this_node.stellar_core.db.name}}?sslmode={{this_node.stellar_core.db.ssl_mode|default('disable')}}"
       STELLAR_CORE_URL: "{{this_node.stellar_core.url}}"
       LOG_LEVEL: "{{horizon.log_level|default('warn')}}"
