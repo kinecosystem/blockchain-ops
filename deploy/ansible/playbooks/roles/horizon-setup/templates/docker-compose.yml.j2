@@ -16,8 +16,8 @@ services:
       STELLAR_CORE_URL: "{{this_node.stellar_core.url}}"
       LOG_LEVEL: "{{horizon.log_level|default('warn')}}"
       INGEST: "true"
-      PER_HOUR_RATE_LIMIT: "999999"
-      HISTORY_RETENTION_COUNT: "900000"
+      PER_HOUR_RATE_LIMIT: "10000000"
+      HISTORY_RETENTION_COUNT: "250000"
       NETWORK_PASSPHRASE: "{{horizon.network.passphrase}}"
       FRIENDBOT_URL: '{{horizon.friendbot_url|default("")}}'
 
