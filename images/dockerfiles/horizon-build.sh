@@ -5,7 +5,7 @@ set -x
 set -e
 
 BUILD_TIME=$(date -u --rfc-3339=seconds | sed 's/ /T/')
-HORIZON_VERSION="kinecosystem/horizon-v0.12.3-control-db-connection-count"
+HORIZON_VERSION="kinecosystem/horizon-v0.12.3-sse-hello-timer-5s"
 
 sudo docker run \
     -v $GOPATH/src/github.com/kinecosystem/go:/go/src/github.com/kinecosystem/go \

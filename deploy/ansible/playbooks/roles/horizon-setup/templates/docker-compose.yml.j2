@@ -4,7 +4,7 @@ version: "3"
 
 services:
   horizon:
-    image: kinecosystem/horizon:v0.12.3-control-db-connection-count
+    image: kinecosystem/horizon:v0.12.3-sse-hello-timer-5s
     container_name: horizon
     network_mode: host  # listens on port 8000
     volumes:
@@ -17,7 +17,7 @@ services:
       LOG_LEVEL: "{{horizon.log_level|default('warn')}}"
       INGEST: "true"
       PER_HOUR_RATE_LIMIT: "10000000"
-      HISTORY_RETENTION_COUNT: "250000"
+      HISTORY_RETENTION_COUNT: "900000"
       NETWORK_PASSPHRASE: "{{horizon.network.passphrase}}"
       FRIENDBOT_URL: '{{horizon.friendbot_url|default("")}}'
 
