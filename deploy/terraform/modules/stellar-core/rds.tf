@@ -14,8 +14,8 @@ module "rds" {
   availability_zone      = "${data.aws_subnet.default.availability_zone}"
   create_db_subnet_group = false                                          # use default
 
-  instance_class    = "db.t2.medium"
-  storage_type      = "standard"     # magnetic
+  instance_class    = "${var.rds_instance_class}"
+  storage_type      = "standard"                  # magnetic
   allocated_storage = 20
 
   name     = "core"

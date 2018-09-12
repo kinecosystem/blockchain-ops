@@ -21,9 +21,10 @@ module "{{horizon_module}}" {
   stellar_network_name = "{{stellar.network_name}}"
   tld                  = "{{stellar.tld}}"
   zone                 = "{{node.zone}}"
-  instance_type        = "{{stellar.instance_type}}"
+  instance_type        = "{{node.horizon.instance_type}}"
 
   rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+  rds_instance_class   = "{{node.horizon.rds_instance_class}}"
 }
 
 output "ec2_{{horizon_module}}" {

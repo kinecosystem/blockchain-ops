@@ -21,9 +21,10 @@ module "{{stellar_core_module}}" {
   stellar_network_name = "{{stellar.network_name}}"
   tld                  = "{{stellar.tld}}"
   zone                 = "{{node.zone}}"
-  instance_type        = "{{stellar.instance_type}}"
+  instance_type        = "{{node.instance_type}}"
 
   rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+  rds_instance_class   = "{{node.rds_instance_class}}"
 
   {%if node.horizon%}
   horizon_security_group_id = "${module.{{horizon_module}}.ec2_security_group_id[0]}"

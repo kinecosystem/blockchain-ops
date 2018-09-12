@@ -6,6 +6,7 @@ variable "zone" {}
 variable "instance_type" {}
 
 variable "rds_password" {}
+variable "rds_instance_class" {}
 
 variable "tld" {}
 variable "name" {}
