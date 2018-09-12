@@ -98,13 +98,10 @@ resource "aws_security_group_rule" "ingress_stellar_core_control" {
   description       = "Stellar Core control"
   security_group_id = "${aws_security_group.this.id}"
 
-  # optionally omit this resource if there is not attached horizon to this stellar-core node
-  #
-  # NOTE if you get "value of 'count' cannot be computed"
-  # see https://github.com/hashicorp/terraform/issues/12570
-  count = "${var.horizon_security_group_id != "" ? 1 : 0}"
-
   source_security_group_id = "${var.horizon_security_group_id}"
+
+  # optionally omit this resource if there is not attached horizon to this stellar-core node
+  count = "${var.horizon_security_group_id_count}"
 }
 
 resource "aws_security_group_rule" "egress_postgresql" {

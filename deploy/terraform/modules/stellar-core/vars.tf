@@ -12,3 +12,4 @@ variable "tld" {}
 variable "name" {}
 
 variable "horizon_security_group_id" {}
+variable "horizon_security_group_id_count" {}
