@@ -7,7 +7,6 @@ stellar:
   # NOTE try to keep the network name short as some aws resource have a name
   # length limit e.g. elb name length must be less than 32 characters
   network_name: terraform-test
-  instance_type: t2.medium  # ec2 instance type to use
   tld: mydomain.com  # route53 top level domain
   ssh:
     private_key: ./terraform-test.pem
@@ -15,14 +14,31 @@ stellar:
   nodes:
     - region: us-east-1
       zone: us-east-1a
-      horizon: true
+      instance_type: t2.medium
+      rds_instance_class: db.t2.medium
+      horizon:
+        instance_type: t2.medium
+        rds_instance_class: db.t2.medium
 
     - region: us-east-1
       zone: us-east-1b
+      instance_type: t2.medium
+      rds_instance_class: db.t2.medium
+      horizon:
+        instance_type: t2.medium
+        rds_instance_class: db.t2.medium
 
     - region: us-east-1
       zone: us-east-1c
-      horizon: true
+      instance_type: t2.medium
+      rds_instance_class: db.t2.medium
+      horizon:
+        instance_type: t2.medium
+        rds_instance_class: db.t2.medium
 
+    # missing horizon key means horizon ec2 and rds instances will not be created
+    # i.e. horizon is optional
     - region: us-west-2
       zone: us-west-2c
+      instance_type: t2.medium
+      rds_instance_class: db.t2.medium

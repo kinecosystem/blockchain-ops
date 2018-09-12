@@ -21,14 +21,19 @@ module "{{stellar_core_module}}" {
   stellar_network_name = "{{stellar.network_name}}"
   tld                  = "{{stellar.tld}}"
   zone                 = "{{node.zone}}"
-  instance_type        = "{{stellar.instance_type}}"
+  instance_type        = "{{node.instance_type}}"
 
   rds_password         = "{{env_vars['RDS_PASSWORD']}}"
+  rds_instance_class   = "{{node.rds_instance_class}}"
 
   {%if node.horizon%}
+  # walk around "value of 'count' cannot be computed" bug
+  # https://github.com/hashicorp/terraform/issues/12570
   horizon_security_group_id = "${module.{{horizon_module}}.ec2_security_group_id[0]}"
+  horizon_security_group_id_count = "1"
   {%else%}
   horizon_security_group_id = ""
+  horizon_security_group_id_count = "0"
   {%endif%}
 }
 

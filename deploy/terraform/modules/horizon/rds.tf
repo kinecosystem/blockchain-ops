@@ -9,7 +9,7 @@ module "rds" {
   subnet_ids              = ["${data.aws_subnet.default.id}"]
   availability_zone       = "${data.aws_subnet.default.availability_zone}"
   create_db_subnet_group  = false                                                   # use default
-  instance_class          = "db.t2.medium"
+  instance_class          = "${var.rds_instance_class}"
   storage_type            = "standard"                                              # magnetic
   allocated_storage       = 100
   name                    = "horizon"
