@@ -58,8 +58,8 @@ resource "aws_route53_record" "{{module.name}}" {
   }
 
   set_identifier = "{{module.name}}"
-  latency_routing_policy = {
-    region = "{{module.region}}"
+  weighted_routing_policy = {
+    weight = 1
   }
 }
 
