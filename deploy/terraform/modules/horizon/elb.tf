@@ -16,8 +16,9 @@ module "alb" {
 
   security_groups = ["${module.alb_security_group.this_security_group_id}"]
 
-  # horizon-nginx-proxy cuts connections after 60 seconds
-  idle_timeout = 70
+  # horizon-nginx-proxy cuts connections after 900s = 15m
+  # so we cut 10s just after that i.e. let nginx manage disconnects
+  idle_timeout = 910
 
   http_tcp_listeners = [
     {
