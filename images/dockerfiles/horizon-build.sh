@@ -5,8 +5,8 @@ set -x
 set -e
 
 BUILD_TIME=$(date -u --rfc-3339=seconds | sed 's/ /T/')
-HORIZON_VERSION='kinecosystem/horizon-v0.12.3-sse-preamble-only-when-no-error'
-HORIZON_IMAGE_TAG='v0.12.3-sse-preamble-only-when-no-error'
+HORIZON_VERSION='kinecosystem/horizon-v0.12.3-sse-pubsub-performance-improvement'
+HORIZON_IMAGE_TAG='v0.12.3-sse-pubsub-performance-improvement'
 
 sudo docker run \
     -v $GOPATH/src/github.com/kinecosystem/go:/go/src/github.com/kinecosystem/go \
