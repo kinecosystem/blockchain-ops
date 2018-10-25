@@ -24,6 +24,8 @@ resource "aws_db_instance" "this" {
   backup_retention_period = 0
   backup_window           = "03:00-06:00"
 
+  skip_final_snapshot = true
+
   tags = {
     type            = "horizon"
     stellar-network = "${var.stellar_network_name}"
