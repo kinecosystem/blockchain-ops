@@ -23,8 +23,8 @@ module "{{stellar_core_module}}" {
   zone                 = "{{node.zone}}"
   instance_type        = "{{node.instance_type}}"
 
-  rds_password         = "{{env_vars['RDS_PASSWORD']}}"
-  rds_instance_class   = "{{node.rds_instance_class}}"
+  rds_password         = "{{node.rds.password}}"
+  rds_instance_class   = "{{node.rds.instance_class}}"
 
   {%if node.horizon%}
   # walk around "value of 'count' cannot be computed" bug

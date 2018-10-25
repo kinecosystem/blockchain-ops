@@ -23,8 +23,8 @@ module "{{horizon_module}}" {
   zone                 = "{{node.zone}}"
   instance_type        = "{{node.horizon.instance_type}}"
 
-  rds_password         = "{{env_vars['RDS_PASSWORD']}}"
-  rds_instance_class   = "{{node.horizon.rds_instance_class}}"
+  rds_password         = "{{node.horizon.rds.password}}"
+  rds_instance_class   = "{{node.horizon.rds.instance_class}}"
 }
 
 output "ec2_{{horizon_module}}" {

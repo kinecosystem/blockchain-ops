@@ -1,6 +1,4 @@
-module "rds" {
-  source = "terraform-aws-modules/rds/aws"
-
+resource "aws_db_instance" "this" {
   identifier = "${var.name}"
 
   engine               = "postgres"
@@ -10,9 +8,8 @@ module "rds" {
 
   vpc_security_group_ids = ["${module.rds_security_group.this_security_group_id}"]
 
-  subnet_ids             = ["${data.aws_subnet.default.id}"]
-  availability_zone      = "${data.aws_subnet.default.availability_zone}"
-  create_db_subnet_group = false                                          # use default
+  db_subnet_group_name = "${data.aws_subnet.default.id}"
+  availability_zone    = "${data.aws_subnet.default.availability_zone}"
 
   instance_class    = "${var.rds_instance_class}"
   storage_type      = "standard"                  # magnetic
@@ -45,5 +42,5 @@ module "rds_security_group" {
 
 output "rds" {
   description = "RDS address"
-  value       = "${module.rds.this_db_instance_address}"
+  value       = "${aws_db_instance.this.address}"
 }
