@@ -23,17 +23,18 @@ This file is used in processing the `.tf.j2` Jinja2 templates to product `.tf` f
 ## Launch
 
 - Generate .pem keys for SSHing into the instances that will be launched and place them in the root directory.
-- Generate the RDS password for the RDS instances. This password is given to Jinja2 for template processing via the environment variable `RDS_PASSWORD`.
-Currently this environment variable must be set on every call to `invoke ...`
+- Generate the RDS passwords for RDS instances.
+- Set up AWS CLI profile credentials in $HOME/.aws/credentials. Required so Terraform will be able to invoke AWS various APIs.
 - Update [vars.yml](vars.yml) with the new network parameters.
 - call `invoke new-workspace` to initialize the new network Terraform state on S3:
 ```
-RDS_PASSWORD='xxx' invoke new-workspace
+# AWS_PROFILE defines your aws cli credentials
+AWS_PROFILE=my-profile invoke new-workspace
 ```
 - call `invoke plan` to see a plan the resources that will be launched and
 verify everything is in place:
 ```
-RDS_PASSWORD='xxx' invoke plan
+AWS_PROFILE=my-profile invoke plan
 ```
 - call `invoke apply` to execute the plan you saw when calling `invoke plan`
 
