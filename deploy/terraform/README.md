@@ -38,6 +38,14 @@ AWS_PROFILE=my-profile invoke plan
 ```
 - call `invoke apply` to execute the plan you saw when calling `invoke plan`
 
+### Tips
+
+#### Generate AWS Public key from Private Key
+
+```bash
+ssh-keygen -y -f my-key.pem > my-key.pem.pub
+```
+
 ## Input for Ansible
 
 After launching the infrastructure, Terraform will output a list of addresses and other information.
