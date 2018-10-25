@@ -2,7 +2,7 @@ version: "3"
 
 services:
   stellar-core:
-    image: kinecosystem/stellar-core:9.2.0
+    image: kinecosystem/stellar-core:kinecosystem-v1.0.0-stellar-v9.2.0
     container_name: stellar_core
     ports:
       - 11625:11625
