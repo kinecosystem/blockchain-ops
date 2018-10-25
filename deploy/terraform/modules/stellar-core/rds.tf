@@ -8,7 +8,7 @@ resource "aws_db_instance" "this" {
 
   vpc_security_group_ids = ["${module.rds_security_group.this_security_group_id}"]
 
-  db_subnet_group_name = "${data.aws_subnet.default.id}"
+  db_subnet_group_name = "default"                                      # TODO make this configurable
   availability_zone    = "${data.aws_subnet.default.availability_zone}"
 
   instance_class    = "${var.rds_instance_class}"
