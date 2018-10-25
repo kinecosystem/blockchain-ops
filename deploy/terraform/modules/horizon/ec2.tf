@@ -16,7 +16,7 @@ resource "aws_instance" "this" {
   ]
 
   lifecycle {
-    ignore_changes = ["private_ip", "ami", "root_block_device", "ebs_optimized"]
+    ignore_changes = ["id", "private_ip", "ami", "root_block_device", "ebs_optimized"]
   }
 
   tags = {

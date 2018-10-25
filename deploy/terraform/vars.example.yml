@@ -15,30 +15,44 @@ stellar:
     - region: us-east-1
       zone: us-east-1a
       instance_type: t2.medium
-      rds_instance_class: db.t2.medium
+      rds:
+        instance_class: db.t2.medium
+        password: "12345678"
       horizon:
         instance_type: t2.medium
-        rds_instance_class: db.t2.medium
+        rds:
+          instance_class: db.t2.medium
+          password: "12345678"
 
     - region: us-east-1
       zone: us-east-1b
       instance_type: t2.medium
-      rds_instance_class: db.t2.medium
+      rds:
+        instance_class: db.t2.medium
+        password: "12345678"
       horizon:
         instance_type: t2.medium
-        rds_instance_class: db.t2.medium
+        rds:
+          instance_class: db.t2.medium
+          password: "12345678"
 
     - region: us-east-1
       zone: us-east-1c
       instance_type: t2.medium
-      rds_instance_class: db.t2.medium
+      rds:
+        instance_class: db.t2.medium
+        password: "12345678"
       horizon:
         instance_type: t2.medium
-        rds_instance_class: db.t2.medium
+        rds:
+          instance_class: db.t2.medium
+          password: "12345678"
 
     # missing horizon key means horizon ec2 and rds instances will not be created
     # i.e. horizon is optional
     - region: us-west-2
       zone: us-west-2c
       instance_type: t2.medium
-      rds_instance_class: db.t2.medium
+      rds:
+        instance_class: db.t2.medium
+        password: "12345678"
