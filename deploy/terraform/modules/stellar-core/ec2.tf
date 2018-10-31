@@ -195,5 +195,5 @@ data "aws_ami" "ubuntu" {
 }
 
 data "aws_route53_zone" "kin" {
-  name = "kininfrastructure.com."
+  name = "${format("%s.", var.tld)}"
 }

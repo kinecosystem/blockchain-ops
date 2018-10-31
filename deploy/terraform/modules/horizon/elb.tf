@@ -33,7 +33,7 @@ module "alb" {
     {
       port            = "443"
       protocol        = "HTTPS"
-      certificate_arn = "${data.aws_acm_certificate.kininfrastructure.arn}"
+      certificate_arn = "${data.aws_acm_certificate.kin.arn}"
     },
   ]
 
@@ -103,8 +103,8 @@ output "alb_zone_id" {
   value       = "${module.alb.load_balancer_zone_id}"
 }
 
-data "aws_acm_certificate" "kininfrastructure" {
-  domain   = "*.kininfrastructure.com"
+data "aws_acm_certificate" "kin" {
+  domain   = "${var.certificate_domain_name}"
   statuses = ["ISSUED"]
 }
 

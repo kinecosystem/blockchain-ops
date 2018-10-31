@@ -18,13 +18,14 @@ module "{{horizon_module}}" {
   instance_key_pair_name = "${aws_key_pair.{{node.region}}.key_name}"
   ssh_private_key = "{{stellar.ssh.private_key}}"
 
-  stellar_network_name = "{{stellar.network_name}}"
-  tld                  = "{{stellar.tld}}"
-  zone                 = "{{node.zone}}"
-  instance_type        = "{{node.horizon.instance_type}}"
+  stellar_network_name    = "{{stellar.network_name}}"
+  tld                     = "{{stellar.tld}}"
+  certificate_domain_name = "{{stellar.certificate_domain_name}}"
+  zone                    = "{{node.zone}}"
+  instance_type           = "{{node.horizon.instance_type}}"
 
-  rds_password         = "{{node.horizon.rds.password}}"
-  rds_instance_class   = "{{node.horizon.rds.instance_class}}"
+  rds_password            = "{{node.horizon.rds.password}}"
+  rds_instance_class      = "{{node.horizon.rds.instance_class}}"
 }
 
 output "ec2_{{horizon_module}}" {
@@ -68,7 +69,7 @@ resource "aws_route53_record" "{{module.name}}" {
 data "aws_route53_zone" "kin" {
   provider = "aws.{{stellar.nodes|map(attribute="region")|first}}"
 
-  name = "kininfrastructure.com."
+  name = "{{stellar.tld}}."
 }
 
 

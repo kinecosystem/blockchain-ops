@@ -14,7 +14,7 @@ services:
       # horizon listens on port 8000
       PROXY_PASS_URL: http://localhost:8000
       # Set host for Horizon's response links, leave as $$host for the links to show the original request host(localhost)
-      HOST: "horizon-{{horizon.network.name}}.kininfrastructure.com"
+      HOST: "{{horizon.nginx_host}}"
 
 
     restart: on-failure
