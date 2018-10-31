@@ -9,5 +9,6 @@ variable "rds_instance_class" {}
 variable "rds_password" {}
 
 variable "tld" {}
+variable "certificate_domain_name" {}
 
 variable "name" {}

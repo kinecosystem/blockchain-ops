@@ -7,7 +7,7 @@ terraform {
   provider = "aws.backend-us-east-1"
 
   backend "s3" {
-    bucket = "terraform-state-stellar"
+    bucket = "{{stellar.network_name}}-terraform-state-stellar"
     key    = "terraform.tfstate"
     region = "us-east-1"  # consistent across all workspaces
 
