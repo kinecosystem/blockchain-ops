@@ -1,0 +1,28 @@
+---
+# deploy stellar-core and horizon
+
+# download inventory and group vars
+#
+# NOTE no need to execute this more than once
+- hosts: example-localhost
+  gather_facts: no
+  roles:
+    - role: get-parameter
+      get_parameter:
+        name: example.inventory.yml
+        path: ../inventory
+
+    - role: get-parameter
+      get_parameter:
+        name: example.group_vars.horizon.yml
+        path: group_vars/example
+
+    - role: get-parameter
+      get_parameter:
+        name: example.group_vars.stellar-core.cfg.yml
+        path: group_vars/example
+
+    - role: get-parameter
+      get_parameter:
+        name: datadog.yml
+        path: group_vars/example
