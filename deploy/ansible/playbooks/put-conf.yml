@@ -1,0 +1,22 @@
+---
+# upload (save) inventory and group vars in AWS SSM Parameter Store
+#
+# NOTE no need to execute this more than once
+- hosts: example-localhost
+  gather_facts: no
+  roles:
+    # upload parameters to ssm
+    - role: put-parameter
+      put_parameter:
+        name: example.inventory.yml
+        path: ../inventory/example.yml
+
+    - role: put-parameter
+      put_parameter:
+        name: example.group_vars.horizon.yml
+        path: group_vars/example/horizon.yml
+
+    - role: put-parameter
+      put_parameter:
+        name: example.group_vars.stellar-core.cfg.yml
+        path: group_vars/example/stellar-core.cfg.yml

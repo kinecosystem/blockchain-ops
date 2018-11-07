@@ -1,0 +1,22 @@
+---
+- hosts: example-horizon
+  roles:
+    - sync-clock
+    - apt-get-update
+    - optimize-network
+    - common-packages
+    - docker
+
+    - datadog-horizon
+
+    # NOTE must come before horizon-start because of a bug that overrides
+    # horizon group_var after calling docker_service
+    #
+    # https://github.com/ansible/ansible/issues/33960
+    - horizon-nginx-proxy
+
+    - horizon-health-check
+
+    - horizon-setup
+    - horizon-init
+    - horizon-start

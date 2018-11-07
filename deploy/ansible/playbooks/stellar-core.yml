@@ -1,0 +1,11 @@
+---
+- hosts: example-stellar-core
+  roles:
+    - sync-clock
+    - apt-get-update
+    - common-packages
+    - awscli
+    - docker
+
+    - datadog-stellar-core
+    - stellar-core
