@@ -43,6 +43,7 @@ AWS_PROFILE=my-profile invoke plan
 #### Generate AWS Public key from Private Key
 
 ```bash
+# requires openssl package
 ssh-keygen -y -f my-key.pem > my-key.pem.pub
 ```
 
