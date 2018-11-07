@@ -11,9 +11,9 @@ The basic form of a federation node consists of the following:
 
 Core is the backbone of the Kin network. It maintains a local copy of the ledger, communicating and staying in sync with other instances of Core on the network. It also store historical records of the ledger and participate in consensus.
 
-#### Recommended Hardware Requirements
+#### Required Hardware Requirements
 
-A c5.large AWS machine or equivalent (4 vCPU, 8 GB RAM, 20 GB Magnetic)
+A c5.4xlarge AWS machine or equivalent with 20 GB Magnetic storage.
 
 ** IMPORTANT NOTE: As the number of transactions on the Kin blockchain expected to grow, and as we continue to add security features and customize to Kin Core and Kin Horizon, hardware requirements are subject to change.
 
@@ -40,9 +40,9 @@ Core maintains the current state of the ledger in a SQL DB. Currently the recomm
 
 This database is the main way a dependent service such as Horizon can gather information on the current ledger state or transaction history.
 
-#### Recommended Hardware Requirements
+#### Required Hardware Requirements
 
-A db.m4.xlarge AWS RDS machine or equivalent (4 vCPU, 16 GB RAM, 100 GB Magnetic)
+A db.m4.xlarge AWS RDS machine or equivalent with 100 GB Magnetic storage.
 
 ### Core History Archive
 
@@ -53,9 +53,9 @@ Core normally interacts with one or more “history archives” which are config
 
 Horizon is the client-facing API server for the Kin ecosystem. It acts as the interface between Core and applications that want to access the Kin network. Horizon allows you to submit transactions to the network, check the status of accounts, and subscribe to event streams.
 
-#### Recommended Hardware Requirements
+#### Required Hardware Requirements
 
-A c5.large AWS machine or equivalent (4 vCPU, 8 GB RAM, 20 GB Magnetic)
+A c5.large AWS machine or equivalent with 20 GB Magnetic storage.
 
 #### Network Connections
 
@@ -76,9 +76,9 @@ Horizon should be monitored for:
 
 Horizon is dependent upon a PostgreSQL server, which it uses to store processed core data for ease of use.
 
-#### Recommended Hardware Requirements
+#### Required Hardware Requirements
 
-A db.m4.xlarge AWS RDS machine or equivalent (4 vCPU, 16 GB RAM, 100 GB Magnetic)
+A db.m4.xlarge AWS RDS machine or equivalent with 100 GB Magnetic storage.
 
 
 ## Federation Node Set Up Process
