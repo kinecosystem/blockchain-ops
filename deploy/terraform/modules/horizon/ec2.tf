@@ -33,7 +33,11 @@ resource "aws_instance" "this" {
 
   # ansible requirement
   provisioner "remote-exec" {
-    inline = ["sudo apt-get install -qq python"]
+    inline = [
+      "sudo apt-get update -qq",
+      "sudo apt-get update -qq",
+      "sudo apt-get install -qq python",
+    ]
 
     connection {
       type        = "ssh"
