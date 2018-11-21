@@ -1,18 +1,14 @@
-"""
-Custom datadog-agent check that gets a json response from a given URL,
-and extract a specific metric from it based on a given json path.
-"""
-
-import requests
+"""Get a JSON response from a given URL, and extract a specific metric based on a given JSON path."""
 from hashlib import md5
 import time
+import requests
 
 from datadog_checks.checks import AgentCheck
 from datadog_checks.errors import CheckException
 from jsonpath_rw import parse
 
 
-class JsonCheck(AgentCheck):
+class JSONCheck(AgentCheck):
     """This class holds the json_check check and all the relevant events."""
 
     def check(self, instance):
