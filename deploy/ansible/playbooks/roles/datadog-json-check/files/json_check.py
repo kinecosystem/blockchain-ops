@@ -8,6 +8,7 @@ from hashlib import md5
 import time
 
 from datadog_checks.checks import AgentCheck
+from datadog_checks.errors import CheckException
 from jsonpath_rw import parse
 
 
@@ -38,12 +39,22 @@ class JsonCheck(AgentCheck):
 
         data = r.json()
         for metric in metrics:
-            for name, path in metric.items():
+            for name, obj in metric.items():
+                path, typ = obj['path'], obj['type'].lower()
                 try:
                     # Get the value from the path in the json file
                     expression = parse(path)
                     match = expression.find(data)[0].value
-                    self.gauge(name, float(match))
+
+                    if typ == 'gauge':
+                        self.gauge(name, float(match))
+                    elif typ == 'count':
+                        self.count(name, float(match))
+                    elif typ == 'rate':
+                        self.rate(name, float(match))
+                    else:
+                        raise CheckException('Configuration error: Unknown metric type "{}" for metric "{}"'.format(typ, name))
+
                 except IndexError:
                     # If there is no matching value
                     self.no_match_event(url, path, aggregation_key)
