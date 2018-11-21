@@ -48,7 +48,7 @@ dependencies:
           - url: '{{(stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first).archive.get_address}}.well-known/stellar-history.json'
             metrics:
               # latest ledger updated in the history archive
-              - archive.latest_ledger: currentLedger
+              - archive.latest_ledger: {path: currentLedger, type: gauge}
 
           - url: http://localhost:11626/metrics
             metrics:
