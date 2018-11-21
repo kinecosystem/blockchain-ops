@@ -55,30 +55,30 @@ dependencies:
             metrics:
               # Metrics that include "count" report the 5 minute moving avg per second of this metric
 
-              - horizon.goroutines: goroutines.value                                    # goroutines used by the horizon app
+              - horizon.goroutines: {path: goroutines.value, type: gauge}                                    # goroutines used by the horizon app
 
-              - horizon.elder_ledger: '"history.elder_ledger".value'                    # oldest ledger in the horizon db
-              - horizon.latest_ledger: '"history.latest_ledger".value'                  # newest ledger in the horizon db
+              - horizon.elder_ledger: {path: '"history.elder_ledger".value', type: gauge}                    # oldest ledger in the horizon db
+              - horizon.latest_ledger: {path: '"history.latest_ledger".value', type: gauge}                  # newest ledger in the horizon db
 
-              - horizon.open_connections: '"history.open_connections".value'            # open connections to the horizon database
-              - horizon.core_open_connections: '"stellar_core.open_connections".value'  # open connections to the stellar core database
+              - horizon.open_connections: {path: '"history.open_connections".value', type: gauge}            # open connections to the horizon database
+              - horizon.core_open_connections: {path: '"stellar_core.open_connections".value', type: gauge}  # open connections to the stellar core database
 
-              - horizon.requests_failed: '"requests.failed"."count"'                    # failed requests to horizon (400<= status code < 600)
-              - horizon.requests_succeeded: '"requests.succeeded"."count"'              # successful requests to horizon (200<= status code < 400)
-              - horizon.requests_total: '"requests.total"."count"'                      # total requests to this horizon
+              - horizon.requests_failed: {path: '"requests.failed"."count"', type: count}                    # failed requests to horizon (400<= status code < 600)
+              - horizon.requests_succeeded: {path: '"requests.succeeded"."count"', type: count}              # successful requests to horizon (200<= status code < 400)
+              - horizon.requests_total: {path: '"requests.total"."count"', type: count}                      # total requests to this horizon
 
-              - horizon.txsub_buffered: '"txsub.buffered".value'                        # submission buffered in the submission queue
-              - horizon.txsub_open: '"txsub.open".value'                                # transactions that have yet to be confirmed as successful or failed
-              - horizon.txsub_succeeded: '"txsub.succeeded"."count"'                    # successfull transactions sent from this horizon
-              - horizon.txsub_failed: '"txsub.failed"."count"'                          # failed transactions sent from this proccess
-              - horizon.txsub_total: '"txsub.total"."count"'                            # total number of transactions sent to this horizon
+              - horizon.txsub_buffered: {path: '"txsub.buffered".value', type: gauge}                        # submission buffered in the submission queue
+              - horizon.txsub_open: {path: '"txsub.open".value', type: gauge}                                # transactions that have yet to be confirmed as successful or failed
+              - horizon.txsub_succeeded: {path: '"txsub.succeeded"."count"', type: count}                    # successfull transactions sent from this horizon
+              - horizon.txsub_failed: {path: '"txsub.failed"."count"', type: count}                          # failed transactions sent from this proccess
+              - horizon.txsub_total: {path: '"txsub.total"."count"', type: count}                            # total number of transactions sent to this horizon
 
-              - horizon.requests_failed_5m_rate: '"requests.failed"."5m.rate"'
-              - horizon.requests_succeeded_5m_rate: '"requests.succeeded"."5m.rate"'
-              - horizon.requests_total_5m_rate: '"requests.total"."5m.rate"'
+              - horizon.requests_failed_5m_rate: {path: '"requests.failed"."5m.rate"', type: rate}
+              - horizon.requests_succeeded_5m_rate: {path: '"requests.succeeded"."5m.rate"', type: rate}
+              - horizon.requests_total_5m_rate: {path: '"requests.total"."5m.rate"', type: rate}
 
-              - horizon.txsub_failed_5m_rate: '"txsub.failed"."5m.rate"'
-              - horizon.txsub_succeeded_5m_rate: '"txsub.succeeded"."5m.rate"'
-              - horizon.txsub_total_5m_rate: '"txsub.total"."5m.rate"'
+              - horizon.txsub_failed_5m_rate: {path: '"txsub.failed"."5m.rate"', type: rate}
+              - horizon.txsub_succeeded_5m_rate: {path: '"txsub.succeeded"."5m.rate"', type: rate}
+              - horizon.txsub_total_5m_rate: {path: '"txsub.total"."5m.rate"', type: rate}
 
   - role: datadog-json-check

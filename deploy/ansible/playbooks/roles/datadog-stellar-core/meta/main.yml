@@ -52,15 +52,10 @@ dependencies:
 
           - url: http://localhost:11626/metrics
             metrics:
-              # ledger close times
-              - core.ledger_age_closed: 'metrics."ledger.age.closed"."count"'
-              - core.ledger_ledger_close: 'metrics."ledger.ledger.close"."count"'
-
-              # time to apply a transaction to ledger
-              - core.ledger_transaction_apply: 'metrics."ledger.transaction.apply"."count"'
-
-              # count of scp sync losts
-              - core.scp_sync_lost: 'metrics."scp.sync.lost"."count"'
+              - core.ledger_age_closed: {path: 'metrics."ledger.age.closed"."count"', type: count}
+              - core.ledger_ledger_close: {path: 'metrics."ledger.ledger.close"."count"', type: count}
+              - core.ledger_transaction_apply: {path: 'metrics."ledger.transaction.apply"."count"', type: count}  # time to apply a transaction to ledger
+              - core.scp_sync_lost: {path: 'metrics."scp.sync.lost"."count"', type: count}                        # count of scp sync losts
 
 
   - role: datadog-json-check
