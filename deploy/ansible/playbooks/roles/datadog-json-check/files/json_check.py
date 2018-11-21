@@ -7,6 +7,8 @@ from datadog_checks.checks import AgentCheck
 from datadog_checks.errors import CheckException
 from jsonpath_rw import parse
 
+__version__ = "2.0.0"
+
 
 class JSONCheck(AgentCheck):
     """This class holds the json_check check and all the relevant events."""
