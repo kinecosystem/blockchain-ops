@@ -1,17 +1,16 @@
-"""
-Custom datadog-agent check that gets a json response from a given URL,
-and extract a specific metric from it based on a given json path.
-"""
-
-import requests
+"""Get a JSON response from a given URL, and extract a specific metric based on a given JSON path."""
 from hashlib import md5
 import time
+import requests
 
 from datadog_checks.checks import AgentCheck
+from datadog_checks.errors import CheckException
 from jsonpath_rw import parse
 
+__version__ = "2.0.0"
 
-class JsonCheck(AgentCheck):
+
+class JSONCheck(AgentCheck):
     """This class holds the json_check check and all the relevant events."""
 
     def check(self, instance):
@@ -38,12 +37,22 @@ class JsonCheck(AgentCheck):
 
         data = r.json()
         for metric in metrics:
-            for name, path in metric.items():
+            for name, obj in metric.items():
+                path, typ = obj['path'], obj['type'].lower()
                 try:
                     # Get the value from the path in the json file
                     expression = parse(path)
                     match = expression.find(data)[0].value
-                    self.gauge(name, float(match))
+
+                    if typ == 'gauge':
+                        self.gauge(name, float(match))
+                    elif typ == 'count':
+                        self.count(name, float(match))
+                    elif typ == 'rate':
+                        self.rate(name, float(match))
+                    else:
+                        raise CheckException('Configuration error: Unknown metric type "{}" for metric "{}"'.format(typ, name))
+
                 except IndexError:
                     # If there is no matching value
                     self.no_match_event(url, path, aggregation_key)
