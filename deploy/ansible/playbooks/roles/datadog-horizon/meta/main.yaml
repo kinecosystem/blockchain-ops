@@ -73,12 +73,12 @@ dependencies:
               - horizon.txsub_failed: {path: '"txsub.failed"."count"', type: count}                          # failed transactions sent from this proccess
               - horizon.txsub_total: {path: '"txsub.total"."count"', type: count}                            # total number of transactions sent to this horizon
 
-              - horizon.requests_failed_5m_rate: {path: '"requests.failed"."5m.rate"', type: rate}
-              - horizon.requests_succeeded_5m_rate: {path: '"requests.succeeded"."5m.rate"', type: rate}
-              - horizon.requests_total_5m_rate: {path: '"requests.total"."5m.rate"', type: rate}
+              - horizon.requests_failed_1m_rate: {path: '"requests.failed"."1m.rate"', type: rate}
+              - horizon.requests_succeeded_1m_rate: {path: '"requests.succeeded"."1m.rate"', type: rate}
+              - horizon.requests_total_1m_rate: {path: '"requests.total"."1m.rate"', type: rate}
 
-              - horizon.txsub_failed_5m_rate: {path: '"txsub.failed"."5m.rate"', type: rate}
-              - horizon.txsub_succeeded_5m_rate: {path: '"txsub.succeeded"."5m.rate"', type: rate}
-              - horizon.txsub_total_5m_rate: {path: '"txsub.total"."5m.rate"', type: rate}
+              - horizon.txsub_failed_1m_rate: {path: '"txsub.failed"."1m.rate"', type: rate}
+              - horizon.txsub_succeeded_1m_rate: {path: '"txsub.succeeded"."1m.rate"', type: rate}
+              - horizon.txsub_total_1m_rate: {path: '"txsub.total"."1m.rate"', type: rate}
 
   - role: datadog-json-check
