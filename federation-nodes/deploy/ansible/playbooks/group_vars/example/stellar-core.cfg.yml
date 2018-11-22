@@ -1,0 +1,26 @@
+---
+stellar_core:
+  network:
+    name: my-network
+    passphrase: xxx
+
+  nodes:
+    - name: us-east-1
+      host: us-east-1.my-network.com:11626
+      seed: yyy
+      address: yyy
+      db:
+        name: yyy
+        host: stellar
+        user: stellar
+        password: yyy
+      archive:
+        get_address: https://s3.amazonaws.com/my-network/
+        put_address: s3://my-network-us-east-1/
+
+  preexisting_nodes:
+    - name: stellar-core-XXXX
+      host: stellar-core-ecosystem-XXXX.mydomain.com:11625
+      address: <stellar address>
+      archive:
+        get_address: https://s3.amazonaws.com/stellar-core-ecosystem-XXXX/

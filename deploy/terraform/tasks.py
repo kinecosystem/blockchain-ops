@@ -11,9 +11,12 @@ TERRAFORM_VERSION = '0.11.7'
 
 
 @task
-def install(c, version=TERRAFORM_VERSION):
+def install(c, ostype='linux', version=TERRAFORM_VERSION):
     """Download a local version of Terraform."""
-    file = f'terraform_{version}_linux_amd64.zip'
+    if ostype == 'mac':
+        ostype = darwin
+
+    file = f'terraform_{version}_{ostype}_amd64.zip'
 
     if os.path.exists('terraform'):
         print('Terraform file found')
