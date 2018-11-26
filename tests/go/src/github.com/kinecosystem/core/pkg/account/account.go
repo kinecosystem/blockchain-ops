@@ -1,6 +1,4 @@
-// Create and fund multiple accounts.
-//
-// Seed and address keypairs are dumped to JSON file.
+// Package account implements creating accounts and balance fetching logic.
 package account
 
 import (
