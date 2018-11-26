@@ -1,4 +1,5 @@
-package main
+// Package errors helps with parsing and logging Horizon errors.
+package errors
 
 import (
 	"github.com/go-kit/kit/log"

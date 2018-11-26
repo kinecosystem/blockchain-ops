@@ -1,4 +1,7 @@
-package main
+// Create and fund multiple accounts.
+//
+// Seed and address keypairs are dumped to JSON file.
+package account
 
 import (
 	"math"
@@ -10,6 +13,8 @@ import (
 	"github.com/stellar/go/build"
 	"github.com/stellar/go/clients/horizon"
 	"github.com/stellar/go/keypair"
+
+	"github.com/kinecosystem/core/pkg/errors"
 )
 
 const (
@@ -21,6 +26,15 @@ const (
 	submitTimeout       = 20 * time.Second
 	retryFailedTxAmount = 10
 )
+
+type Keypair struct {
+	Seed    string `json:"seed"`
+	Address string `json:"address"`
+}
+
+type Keypairs struct {
+	Keypairs []Keypair `json:"keypairs"`
+}
 
 func Create(horizonAddr string, network build.Network, funder *keypair.Full, accountsNum int, fundAmount string, logger log.Logger) ([]keypair.KP, error) {
 	level.Info(logger).Log("msg", "creating accounts", "accounts_num", accountsNum)
@@ -50,7 +64,7 @@ func Create(horizonAddr string, network build.Network, funder *keypair.Full, acc
 
 		err := submitWithRetry(horizonAddr, network, ops, funder.Seed(), logger)
 		if err != nil {
-			GetTxErrorResultCodes(err, logger)
+			errors.GetTxErrorResultCodes(err, logger)
 			return nil, err
 		}
 
@@ -113,7 +127,7 @@ func submitWithRetry(horizonAddr string, network build.Network, ops []build.Tran
 			return nil
 		}
 
-		GetTxErrorResultCodes(err, logger)
+		errors.GetTxErrorResultCodes(err, logger)
 
 		time.Sleep(5 * time.Second)
 	}
