@@ -1,0 +1,11 @@
+package: .
+import:
+- package: github.com/go-kit/kit
+  subpackages:
+  - log
+  - log/level
+- package: github.com/stellar/go
+  subpackages:
+  - build
+  - clients/horizon
+  - keypair
