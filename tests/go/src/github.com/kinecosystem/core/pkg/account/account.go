@@ -6,8 +6,8 @@ import (
 
 	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/log/level"
-	"github.com/stellar/go/build"
-	"github.com/stellar/go/keypair"
+	"github.com/kinecosystem/go/build"
+	"github.com/kinecosystem/go/keypair"
 
 	"github.com/kinecosystem/core/pkg/errors"
 	"github.com/kinecosystem/core/pkg/submit"

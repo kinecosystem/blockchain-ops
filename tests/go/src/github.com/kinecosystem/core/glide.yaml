@@ -4,7 +4,7 @@ import:
   subpackages:
   - log
   - log/level
-- package: github.com/stellar/go
+- package: github.com/kinecosystem/go
   subpackages:
   - build
   - clients/horizon

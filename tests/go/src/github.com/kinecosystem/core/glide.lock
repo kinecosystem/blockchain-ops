@@ -1,5 +1,5 @@
-hash: 11605ea55348e888776404c008257f9cdf929f54e03dd376a99f932e90c69bbe
-updated: 2018-11-26T17:12:16.917007315+02:00
+hash: d8df00874bdbae788d21dd601f291041b121789027c98c40632b5c98abf4be13
+updated: 2018-11-27T12:01:06.252369309+02:00
 imports:
 - name: github.com/agl/ed25519
   version: 278e1ec8e8a6e017cd07577924d6766039146ced
@@ -24,8 +24,30 @@ imports:
   - log/level
 - name: github.com/go-logfmt/logfmt
   version: d4327190ff838312623b09bfeb50d7c93c8d9c1d
+- name: github.com/kinecosystem/go
+  version: ecec182a488dd50d3e61c74265d610e8ab97b92f
+  subpackages:
+  - amount
+  - build
+  - clients/horizon
+  - crc16
+  - hash
+  - keypair
+  - network
+  - price
+  - strkey
+  - support/errors
+  - support/http/mutil
+  - support/log
+  - support/render/problem
+  - xdr
 - name: github.com/kr/logfmt
   version: b84e30acd515aadc4b783ad4ff83aff3299bdfe0
+- name: github.com/lib/pq
+  version: 50761b0867bd1d9d069276790bcd4a3bccf2324a
+  repo: https://github.com/lib/pq
+  subpackages:
+  - oid
 - name: github.com/manucorporat/sse
   version: ee05b128a739a0fb76c7ebd3ae4810c1de808d6d
   repo: https://github.com/manucorporat/sse
@@ -50,23 +72,6 @@ imports:
   repo: https://github.com/sirupsen/logrus
   subpackages:
   - hooks/test
-- name: github.com/stellar/go
-  version: 333387f23a0f205a3c00bdc33cb454e0fda32095
-  subpackages:
-  - amount
-  - build
-  - clients/horizon
-  - crc16
-  - hash
-  - keypair
-  - network
-  - price
-  - strkey
-  - support/errors
-  - support/http/mutil
-  - support/log
-  - support/render/problem
-  - xdr
 - name: github.com/stretchr/objx
   version: 1a9d0bb9f541897e62256577b352fdbc1fb4fd94
   repo: https://github.com/stretchr/objx
