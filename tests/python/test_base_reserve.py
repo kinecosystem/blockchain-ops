@@ -12,7 +12,7 @@ WHITELIST_MANAGER_KEYPAIR = Keypair(sys.argv[2])
 
 def main():
     # Create the environment
-    local_env = Environment('LOCAL', 'http://localhost:8008', PASSPHRASE, 'http://localhost:8001')
+    local_env = Environment('LOCAL', 'http://localhost:8000', PASSPHRASE, 'http://localhost:8001')
 
     # Create a client
     client = KinClient(local_env)

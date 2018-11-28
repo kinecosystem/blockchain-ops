@@ -153,4 +153,15 @@ def network(c):
         c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d horizon'.format(
             root_account_seed=root_account_seed), hide='stderr')
 
+        #TODO: doesn't work, need to execute these commands manually
+        # Update ledger parameters
+        print('Updating base reserve')
+        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=0"')
+        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=0"')
+
+        # Already starts at 9, but this fixes a bug that doesn't allow manageData ops
+        print('Updating protocol version')
+        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&protocolversion=9"')
+        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&protocolversion=9"')
+
     print('Network ready')
