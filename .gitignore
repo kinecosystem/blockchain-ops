@@ -1,1 +1,3 @@
 /connect
+**.idea/
+__pycache__/
