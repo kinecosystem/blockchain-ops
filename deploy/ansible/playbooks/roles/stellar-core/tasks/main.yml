@@ -17,11 +17,18 @@
     dest: /opt/stellar-core/docker-compose.yml
     mode: 0644
 
-- name: pull docker image
+- name: pull docker image - this tends to fail so ignore errors
   docker_service:
     project_src: /opt/stellar-core
-    state: absent
     pull: yes
+    stopped: yes
+  ignore_errors: yes
+
+- name: pull docker image - again
+  docker_service:
+    project_src: /opt/stellar-core
+    pull: yes
+    stopped: yes
 
 - name: initialize database
   command: docker-compose run --rm stellar-core --newdb

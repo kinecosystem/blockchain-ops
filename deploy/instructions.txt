@@ -1,0 +1,53 @@
+How to Deploy a new node - a sort of a guide:
+
+There are a couple of different use cases to our deploy scripts:
+The original use case was to setup n-nodes (0<n) which, together, form a 'network'. In this use case, the nodes all connect to each other and all serve together - they're all taking part in SCP.
+
+Another, differnet use case is one where a single node is setup in an AWS account, but it wants to receive SCP updates from an already-existing network. This use case is typical to federation nodes and requries a somewhat-different configuration. for this configuration, you should use a differnt stellar-core.cfg.j2 and stellar-core.cfg.yml files, listed in federation-nodes/deploy/ansible - overwrite the original file and use these instead, after you fill in the missing info about the pre-existing nodes.
+
+0. start pipenv (pipenv install, pipenv shell) in the terraform dir. note that by default, pipenv expects python 3.7 to be available on your machine. You can change it in the Pipfile. ensure 'pipenv run invoke' works.
+1. get terraform. either use "pipenv run invoke install --ostype='mac'" or just get it manually and place the binary in the terraform directory (you may need to install wget first).
+2. get AWS credntials and login to the console.
+3. check that a *-prefix cert exists (certificate manager) and is in the same area as the deployment and is verified.
+4. copy the entire work folder and rename it.
+5. dont forget to trash the .terraform directory
+6. if you're not using us-east-1, be sure to edit all the terraform code in .j2 files to your region.
+7. if there is no user with cli-access in IAM, create one and write down the credentials in lastpass.
+8. export the AWS credentials into cli. remove AWS session/token if they exist.
+9. create a new ssh key in AWS, download it, chmod 600 it, 
+10. create a public key from the private key: ssh-keygen -y -f my_key.pem > my-key.pem.pub.
+11. place it in the terraform dir and your .ssh dir
+
+12. optionally, export TF_LOG=DEBUG # increases terraform log level
+13. edit the terraform vars.yml
+14. create a bucket in s3 (in the same region as the deployment) named: 							<network_name>-terraform-state-stellar
+15. run invoke new-workspace. if its failing, trash .terraform and the contents of the s3 bucket.
+16. create a dummy db in rds (t.micro). this generates a subnet group called deafult which is needed. delete the db immideatly. no need to wait for its completion. this is a temporary workaround.
+17. run invoke plan
+18. run invoke apply
+19. if it went well, copy the results aside
+20. edit your ssh config (~/.ssh/config) for the public ip addresses and fqdn - (like 'ec2-34-235-127-215.compute-1.amazonaws.com') - for both core and horizon instances. dont forget to change the ssh key there, too!
+21. create a seed/address pair using docker (docker run --rm -it -v ./stellar-core.cfg kinecosystem/stellar-core --genseed)
+22. edit the inventory, group-files and all other required files in the ansible folder.
+23. if the node you're setting up should connect to an existing network, be sure to remove the FORCE-SCP step.
+24. if the node you're setting up is not a part of a larger network, you'll need to enable UNSAFE_QUORUM, in the core config file (playbooks/roles/stellar-core/templates/stellar-core.cfg.j2). Stellar refuses to start nodes in unsafe config otherwise.
+25. run the various ansible playbooks (horizon, core, put_get_ssm - in this order)
+
+troubleshooting:
+1. on mac, the SSM Ansible plugin sometimes fails. export the line below to fix:
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES # https://github.com/ansible/ansible/issues/32499 
+
+2. if you're getting an error about the kms alias already existing, you can do this:
+aws kms delete-alias --region us-west-1  --alias-name alias/socialfoundrykin
+
+3. if the kms key is missing, you can just create one. its only used in the put_get_ssm playbook.
+
+4. RDS passwords must be alphanumeric
+
+5. Amazon has this strange policy where new accounts can create large instances. there are 2 kinds of failures: either the account is 'not verified' or there's an actual limit on creating the instance type (happens in smaller regions). in the first case, email 'aws-verification@amazon.com', in the seconds case, you can ask to raise the limit. it can take a few hours for them to fix it.
+
+6. getting access denied on new-workspace? you forgot the create the bucket. or maybe you placed it in the wrong place. or mis-spelled its name.
+
+7. if you happen to run the horizon ansible book twice, note that the step 'initialize database' can only run once. either comment it or clear the database (you can psql into the db, then switch to another db (\c DBNAME) and drop the horizon db)
+
+
