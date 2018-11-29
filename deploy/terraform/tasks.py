@@ -14,7 +14,7 @@ TERRAFORM_VERSION = '0.11.7'
 def install(c, ostype='linux', version=TERRAFORM_VERSION):
     """Download a local version of Terraform."""
     if ostype == 'mac':
-        ostype = darwin
+        ostype = 'darwin'
 
     file = f'terraform_{version}_{ostype}_amd64.zip'
 
