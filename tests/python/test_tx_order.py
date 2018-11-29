@@ -32,7 +32,7 @@ def get_latest_ledger(client):
 
 async def main():
     # Create the environment
-    local_env = Environment('LOCAL', 'http://localhost:8008', PASSPHRASE, 'http://localhost:8001')
+    local_env = Environment('LOCAL', 'http://localhost:8000', PASSPHRASE, 'http://localhost:8001')
 
     # Create a client
     client = KinClient(local_env)
@@ -41,9 +41,7 @@ async def main():
     initial_ledger_size = get_latest_ledger(client)['max_tx_set_size']
     try:
         # Set ledger tx size to 3
-        # TODO: change to py-invoke
         requests.get('http://localhost:11626/upgrades?mode=set&maxtxsize=3&upgradetime=2018-10-15T18:34:00Z')
-        requests.get('http://localhost:11627/upgrades?mode=set&maxtxsize=3&upgradetime=2018-10-15T18:34:00Z')
 
         # Create the root account object
         root_account = client.kin_account(derive_root_account(PASSPHRASE).secret_seed)
@@ -128,9 +126,6 @@ async def main():
         raise
     finally:
         # Set tx size to what it was before
-        # TODO: change to py-invoke
         requests.get(f'http://localhost:11626/upgrades?mode=set&maxtxsize={initial_ledger_size}&upgradetime=2018-10-15T18:34:00Z')
-        requests.get(f'http://localhost:11627/upgrades?mode=set&maxtxsize={initial_ledger_size}&upgradetime=2018-10-15T18:34:00Z')
-
 if __name__ == '__main__':
     asyncio.run(main())
