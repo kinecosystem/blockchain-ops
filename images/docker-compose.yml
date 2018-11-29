@@ -1,6 +1,20 @@
 version: "3"
 
 services:
+
+  stellar-core-telegraf-1:
+    environment:
+     - NODE_NAME="stellar-core-1"
+    image: kinecosystem/stellar-core-telegraf:latest
+    links:
+     - "stellar-core:stellar-core"
+    restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
+
   stellar-core-1:
     image: kinecosystem/stellar-core
     ports:
@@ -24,6 +38,19 @@ services:
       POSTGRES_USER: stellar
       POSTGRES_PASSWORD: "12345678"
       POSTGRES_DB: core
+
+  stellar-core-telegraf-2:
+    environment:
+     - NODE_NAME="stellar-core-2"
+    image: kinecosystem/stellar-core-telegraf:latest
+    links:
+     - "stellar-core:stellar-core"
+    restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
 
   stellar-core-2:
     image: kinecosystem/stellar-core
@@ -102,6 +129,8 @@ services:
     links:
       - horizon
     environment:
+      STATSD_SAMPLE_RATE_PERCENT: 100
+      STATSD_METRIC_PREFIX: 'my-horizon'
       PROXY_LISTEN_PORT: 80
       PROXY_READ_TIMEOUT: 10
       PROXY_PASS_URL: http://horizon:8000
