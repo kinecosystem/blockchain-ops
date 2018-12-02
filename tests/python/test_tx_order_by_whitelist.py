@@ -1,4 +1,4 @@
-"""Test the prioritization of transactions in the ledger"""
+"""Test the prioritization of transactions in the ledger based on whitelist"""
 
 import sys
 import asyncio
