@@ -185,16 +185,19 @@ resource "aws_security_group_rule" "egress_apt_key_server" {
 # data sources to get vpc, subnet, ami, route53 details
 
 data "aws_vpc" "default" {
+  provider = "aws.us-east-1"
   default = true
 }
 
 data "aws_subnet" "default" {
+  provider = "aws.us-east-1"
   vpc_id            = "${data.aws_vpc.default.id}"
   availability_zone = "${var.zone}"
   default_for_az    = true
 }
 
 data "aws_ami" "ubuntu" {
+  provider = "aws.us-east-1"
   most_recent = true
 
   owners = ["099720109477"] # canonical/ubuntu
@@ -210,5 +213,6 @@ data "aws_ami" "ubuntu" {
 }
 
 data "aws_route53_zone" "kin" {
+  provider = "aws.us-east-1"
   name = "${format("%s.", var.tld)}"
 }
