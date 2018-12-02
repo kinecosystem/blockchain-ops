@@ -6,7 +6,7 @@
     - optimize-network
     - common-packages
     - docker
-
+    - horizon-network-latency-test
     - datadog-horizon
 
     # NOTE must come before horizon-start because of a bug that overrides

@@ -1,0 +1,15 @@
+{% set this_node = horizon.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+---
+version: "3"
+services:
+  network-latency-telegraf:
+    environment:
+      NODE_NAME: "{{stellar_core.network.name}}"
+      TARGET_URL: "http://{{this_node.stellar_core.url}}:11626/info"
+    image: kinecosystem/network-latency-telegraf
+    restart: always
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"

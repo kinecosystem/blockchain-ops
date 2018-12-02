@@ -1,0 +1,29 @@
+---
+- name: create /opt/horizon-network-latency-test directory
+  file:
+    path: /opt/horizon-network-latency-test
+    state: directory
+    mode: 0655
+
+- name: cp docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: /opt/horizon-network-latency-test/docker-compose.yml
+    mode: 0400
+
+- name: pull docker image - this tends to fail so ignore errors
+  docker_service:
+    project_src: /opt/horizon-network-latency-test
+    stopped: yes
+    pull: yes
+  ignore_errors: yes
+
+- name: pull docker image - again
+  docker_service:
+    project_src: /opt/horizon-network-latency-test
+    stopped: yes
+    pull: yes
+
+- name: start horizon-network-latency-test
+  docker_service:
+    project_src: /opt/horizon-network-latency-test
