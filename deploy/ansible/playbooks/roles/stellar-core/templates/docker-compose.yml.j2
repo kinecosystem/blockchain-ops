@@ -8,7 +8,7 @@ services:
     image: kinecosystem/stellar-core-telegraf:v1
     links:
      - "stellar-core:stellar-core"
-    restart: on-failure
+    restart: always
     logging:
       driver: json-file
       options:
@@ -23,7 +23,7 @@ services:
       - 11626:11626
     volumes:
       - ./volumes/stellar-core:/opt/stellar-core
-    restart: on-failure
+    restart: always
     logging:
       driver: json-file
       options:

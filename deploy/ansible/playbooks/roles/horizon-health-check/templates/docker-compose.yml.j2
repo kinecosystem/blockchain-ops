@@ -16,7 +16,7 @@ services:
       REQUEST_TIMEOUT: 2
       CORE_INFO_URL: {{this_node.stellar_core.url}}/info
 
-    restart: on-failure
+    restart: always
     logging:
       driver: json-file
       options:

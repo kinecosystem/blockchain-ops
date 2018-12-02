@@ -9,7 +9,7 @@ In docker-compose, add the following service next to the horizon's nginx one.
 services:
   horizon-telegraf:
     image: kinecosystem/horizon-telegraf:latest
-    restart: on-failure
+    restart: always
     logging:
       driver: json-file
       options:

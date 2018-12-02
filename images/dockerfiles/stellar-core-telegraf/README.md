@@ -12,7 +12,7 @@ services:
     image: kinecosystem/stellar-core-telegraf:latest
     links:
      - "stellar-core:stellar-core"
-    restart: on-failure
+    restart: always
     logging:
       driver: json-file
       options:

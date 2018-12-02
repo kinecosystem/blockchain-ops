@@ -6,7 +6,7 @@ services:
     image: kinecosystem/horizon-telegraf:v1
     container_name: horizon-telegraf
     network_mode: host
-    restart: on-failure
+    restart: always
     logging:
       driver: json-file
       options:
@@ -30,7 +30,7 @@ services:
       HOST: "{{horizon.nginx_host}}"
 
 
-    restart: on-failure
+    restart: always
     logging:
       driver: json-file
       options:

@@ -8,7 +8,7 @@ In docker-compose, add the following service wherever you want your stats monito
 services:
   telegraf-datadog-forwarder:
     image: kinecosystem/telegraf-datadog-forwarder:latest
-    restart: on-failure
+    restart: always
     environment:
       DATADOG_API_KEY: <the api key>
     logging:
