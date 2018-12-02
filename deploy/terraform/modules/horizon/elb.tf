@@ -104,10 +104,12 @@ output "alb_zone_id" {
 }
 
 data "aws_acm_certificate" "kin" {
+  provider = "aws.us-east-1"
   domain   = "${var.certificate_domain_name}"
   statuses = ["ISSUED"]
 }
 
 data "aws_subnet_ids" "default" {
+  provider = "aws.us-east-1"
   vpc_id = "${data.aws_vpc.default.id}"
 }
