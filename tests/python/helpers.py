@@ -15,7 +15,7 @@ def derive_root_account(passphrase):
 
 
 async def send_txs(txs):
-    with ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=len(txs)) as executor:
         loop = asyncio.get_running_loop()
         promises = [loop.run_in_executor(executor, tx.submit) for tx in txs]
 

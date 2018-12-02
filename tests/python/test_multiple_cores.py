@@ -53,11 +53,11 @@ async def main():
     print('Creating new test accounts')
     root_account.create_account(accounts[0].public_address, 100000000, minimum_fee)
     root_account.create_account(accounts[1].public_address, 100000000, minimum_fee)
-    assert clients[0].does_account_exists(accounts[1].public_address) & clients[0].does_account_exists(
+    assert clients[0].does_account_exists(accounts[1].public_address) and clients[0].does_account_exists(
         accounts[0].public_address)
     print('2 Test accounts created - Passed')
 
-    for i in range(0, tx_count):
+    for i in tx_count:
         # generating transactions using multiple kin-cores
         builder = Builder('LOCAL', clients[i % len(clients)].horizon, fee=minimum_fee,
                           secret=accounts[i % len(accounts)].secret_seed)
