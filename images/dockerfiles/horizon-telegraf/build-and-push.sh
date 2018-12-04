@@ -1,2 +1,2 @@
-docker build . -t kinecosystem/horizon-telegraf
-docker push kinecosystem/horizon-telegraf:latest
+docker build . -t kinecosystem/horizon-telegraf:v1.0.1
+docker push kinecosystem/horizon-telegraf:v1.0.1

@@ -28,13 +28,13 @@ http {
     proxy_read_timeout ${PROXY_READ_TIMEOUT};
 
     location / {
-      statsd_count "${STATSD_METRIC_PREFIX}.$request_method" 1;
+      statsd_count "request_count.$request_method.${NODE_NAME}" 1;
       # http://nginx.org/en/docs/http/ngx_http_upstream_module.html#keepalive
       proxy_http_version 1.1;
       proxy_set_header Connection "";
       proxy_set_header Host   ${HOST};
       proxy_pass ${PROXY_PASS_URL};
-      statsd_timing "${STATSD_METRIC_PREFIX}.$request_method.index_response_time" "$upstream_response_time";
+      statsd_timing "response_time.$request_method.${NODE_NAME}" "$upstream_response_time";
 
       # if the request is for sse, return 200 instead of 504
       #

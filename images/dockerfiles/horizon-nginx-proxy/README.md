@@ -14,8 +14,7 @@ This nginx image contains a dyanmic module for emitting statsd stats. The stats 
 - number of requests served per method
 - the duration of requests per method
 
-note that you can configure the sample rate and the destination to which the stats are sent as well as the prefix attached
-to the metrices.
+note that you can configure the sample rate and the destination to which the stats are sent as well as set a node-name to the metrices. This node name can later be used by a telegraf statsd input plugin and transofrmed into a tag
 
 ## Usage
 
@@ -34,7 +33,7 @@ horizon-nginx-proxy:
     - 8000:8000
   environment:
    STATSD_SAMPLE_RATE_PERCENT: 100
-    STATSD_METRIC_PREFIX: 'my_node'
+    NODE_NAME: 'my_node'
     PROXY_LISTEN_PORT: 8000
     PROXY_READ_TIMEOUT: 10
     PROXY_PASS_URL: http://horizon:8000

@@ -1,13 +1,15 @@
-# this telegraf client runs some simple network latency checks and reports them
+# Telegraf configuration for stellar core:
+# this configuration does one thing: it reports the /info metrics from the core
+# to the Kin Ecosystem metric collection endpoint, every 10 seconds
 
 # Global tags can be specified here in key="value" format.
 [tags]
-  node_name = "${NODE_NAME}" # take from env
+  node_name = "$NODE_NAME" # take from env
 
 # Configuration for telegraf agent
 [agent]
   # Default data collection interval for all inputs
-  interval = "1s"
+  interval = "10s"
   # Rounds collection interval to 'interval'
   # ie, if interval="10s" then always collect on :00, :10, :20, etc.
   round_interval = true
@@ -54,10 +56,32 @@
 #                                  INPUTS                                     #
 ###############################################################################
 
+# parse json from http
+[[inputs.http]]
+  ## One or more URLs from which to read formatted metrics
+  urls = [
+    "http://stellar-core:11626/info"
+  ]
+
+  ## HTTP method
+  # method = "GET"
+
+  name_override = "stellar-core-ledger"
+
+  data_format = "json"
+
+  ## Query is a GJSON path that specifies a specific chunk of JSON to be
+  ## parsed, if not specified the whole document will be parsed.
+  ##
+  ## GJSON query paths are described here:
+  ##   https://github.com/tidwall/gjson#path-syntax
+  json_query = "info.ledger"
+
 [[inputs.exec]]
   ## Commands array
   commands = [
-    "/tmp/check_latency.sh",
+    "/tmp/get_load5.sh",
+    "/tmp/get_core_state.sh",
   ]
 
   ## Timeout for each command to complete.
