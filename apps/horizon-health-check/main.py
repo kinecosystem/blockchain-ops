@@ -19,6 +19,7 @@ START_TIMESTAMP = time.time()
 
 # Load configuration from env variables
 CORE_INFO_URL = os.environ['CORE_INFO_URL']
+HORIZON_INFO_URL = os.environ['HORIZON_INFO_URL']
 BUILD_VERSION = os.environ['BUILD_VERSION']
 REQUEST_TIMEOUT = float(os.environ['REQUEST_TIMEOUT'])
 
@@ -42,9 +43,17 @@ def status():
         response = requests.get(CORE_INFO_URL, timeout=REQUEST_TIMEOUT)
         response.raise_for_status()
 
-        health = (response.json()['info']['state'] == 'Synced!')
-        if health:
-            return make_reply('Core is synced', 200)
-        return make_reply('Core is not synced', 503)
+        core_health = (response.json()['info']['state'] == 'Synced!')
+        msg = 'Core is ' + ('synced' if core_health else 'not synced')
+
+        response = requests.get(HORIZON_INFO_URL, timeout=REQUEST_TIMEOUT)
+        response.raise_for_status()
+
+        horizon_health = (int(response.json()['core_latest_ledger']) - int(response.json()['history_latest_ledger']) < 3)
+        msg += ', Horizon is ' + ('synced' if horizon_health else 'not synced')
+
+        if core_health and horizon_health:
+            return make_reply(msg, 200)
+        return make_reply(msg, 503)
     except Exception as e:
-        return make_reply('Could not check core: {}'.format(str(e)), 503)
+        return make_reply('Could not perform health check: {}'.format(str(e)), 503)
