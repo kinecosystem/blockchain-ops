@@ -1,0 +1,16 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pycodestyle = "*"
+pydocstyle = "*"
+pylint = "*"
+
+[packages]
+invoke = "==1.2.0"
+kin-sdk = "==2.1.3"
+
+[requires]
+python_version = "3.7"
