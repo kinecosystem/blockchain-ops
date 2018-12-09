@@ -22,4 +22,4 @@ ENV DATABASE_URL= \
 
 ENTRYPOINT ["/usr/local/bin/horizon"]
 
-COPY horizon /usr/local/bin/
+COPY ./volumes/go-git/horizon /usr/local/bin/

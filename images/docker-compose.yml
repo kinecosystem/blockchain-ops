@@ -17,7 +17,7 @@ services:
 
   stellar-core:
     build:
-      dockerfile: Dockerfile.stellar-core
+      dockerfile: dockerfiles/Dockerfile.stellar-core
       context: .
     ports:
       - 11626:11626
@@ -42,7 +42,7 @@ services:
 
   horizon:
     build:
-      dockerfile: Dockerfile.horizon
+      dockerfile: dockerfiles/Dockerfile.horizon
       context: .
     ports:
       - 8000:8000
@@ -90,14 +90,14 @@ services:
 
   stellar-core-build:
     build:
-      dockerfile: Dockerfile.stellar-core-build
+      dockerfile: dockerfiles/Dockerfile.stellar-core-build
       context: .
     volumes:
       - ./volumes/stellar-core-git:/stellar-core
 
   horizon-build:
     build:
-      dockerfile: Dockerfile.horizon-build
+      dockerfile: dockerfiles/Dockerfile.horizon-build
       context: .
     volumes:
       - ./volumes/go-git:/go/src/github.com/kinecosystem/go

@@ -8,5 +8,6 @@ RUN mkdir -p /stellar-core
 WORKDIR /stellar-core
 VOLUME /stellar-core
 
-COPY stellar-core-build/build.sh /
-COPY stellar-core-build/clean.sh /
+COPY copy/stellar-core-build/build.sh /
+
+CMD /build.sh
