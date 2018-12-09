@@ -42,7 +42,8 @@ def vendor(c, arch='linux-amd64',):
     glide(c, arch)
 
     print('Vendoring dependencies')
-    c.run('./glide install', hide='stderr')
+    if not os.path.isdir('{}/vendor'.format(c.cwd)):
+        c.run('./glide install', hide='stderr')
 
 
 def is_image_exists(c, name):
