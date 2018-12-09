@@ -57,6 +57,8 @@
 #                                  INPUTS                                     #
 ###############################################################################
 
+[[inputs.system]]
+
 # parse json from http
 [[inputs.http]]
   ## One or more URLs from which to read formatted metrics
@@ -81,7 +83,6 @@
 [[inputs.exec]]
   ## Commands array
   commands = [
-    "/tmp/get_load5.sh",
     "/tmp/get_core_state.sh",
   ]
 
