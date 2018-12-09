@@ -1,5 +1,4 @@
 """Call various Terraform actions."""
-import json
 import os
 import os.path
 from datetime import datetime, timezone
@@ -7,9 +6,10 @@ from hashlib import sha256
 from time import sleep
 
 import requests
-from invoke import task
+from invoke import task, call
+from invoke.exceptions import Exit
 
-from kin import Keypair, KinClient, Environment as KinEnvironment
+from kin import KinClient, Environment as KinEnvironment
 from kin.blockchain.builder import Builder
 import kin_base
 
@@ -56,33 +56,87 @@ def is_image_exists(c, name):
     return False
 
 
+def is_git_dir_modified(c):
+    """Return True if the given git repo directory is unmodified."""
+    res = c.run('git status --porcelain', hide='both')
+    for line in res.stdout:
+        if line.startswith(' M '):
+            print('Git directory {} is modified'.format(c.cwd))
+            return True
+
+    print('Git directory {} is unmodified'.format(c.cwd))
+    return False
+
+
+def git_dir_checkout_branch(c, branch):
+    """Checkout a specific branch for given repo directory."""
+    print('Checking out kinecosystem/master')
+    c.run('git checkout {}'.format(branch))
+
+
+def init_git_repo(c, git_url, dir_name, branch='kinecosystem/master'):
+    """Make sure git repo directory is available before building."""
+    # clone git repo if it doesn't exist,
+    # otherwise checkout kinecosystem/master branch
+    if not os.path.isdir('{}/{}/volumes/{}'.format(os.getcwd(), c.cwd, dir_name)):
+        print('Core git repository doesn\'t exist, cloning')
+        c.run('git clone --branch {branch} {git_url} volumes/{dir_name}'.format(branch=branch, git_url=git_url, dir_name=dir_name))
+    else:
+        with c.cd('volumes/{}'.format(dir_name)):
+            if is_git_dir_modified(c):
+                raise Exit('Stopping, please clean changes and retry')
+
+            git_dir_checkout_branch(c, branch)
+
+
 @task
-def build_core(c, version='kinecosystem/master'):
+def build_core(c, version, production=True):
     """Build Core binary docker image."""
     with c.cd('images'):
-        if is_image_exists(c, 'images_stellar-core'):
+        # we always rebuild production images.
+        # for non-production (e.g. local test network), we don't
+        #
+        # NOTE docker compose doesn't have a way of knowing if an image was already
+        # built, so we search for it manually
+        if not production and is_image_exists(c, 'images_stellar-core'):
             return
 
-        if not os.path.isdir('./images/volumes/stellar-core-git'):
-            print('Core git repository doesn\'t exist, cloning')
-            c.run('git clone --branch kinecosystem/master https://github.com/kinecosystem/stellar-core.git volumes/stellar-core-git')
+        init_git_repo(c, 'https://github.com/kinecosystem/stellar-core.git', 'stellar-core-git')
 
         print('Building core')
-        c.run('sudo docker-compose build stellar-core-build')
-        c.run('sudo docker-compose run stellar-core-build')
-        c.run('sudo docker-compose build stellar-core')
+
+        if production:
+            c.run('sudo docker build '
+                  '-f dockerfiles/Dockerfile.stellar-core-build '
+                  '-t kinecosystem/stellar-core-build '
+                  '.')
+
+            c.run('sudo docker run --rm '
+                  '-v {}/{}/volumes/stellar-core-git:/stellar-core '
+                  'kinecosystem/stellar-core-build'.format(os.getcwd(), c.cwd))
+
+            c.run('sudo docker build '
+                  '-f dockerfiles/Dockerfile.stellar-core '
+                  '-t kinecosystem/stellar-core:latest '
+                  '-t kinecosystem/stellar-core:{version} '
+                  '.'.format(version=version))
+        else:
+            c.run('sudo docker-compose build stellar-core-build')
+            c.run('sudo docker-compose run stellar-core-build')
+            c.run('sudo docker-compose build stellar-core')
 
 
 @task
-def build_horizon(c, version='kinecosystem/master'):
-    """Build Horizon binary docker image."""
-    with c.cd('images'):
-        if is_image_exists(c, 'images_horizon'):
-            return
+def build_horizon(c, version, production=True):
+    """Build Horizon binary docker image.
 
-        if not os.path.isdir('./images/volumes/go-git'):
-            print('Go (Horizon) Core git repository doesn\'t exist, cloning')
-            c.run('git clone --branch kinecosystem/master https://github.com/kinecosystem/go.git volumes/go-git')
+    By default, builds a Docker image and uploads it to Dockerhub.
+
+    When production is disabled, it builds using docker-compose and doesn't push
+    an image to Dockerhub, mainly used for local network tests.
+    """
+    with c.cd('images'):
+        init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git')
 
         with c.cd('volumes/go-git'):
             vendor(c, arch='linux-amd64')
@@ -99,8 +153,41 @@ def build_horizon(c, version='kinecosystem/master'):
         ])
 
         print('Building Horizon')
-        c.run('sudo docker-compose run horizon-build {cmd}'.format(cmd=cmd))
-        c.run('sudo docker-compose build horizon')
+
+        if production:
+            # build
+            c.run('sudo docker build '
+                  '-f dockerfiles/Dockerfile.horizon-build '
+                  '-t kinecosystem/horizon-build '
+                  '.')
+
+            c.run('sudo docker run '
+                  '--rm '
+                  '-v {}/{}/volumes/go-git:/go/src/github.com/kinecosystem/go kinecosystem/horizon-build '
+                  '{}'.format(os.getcwd(), c.cwd, cmd))
+
+            c.run('sudo docker build '
+                  '-f dockerfiles/Dockerfile.horizon '
+                  '-t kinecosystem/horizon:latest '
+                  '-t kinecosystem/horizon:{version} '
+                  '.'.format(version=version))
+        else:
+            # build using docker compose for local test network
+            c.run('sudo docker-compose run horizon-build {cmd}'.format(cmd=cmd))
+            c.run('sudo docker-compose build horizon')
+
+
+@task
+def push_dockerhub(c, app, version):
+    """Push image to Dockerhub."""
+    if app.lower() == 'core':
+        c.run('sudo docker push kinecosystem/stellar-core:latest')
+        c.run('sudo docker push kinecosystem/stellar-core:{version}'.format(version=version))
+    elif app.lower() == 'horizon':
+        c.run('sudo docker push kinecosystem/horizon:latest')
+        c.run('sudo docker push kinecosystem/horizon:{version}'.format(version=version))
+    else:
+        Exit('Unknown application {}'.format(app))
 
 
 @task
@@ -170,8 +257,9 @@ def create_whitelist_account(_):
     builder.submit()
 
 
-@task(pre=[build_core, build_horizon, rm_network],
-      post=[base_reserve_0, protocol_version_9, create_whitelist_account])
+@task(pre=[call(build_core, version='kinecosystem/master', production=False),
+           call(build_horizon, version='kinecosystem/master', production=False),
+           rm_network])
 def network(c):
     """Initialize a new local test network with single core and horizon instances."""
     print('Launching local network')

@@ -8,6 +8,6 @@ RUN mkdir -p /stellar-core
 WORKDIR /stellar-core
 VOLUME /stellar-core
 
-COPY copy/stellar-core-build/build.sh /
+COPY dockerfiles/stellar-core-build/build.sh /
 
 CMD /build.sh
