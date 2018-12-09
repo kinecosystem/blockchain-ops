@@ -17,7 +17,6 @@ import kin_base
 GLIDE_ARCH = 'linux-amd64'
 
 
-@task
 def glide(c, arch=GLIDE_ARCH, version='v0.13.2'):
     """Dowload glide."""
     print('Downloading glide')
@@ -222,31 +221,26 @@ def upgrade(param, ledger_param, value):
         sleep(1)
 
 
-@task
-def base_reserve_0(_):
+def base_reserve_0():
     """Set base reserve to 0, necessary for spam prevention tests."""
     print('Setting base reserve to 0')
     upgrade('basereserve', 'base_reserve_in_stroops', 0)
 
 
-@task
-def protocol_version_9(_):
+def protocol_version_9():
     """Protocol is already at 9, but this fixes a bug which prevents manageData ops."""
     print('Setting protocol version to 9')
     upgrade('protocolversion', 'protocol_version', 9)
 
 
-@task
-def create_whitelist_account(_):
+def create_whitelist_account():
     """Create whitelist account for prioritizing transactions in tests."""
     print('Creating whitelist account')
-
 
     def root_account_seed(passphrase: str) -> str:
         """Return the root account seed based on the given network passphrase."""
         network_hash = sha256(passphrase.encode()).digest()
         return kin_base.Keypair.from_raw_seed(network_hash).seed().decode()
-
 
     env = KinEnvironment('LOCAL', 'http://localhost:8000', 'private testnet')
     root_client = KinClient(env)
@@ -304,5 +298,9 @@ def network(c):
         print('Starting Horizon')
         c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d horizon'.format(
             root_account_seed=root_account_seed), hide='stderr')
+
+    base_reserve_0()
+    protocol_version_9()
+    create_whitelist_account()
 
     print('Network is up')
