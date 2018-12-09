@@ -46,6 +46,7 @@ def vendor(c, arch='linux-amd64',):
 
 
 def is_image_exists(c, name):
+    """Return true if given Docker image exists."""
     res = c.run('sudo docker images', hide='stdout')
     for image in res.stdout.split('\n'):
         if name in image:
@@ -203,6 +204,7 @@ def rm_network(c):
 
 
 def upgrade(param, ledger_param, value):
+    """Apply Core network parameter upgrade."""
     while True:
         r = requests.get('http://localhost:11626/upgrades',
                          params={'mode': 'set', 'upgradetime': '1970-01-01T00:00:00Z', param: value})
