@@ -3,15 +3,15 @@ import json
 import os
 import os.path
 from datetime import datetime, timezone
+from hashlib import sha256
 from time import sleep
 
 import requests
 from invoke import task
 
-from kin import KinClient, Environment as KinEnvironment
+from kin import Keypair, KinClient, Environment as KinEnvironment
 from kin.blockchain.builder import Builder
-
-from python.helpers import root_account_seed
+import kin_base
 
 
 GLIDE_ARCH = 'linux-amd64'
@@ -152,6 +152,13 @@ def protocol_version_9(_):
 def create_whitelist_account(_):
     """Create whitelist account for prioritizing transactions in tests."""
     print('Creating whitelist account')
+
+
+    def root_account_seed(passphrase: str) -> str:
+        """Return the root account seed based on the given network passphrase."""
+        network_hash = sha256(passphrase.encode()).digest()
+        return kin_base.Keypair.from_raw_seed(network_hash).seed().decode()
+
 
     env = KinEnvironment('LOCAL', 'http://localhost:8000', 'private testnet')
     root_client = KinClient(env)
