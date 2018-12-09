@@ -1,10 +1,17 @@
 """Call various Terraform actions."""
-from datetime import datetime, timezone
+import json
 import os
 import os.path
+from datetime import datetime, timezone
 from time import sleep
 
+import requests
 from invoke import task
+
+from kin import KinClient, Environment as KinEnvironment
+from kin.blockchain.builder import Builder
+
+from python.helpers import root_account_seed
 
 
 GLIDE_ARCH = 'linux-amd64'
@@ -108,7 +115,56 @@ def rm_network(c):
         c.run('sudo rm -rf volumes/stellar-core/tmp')
 
 
-@task(build_core, build_horizon, rm_network)
+def upgrade(param, ledger_param, value):
+    while True:
+        r = requests.get('http://localhost:11626/upgrades',
+                         params={'mode': 'set', 'upgradetime': '1970-01-01T00:00:00Z', param: value})
+        r.raise_for_status()
+
+        r = requests.get('http://localhost:8000/ledgers?order=desc&limit=1',
+                         params={'order': 'desc', 'limit': 1})
+        r.raise_for_status()
+        res = r.json()
+        records = res['_embedded']['records']
+        # NOTE records can be empty if called straight after network has started
+        # since no ledgers have been added yet
+        if records and int(records[0][ledger_param]) == value:
+            break
+
+        sleep(1)
+
+
+@task
+def base_reserve_0(_):
+    """Set base reserve to 0, necessary for spam prevention tests."""
+    print('Setting base reserve to 0')
+    upgrade('basereserve', 'base_reserve_in_stroops', 0)
+
+
+@task
+def protocol_version_9(_):
+    """Protocol is already at 9, but this fixes a bug which prevents manageData ops."""
+    print('Setting protocol version to 9')
+    upgrade('protocolversion', 'protocol_version', 9)
+
+
+@task
+def create_whitelist_account(_):
+    """Create whitelist account for prioritizing transactions in tests."""
+    print('Creating whitelist account')
+
+    env = KinEnvironment('LOCAL', 'http://localhost:8000', 'private testnet')
+    root_client = KinClient(env)
+    root_seed = root_account_seed('private testnet')
+    builder = Builder(env.name, root_client.horizon, 100, root_seed)
+
+    builder.append_create_account_op('GBR7K7S6N6C2A4I4URBXM43W7IIOK6ZZD5SAGC7LBRCUCDMICTYMK4LO', str(100e5))
+    builder.sign()
+    builder.submit()
+
+
+@task(pre=[build_core, build_horizon, rm_network],
+      post=[base_reserve_0, protocol_version_9, create_whitelist_account])
 def network(c):
     """Initialize a new local test network with single core and horizon instances."""
     print('Launching local network')
@@ -153,15 +209,4 @@ def network(c):
         c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d horizon'.format(
             root_account_seed=root_account_seed), hide='stderr')
 
-        #TODO: doesn't work, need to execute these commands manually
-        # Update ledger parameters
-        print('Updating base reserve')
-        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=0"')
-        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=0"')
-
-        # Already starts at 9, but this fixes a bug that doesn't allow manageData ops
-        print('Updating protocol version')
-        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&protocolversion=9"')
-        c.run('curl -s "localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&protocolversion=9"')
-
-    print('Network ready')
+    print('Network is up')
