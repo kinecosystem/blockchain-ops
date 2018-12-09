@@ -6,7 +6,6 @@
     - optimize-network
     - common-packages
     - docker
-
     - datadog-horizon
 
     # NOTE must come before horizon-start because of a bug that overrides

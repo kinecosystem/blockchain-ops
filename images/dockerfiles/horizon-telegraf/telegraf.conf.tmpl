@@ -1,10 +1,9 @@
-# Telegraf configuration for stellar core:
-# this configuration does one thing: it reports the /info metrics from the core
-# to the Kin Ecosystem metric collection endpoint, every 10 seconds
+# this telegraf client runs some simple network latency checks and reports them
 
 # Global tags can be specified here in key="value" format.
-#[tags]
-  #node_name = "$NODE_NAME" # take from env
+[tags]
+  node_name = "${NODE_NAME}" # take from env
+  app_name = "horizon"
 
 # Configuration for telegraf agent
 [agent]
@@ -56,6 +55,29 @@
 #                                  INPUTS                                     #
 ###############################################################################
 
+[[inputs.system]]
+
+[[inputs.exec]]
+  ## Commands array
+  commands = [
+    "/tmp/check_latency.sh",
+  ]
+
+  name_prefix = "stellar_core_"
+
+  ## Timeout for each command to complete.
+  timeout = "5s"
+
+  ## measurement name suffix (for separating different commands)
+  #name_suffix = "_mycollector"
+
+  ## Data format to consume.
+  ## Each data format has its own unique set of configuration options, read
+  ## more about them here:
+  ## https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_INPUT.md
+  data_format = "influx"
+
+
 # Statsd Server
 [[inputs.statsd]]
   ## Protocol, must be "tcp", "udp4", "udp6" or "udp" (default=udp)
@@ -88,7 +110,7 @@
   delete_timings = true
 
   ## Percentiles to calculate for timing & histogram stats
-  percentiles = [90, 95, 99]
+  percentiles = [50, 90, 95, 99]
 
   ## separator to use between elements of a statsd metric
   metric_separator = "_"
@@ -99,9 +121,10 @@
 
   ## Statsd data translation templates, more info can be read here:
   ## https://github.com/influxdata/telegraf/blob/master/docs/TEMPLATE_PATTERN.md
-  # templates = [
-  #     "cpu.* measurement*"
-  # ]
+  templates = [
+       "request_count.* measurement.request_method.node_name",
+       "response_time.* measurement.request_method.node_name",
+  ]
 
   ## Number of UDP messages allowed to queue up, once filled,
   ## the statsd server will start dropping packets
@@ -115,3 +138,6 @@
   ## Maximum socket buffer size in bytes, once the buffer fills up, metrics
   ## will start dropping.  Defaults to the OS default.
   # read_buffer_size = 65535
+
+
+# vim: ft=toml
