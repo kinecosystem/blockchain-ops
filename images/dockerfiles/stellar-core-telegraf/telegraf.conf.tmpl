@@ -69,7 +69,7 @@
   ## HTTP method
   # method = "GET"
 
-  name_override = "stellar-core-ledger"
+  name_prefix = "stellar_core_"
 
   data_format = "json"
 
@@ -85,6 +85,8 @@
   commands = [
     "/tmp/get_core_state.sh",
   ]
+
+  name_prefix = "stellar_core_"
 
   ## Timeout for each command to complete.
   timeout = "5s"
