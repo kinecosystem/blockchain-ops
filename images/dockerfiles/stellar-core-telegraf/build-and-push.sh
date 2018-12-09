@@ -1,3 +1,3 @@
-docker build . -t kinecosystem/stellar-core-telegraf:v1.0.16
-docker push kinecosystem/stellar-core-telegraf:v1.0.16
+docker build . -t kinecosystem/stellar-core-telegraf:v1.0.17
+docker push kinecosystem/stellar-core-telegraf:v1.0.17
 
