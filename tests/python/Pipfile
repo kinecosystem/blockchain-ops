@@ -10,6 +10,9 @@ pylint = "*"
 
 [packages]
 kin-sdk = "==2.1.3"
+aiohttp = "*"
+cchardet = "*"
+aiodns = "*"
 
 [requires]
 python_version = "3.7"
