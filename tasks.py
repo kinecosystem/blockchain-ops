@@ -4,22 +4,31 @@ import os.path
 from datetime import datetime, timezone
 from hashlib import sha256
 from time import sleep
+import platform
 
 import requests
 from invoke import task, call
-from invoke.exceptions import Exit
+from invoke.exceptions import Exit, Failure
 
 from kin import KinClient, Environment as KinEnvironment
 from kin.blockchain.builder import Builder
 import kin_base
 
 
-GLIDE_ARCH = 'linux-amd64'
-
-
-def glide(c, arch=GLIDE_ARCH, version='v0.13.2'):
-    """Dowload glide."""
+@task
+def glide(c, version='v0.13.2'):
+    """Download glide."""
     print('Downloading glide')
+
+    # find glide version, copied from glide installation script
+    os_name = platform.system().lower()
+    if os_name == 'linux':
+        arch = 'linux-amd64'
+    elif os_name == 'darwin':
+        arch = 'darwin-amd64'
+    else:
+        raise Failure(os_name_res, reason='Only supported on OSx and Linux')
+    print('Glide arch: {arch}'.format(arch=arch))
 
     # avoid redownloading file if exists
     if os.path.isfile('{cwd}/glide'.format(cwd=c.cwd)):
@@ -34,11 +43,10 @@ def glide(c, arch=GLIDE_ARCH, version='v0.13.2'):
 
     print('Glide downloaded')
 
-
 @task
-def vendor(c, arch='linux-amd64',):
+def vendor(c):
     """Vendor go dependencies."""
-    glide(c, arch)
+    glide(c)
 
     print('Vendoring dependencies')
     if not os.path.isdir('{}/vendor'.format(c.cwd)):
@@ -154,7 +162,7 @@ def build_horizon(c, version, branch='kinecosystem/master', production=True):
         init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', branch)
 
         with c.cd('volumes/go-git'):
-            vendor(c, arch='linux-amd64')
+            vendor(c)
 
         cmd = ' '.join([
             'bash', '-c',
