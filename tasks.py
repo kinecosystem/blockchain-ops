@@ -92,10 +92,16 @@ def init_git_repo(c, git_url, dir_name, branch='kinecosystem/master'):
 
 @task
 def build_core(c, version, production=True):
-    """Build Core binary docker image."""
+    """Build Core binary docker image.
+
+    By default, builds a Docker image tagged ready for production.
+
+    When production is disabled, it builds using docker-compose without properly tagging,
+    mainly used for local network tests.
+    """
     with c.cd('images'):
-        # we always rebuild production images.
-        # for non-production (e.g. local test network), we don't
+        # we always rebuild production images,
+        # but we don't for non-production (e.g. local test network)
         #
         # NOTE docker compose doesn't have a way of knowing if an image was already
         # built, so we search for it manually
@@ -131,10 +137,10 @@ def build_core(c, version, production=True):
 def build_horizon(c, version, production=True):
     """Build Horizon binary docker image.
 
-    By default, builds a Docker image and uploads it to Dockerhub.
+    By default, builds a Docker image tagged ready for production.
 
-    When production is disabled, it builds using docker-compose and doesn't push
-    an image to Dockerhub, mainly used for local network tests.
+    When production is disabled, it builds using docker-compose without properly tagging,
+    mainly used for local network tests.
     """
     with c.cd('images'):
         # we always rebuild production images,
