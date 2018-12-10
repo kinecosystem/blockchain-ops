@@ -91,7 +91,7 @@ def init_git_repo(c, git_url, dir_name, branch='kinecosystem/master'):
 
 
 @task
-def build_core(c, version, production=True):
+def build_core(c, version, branch='kinecosystem/master', production=True):
     """Build Core binary docker image.
 
     By default, builds a Docker image tagged ready for production.
@@ -108,7 +108,7 @@ def build_core(c, version, production=True):
         if not production and is_image_exists(c, 'images_stellar-core'):
             return
 
-        init_git_repo(c, 'https://github.com/kinecosystem/stellar-core.git', 'stellar-core-git')
+        init_git_repo(c, 'https://github.com/kinecosystem/stellar-core.git', 'stellar-core-git', branch)
 
         print('Building core')
 
@@ -134,7 +134,7 @@ def build_core(c, version, production=True):
 
 
 @task
-def build_horizon(c, version, production=True):
+def build_horizon(c, version, branch='kinecosystem/master', production=True):
     """Build Horizon binary docker image.
 
     By default, builds a Docker image tagged ready for production.
@@ -151,7 +151,7 @@ def build_horizon(c, version, production=True):
         if not production and is_image_exists(c, 'images_stellar-core'):
             return
 
-        init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git')
+        init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', branch)
 
         with c.cd('volumes/go-git'):
             vendor(c, arch='linux-amd64')
