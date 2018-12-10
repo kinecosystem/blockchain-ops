@@ -46,7 +46,7 @@ def glide(c, version='v0.13.2'):
 @task
 def vendor(c):
     """Vendor go dependencies."""
-    glide(c, arch)
+    glide(c)
 
     print('Vendoring dependencies')
     if not os.path.isdir('{}/vendor'.format(c.cwd)):
