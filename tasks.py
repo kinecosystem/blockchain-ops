@@ -187,14 +187,16 @@ def build_horizon(c, version, production=True):
 
 
 @task
-def push_dockerhub(c, app, version):
+def push_dockerhub(c, app, version, latest=True):
     """Push image to Dockerhub."""
     if app.lower() == 'core':
-        c.run('sudo docker push kinecosystem/stellar-core:latest')
         c.run('sudo docker push kinecosystem/stellar-core:{version}'.format(version=version))
+        if latest:
+            c.run('sudo docker push kinecosystem/stellar-core:latest')
     elif app.lower() == 'horizon':
-        c.run('sudo docker push kinecosystem/horizon:latest')
         c.run('sudo docker push kinecosystem/horizon:{version}'.format(version=version))
+        if latest:
+            c.run('sudo docker push kinecosystem/horizon:latest')
     else:
         Exit('Unknown application {}'.format(app))
 
