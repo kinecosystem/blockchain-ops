@@ -137,6 +137,14 @@ def build_horizon(c, version, production=True):
     an image to Dockerhub, mainly used for local network tests.
     """
     with c.cd('images'):
+        # we always rebuild production images,
+        # but we don't for non-production (e.g. local test network)
+        #
+        # NOTE docker compose doesn't have a way of knowing if an image was already
+        # built, so we search for it manually
+        if not production and is_image_exists(c, 'images_stellar-core'):
+            return
+
         init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git')
 
         with c.cd('volumes/go-git'):
@@ -235,18 +243,25 @@ def protocol_version_9():
     upgrade('protocolversion', 'protocol_version', 9)
 
 
+def derive_root_account_seed(passphrase):
+    """Return the root account seed based on the given network passphrase."""
+    network_hash = sha256(passphrase.encode()).digest()
+    return kin_base.Keypair.from_raw_seed(network_hash).seed().decode()
+
+
+@task
+def root_account_seed(_, passphrase):
+    """Print root account seed according to given network passphrase."""
+    return derive_root_account_seed(passphrase)
+
+
 def create_whitelist_account():
     """Create whitelist account for prioritizing transactions in tests."""
     print('Creating whitelist account')
 
-    def root_account_seed(passphrase: str) -> str:
-        """Return the root account seed based on the given network passphrase."""
-        network_hash = sha256(passphrase.encode()).digest()
-        return kin_base.Keypair.from_raw_seed(network_hash).seed().decode()
-
     env = KinEnvironment('LOCAL', 'http://localhost:8000', 'private testnet')
     root_client = KinClient(env)
-    root_seed = root_account_seed('private testnet')
+    root_seed = derive_root_account_seed('private testnet')
     builder = Builder(env.name, root_client.horizon, 100, root_seed)
 
     builder.append_create_account_op('GBR7K7S6N6C2A4I4URBXM43W7IIOK6ZZD5SAGC7LBRCUCDMICTYMK4LO', str(100e5))
@@ -254,12 +269,9 @@ def create_whitelist_account():
     builder.submit()
 
 
-@task(pre=[call(build_core, version='kinecosystem/master', production=False),
-           call(build_horizon, version='kinecosystem/master', production=False),
-           rm_network])
-def network(c):
-    """Initialize a new local test network with single core and horizon instances."""
-    print('Launching local network')
+@task(pre=[call(build_core, version='kinecosystem/master', production=False)])
+def start_core(c):
+    """Start a local test Core instance."""
     with c.cd('images'):
         print('Starting Core database')
         c.run('sudo docker-compose up -d stellar-core-db', hide='stderr')
@@ -268,15 +280,7 @@ def network(c):
         # setup core database
         # https://www.stellar.org/developers/stellar-core/software/commands.html
         print('Initializing Core database')
-        res = c.run('sudo docker-compose run stellar-core --newdb --forcescp', hide='both')
-
-        # fetch root account seed
-        for line in res.stdout.split('\n'):
-            if 'Root account seed' in line:
-                root_account_seed = line.strip().split()[7]
-                break
-
-        print('Root account seed: {}'.format(root_account_seed))
+        c.run('sudo docker-compose run stellar-core --newdb --forcescp', hide='both')
 
         # setup cache history archive
         print('Initializing Core history archive')
@@ -287,6 +291,11 @@ def network(c):
         print('Starting Core')
         c.run('sudo docker-compose up -d stellar-core', hide='stderr')
 
+
+@task(pre=[call(build_horizon, version='kinecosystem/master', production=False)])
+def start_horizon(c):
+    """Start a local test Horizon instance."""
+    with c.cd('images'):
         # setup horizon database
         print('Starting Horizon database')
         c.run('sudo docker-compose up -d horizon-db', hide='stderr')
@@ -299,10 +308,15 @@ def network(c):
         # this fixes it
         print('Starting Horizon')
         c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d horizon'.format(
-            root_account_seed=root_account_seed), hide='stderr')
+            root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
 
+
+@task(rm_network, start_core, start_horizon)
+def network(_):
+    """Initialize a new local test network with single core and horizon instances."""
     base_reserve_0()
     protocol_version_9()
     create_whitelist_account()
 
+    print('Root account seed: {}'.format(derive_root_account_seed('private testnet')))
     print('Network is up')
