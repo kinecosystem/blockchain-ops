@@ -2,12 +2,12 @@ version: "3"
 
 services:
 
-  stellar-core-telegraf-1:
+  stellar-core-telegraf:
     environment:
-     - NODE_NAME="stellar-core-1"
+     - NODE_NAME="stellar-core"
     image: kinecosystem/stellar-core-telegraf:latest
     links:
-     - "stellar-core:stellar-core"
+     - stellar-core
     restart: on-failure
     logging:
       driver: json-file
@@ -15,16 +15,17 @@ services:
         max-size: 100m
         max-file: "3"
 
-  stellar-core-1:
-    image: kinecosystem/stellar-core
+  stellar-core:
+    build:
+      dockerfile: dockerfiles/Dockerfile.stellar-core
+      context: .
     ports:
       - 11626:11626
     links:
-      - stellar-core-1-db
-      - stellar-core-2
+      - stellar-core-db
     volumes:
-      - ./volumes/stellar-core-1/opt/stellar-core:/opt/stellar-core
-      - ./volumes/stellar-core-1/tmp/stellar-core:/tmp/stellar-core
+      - ./volumes/stellar-core/opt/stellar-core:/opt/stellar-core
+      - ./volumes/stellar-core/tmp/stellar-core:/tmp/stellar-core
     restart: on-failure
     logging:
       driver: json-file
@@ -32,43 +33,7 @@ services:
         max-size: 100m
         max-file: "3"
 
-  stellar-core-1-db:
-    image: postgres:10-alpine
-    environment:
-      POSTGRES_USER: stellar
-      POSTGRES_PASSWORD: "12345678"
-      POSTGRES_DB: core
-
-  stellar-core-telegraf-2:
-    environment:
-     - NODE_NAME="stellar-core-2"
-    image: kinecosystem/stellar-core-telegraf:latest
-    links:
-     - "stellar-core:stellar-core"
-    restart: on-failure
-    logging:
-      driver: json-file
-      options:
-        max-size: 100m
-        max-file: "3"
-
-  stellar-core-2:
-    image: kinecosystem/stellar-core
-    ports:
-      - 11627:11626
-    links:
-      - stellar-core-2-db
-    volumes:
-      - ./volumes/stellar-core-2/opt/stellar-core:/opt/stellar-core
-      - ./volumes/stellar-core-2/tmp/stellar-core:/tmp/stellar-core
-    restart: on-failure
-    logging:
-      driver: json-file
-      options:
-        max-size: 100m
-        max-file: "3"
-
-  stellar-core-2-db:
+  stellar-core-db:
     image: postgres:10-alpine
     environment:
       POSTGRES_USER: stellar
@@ -76,14 +41,15 @@ services:
       POSTGRES_DB: core
 
   horizon:
-    image: kinecosystem/horizon:latest
-    # using nginx-proxy
+    build:
+      dockerfile: dockerfiles/Dockerfile.horizon
+      context: .
     ports:
       - 8000:8000
     links:
       - horizon-db
-      - stellar-core-1
-      - stellar-core-1-db
+      - stellar-core
+      - stellar-core-db
     volumes:
       - ./volumes/horizon/opt/horizon:/opt/horizon
     environment:
@@ -93,8 +59,8 @@ services:
       NETWORK_PASSPHRASE: private testnet
       DATABASE_URL: postgres://stellar:12345678@horizon-db/horizon?sslmode=disable
       HORIZON_DB_MAX_OPEN_CONNECTIONS: "24"
-      STELLAR_CORE_DATABASE_URL: postgres://stellar:12345678@stellar-core-1-db/core?sslmode=disable
-      STELLAR_CORE_URL: http://stellar-core-1:11626
+      STELLAR_CORE_DATABASE_URL: postgres://stellar:12345678@stellar-core-db/core?sslmode=disable
+      STELLAR_CORE_URL: http://stellar-core:11626
 
       LOG_LEVEL: info
       INGEST: "true"
@@ -121,6 +87,20 @@ services:
       POSTGRES_USER: stellar
       POSTGRES_PASSWORD: "12345678"
       POSTGRES_DB: horizon
+
+  stellar-core-build:
+    build:
+      dockerfile: dockerfiles/Dockerfile.stellar-core-build
+      context: .
+    volumes:
+      - ./volumes/stellar-core-git:/stellar-core
+
+  horizon-build:
+    build:
+      dockerfile: dockerfiles/Dockerfile.horizon-build
+      context: .
+    volumes:
+      - ./volumes/go-git:/go/src/github.com/kinecosystem/go
 
   horizon-nginx-proxy:
     image: kinecosystem/horizon-nginx-proxy:latest
