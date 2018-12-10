@@ -57,7 +57,7 @@ async def main():
         accounts[0].public_address)
     print('2 Test accounts created - Passed')
 
-    for i in tx_count:
+    for i in range(tx_count):
         # generating transactions using multiple kin-cores
         builder = Builder('LOCAL', clients[i % len(clients)].horizon, fee=minimum_fee,
                           secret=accounts[i % len(accounts)].secret_seed)
