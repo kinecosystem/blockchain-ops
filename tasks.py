@@ -268,7 +268,7 @@ def derive_root_account_seed(passphrase):
 @task
 def root_account_seed(_, passphrase):
     """Print root account seed according to given network passphrase."""
-    return derive_root_account_seed(passphrase)
+    print(derive_root_account_seed(passphrase))
 
 
 def create_whitelist_account():
