@@ -1,0 +1,14 @@
+---
+# note, horizon must be stopped prior to running this
+- hosts: <horizon-host-name-from-inventory>
+  vars:
+    - this_node: '{{horizon.nodes|selectattr("name", "equalto", inventory_hostname)|first}}'
+  roles:
+    - recreate-horizon-database
+
+# note, core must be stopped prior to running this
+- hosts: <horizon-host-name-from-inventory>
+  vars:
+    - this_node: '{{horizon.nodes|selectattr("name", "equalto", inventory_hostname)|first}}'
+  roles:
+    - recreate-core-database

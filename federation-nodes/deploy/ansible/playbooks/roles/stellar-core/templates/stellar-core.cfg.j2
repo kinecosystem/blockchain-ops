@@ -53,7 +53,7 @@ NODE_NAMES=[
 ]
 
 [QUORUM_SET]
-THRESHOLD_PERCENT={{stellar_core.threshold_percent|default(66)}}
+THRESHOLD_PERCENT={{stellar_core.threshold_percent|default(67)}}
 VALIDATORS=[
  "${{this_node.name}}",
  {% for node in preexisting_nodes %}
