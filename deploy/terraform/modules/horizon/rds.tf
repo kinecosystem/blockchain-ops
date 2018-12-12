@@ -2,7 +2,7 @@ resource "aws_db_instance" "this" {
   identifier = "${var.name}"
 
   engine               = "postgres"
-  engine_version       = "9.6.6"
+  engine_version       = "9.6.10"
   parameter_group_name = "default.postgres9.6"
   option_group_name    = "default:postgres-9-6"
 
