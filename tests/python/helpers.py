@@ -37,7 +37,11 @@ def derive_root_account(passphrase):
 async def create_accounts(env: Environment, channels: List[Builder], root_account: BaseKeypair, starting_balance, horizon_addresses: List[str] = []):
     """Asynchronously create accounts and return a transaction Builder instance for each account.
 
-    Each Builder instance uses a different Horizon endpoint if given a non-empty list.
+    The amount of accounts to create is determined by how many channels are given
+    and the maximum operatinos allowed in transaction e.g. 10 channels with 100 max ops
+    would cause 10*100=1000 accounts to be created.
+
+    In addition, each Builder instance uses a different Horizon endpoint if given a non-empty list.
     """
     accounts_to_create_num = len(channels) * MAX_OPS
     logging.info('creating %d accounts', accounts_to_create_num)
