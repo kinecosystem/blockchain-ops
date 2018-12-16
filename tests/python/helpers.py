@@ -6,14 +6,9 @@ from typing import List
 
 import aiohttp
 
-from kin import Keypair, Environment
-from kin.blockchain.horizon import Horizon
+from kin import Keypair, KinClient
 from kin.blockchain.builder import Builder
-from kin.config import SDK_USER_AGENT
 from kin_base import Keypair as BaseKeypair
-
-import kin
-import kin_base
 
 NETWORK_NAME = 'LOCAL'
 MIN_FEE = 100
@@ -24,7 +19,7 @@ TX_SET_SIZE = 500
 def root_account_seed(passphrase: str) -> str:
     """Return the root account seed based on the given network passphrase."""
     network_hash = sha256(passphrase.encode()).digest()
-    return kin_base.Keypair.from_raw_seed(network_hash).seed().decode()
+    return BaseKeypair.from_raw_seed(network_hash).seed().decode()
 
 
 def derive_root_account(passphrase):
@@ -34,53 +29,50 @@ def derive_root_account(passphrase):
     return Keypair(seed)
 
 
-async def create_accounts(env: Environment, channels: List[Builder], root_account: BaseKeypair, starting_balance, horizon_addresses: List[str] = []):
-    """Asynchronously create accounts and return a transaction Builder instance for each account.
+async def create_accounts(source: Builder, accounts_num, starting_balance):
+    """Asynchronously create accounts and return a Keypair instance for each created account."""
+    logging.info('creating %d accounts', accounts_num)
 
-    The amount of accounts to create is determined by how many channels are given
-    and the maximum operatinos allowed in transaction e.g. 10 channels with 100 max ops
-    would cause 10*100=1000 accounts to be created.
-
-    In addition, each Builder instance uses a different Horizon endpoint if given a non-empty list.
-    """
-    accounts_to_create_num = len(channels) * MAX_OPS
-    logging.info('creating %d accounts', accounts_to_create_num)
-
-    accounts_to_create = [Keypair() for _ in range(accounts_to_create_num)]
+    # generate txs, squeezing as much "create account" ops as possible to each one.
+    # when each tx is full with as much ops as it can include, sign and generate
+    # that tx's XDR.
+    # then, continue creating accounts using a new tx, and so on.
+    # we stop when we create all ops required according to given accounts_num.
+    kps = [Keypair() for _ in range(accounts_num)]
     xdrs = []
-    for i, channel in enumerate(channels):
-        for kp in accounts_to_create[i*MAX_OPS : i*(MAX_OPS) + MAX_OPS]:
-            # use the root account as the source of the operations
-            #
-            # NOTE channels need a starting balance since they need to pay fees because they are not prioritized
-            channel.append_create_account_op(source=root_account.address(),
-                                             destination=kp.public_address,
-                                             starting_balance=str(starting_balance))
+    batch_amount = (len(kps)+1) // (MAX_OPS+1)
+    for batch_index in range(batch_amount):
+        start = batch_index * MAX_OPS
+        end = min(batch_index+1)*MAX_OPS, len(kps)
+
+        batch_kps = kps[start:end]
+        for kp in batch_kps:
+            source.append_create_account_op(source=source.addres(),
+                                            destination=kp.public_address,
+                                            starting_balance=str(starting_balance))
 
         # sign with channel and root account
-        channel.sign(secret=channel.keypair.seed().decode())
-        if root_account.seed().decode() != channel.keypair.seed().decode():
-            channel.sign(secret=root_account.seed().decode())
-        xdrs.append(channel.gen_xdr())
+        source.sign(secret=source.keypair.seed().decode())
+        xdrs.append(source.gen_xdr())
 
-        channel.next()
+        # clean source builder for next transaction
+        source.next()
 
-    horizon_uri = channels[0].horizon.horizon_uri
-    await send_txs(horizon_uri, xdrs, expected_statuses=[200])
+    await send_txs(source.horizon.horizon_uri, xdrs, expected_statuses=[200])
 
+    logging.info('created %d accounts', accounts_num)
+    return kps
+
+
+def generate_builders(kps: List[Keypair], env_name, horizon) -> List[Builder]:
+    """Receive Keypair list and return Builder list with updated sequence numbers."""
     # fetch sequence numbers asynchronously for all created accounts
-    sequences = await get_sequences(horizon_uri, [a.public_address for a in accounts_to_create])
+    sequences = await get_sequences(horizon, [kp.public_address for kp in kps])
 
     # create tx builders with up-to-date sequence number
     builders = []
-    horizons = ([Horizon(horizon_uri=addr, user_agent=SDK_USER_AGENT) for addr in horizon_addresses]
-                if horizon_addresses
-                else [horizon_uri])
-    for i, kp in enumerate(accounts_to_create):
-        # deterministically pick horizon endpoint from all available endpoint
-        # according to keypair index in account list
-        horizon = horizons[i % len(horizons)]
-        builder = Builder(env.name, horizon, MIN_FEE, kp.secret_seed)
+    for i, kp in enumerate(kps):
+        builder = Builder(env_name, horizon, MIN_FEE, kp.secret_seed)
         builder.sequence = sequences[i]
         builders.append(builder)
 
@@ -94,7 +86,7 @@ def init_tx_builders(env, kps, sequences):
     """Initialize transaction builders for each given seed."""
     builders = []
     for i, kp in enumerate(kps):
-        client = kin.KinClient(env)
+        client = KinClient(env)
         builder = Builder(env.name, client.horizon, MIN_FEE, kp.secret_seed)
         builder.sequence = sequences[i]
         builders.append(builder)
