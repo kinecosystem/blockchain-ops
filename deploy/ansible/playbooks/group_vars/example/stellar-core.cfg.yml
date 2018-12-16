@@ -1,5 +1,7 @@
 ---
 stellar_core:
+  #whitelist_account: <whitelist account goes here. leave empty for none>
+  catchup_complete: false # false defaults to 8192 blocks
   network:
     name: my-network
     passphrase: xxx
