@@ -29,6 +29,10 @@ KNOWN_PEERS=[
 
 ]
 
+{% if stellar_core.whitelist_account %}
+WHITELIST="{{stellar_core.whitelist_account}}"
+{% endif %}
+
 {% if stellar_core.catchup_complete|default(false) %}
 CATCHUP_COMPLETE=true
 {% else %}
