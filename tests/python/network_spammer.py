@@ -10,19 +10,12 @@ from datetime import datetime
 from typing import List
 
 from kin import KinClient, Environment as KinEnvironment, Keypair
-from kin.blockchain.builder import Builder
 
-from helpers import (MIN_FEE, TX_SET_SIZE, NETWORK_NAME,
-                     root_account_seed, create_accounts, add_prioritizers,
+from helpers import (TX_SET_SIZE, NETWORK_NAME,
                      send_txs, get_sequences)
 
 
 AVG_BLOCK_TIME = 5  # seconds
-STARTING_BALANCE = 1e5  # for paying unprioritzied tx fees and channels creating spam accounts
-
-# we create enough accounts to submit txs in parallel for this amount of ledgers
-# e.g. if we want 700 tx/ledger, than we will createa 700 * 10 accounts.
-LEDGER_BUFFER = 20
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
@@ -34,7 +27,8 @@ def parse_args():
 
     parser.add_argument('--length', required=True, type=int, help='Test length in seconds')
     parser.add_argument('--txs-per-ledger', required=True, type=int, help='Transaction rate to submit (spam) in parallel for every ledger round')
-    parser.add_argument('--whitelist-seed', required=True, type=str, help='Whitelist account seed')
+    parser.add_argument('--prioritizer-seeds-file', required=True, type=str, help='Filepath to prioritizer seeds file')
+    parser.add_argument('--spammer-seeds-file', required=True, type=str, help='Filepath to spammer seeds file')
     parser.add_argument('--csv', default='spam-results-{}.csv'.format(str(int(time.time()))), type=str, help='Spam results CSV output')
 
     parser.add_argument('--passphrase', type=str, help='Network passphrase')
@@ -42,6 +36,18 @@ def parse_args():
                         help='Horizon endpoint URL (use multiple --horizon flags for multiple addresses)')
 
     return parser.parse_args()
+
+
+def load_accounts(path) -> List[Keypair]:
+    """Load seeds from file path and return Keypair list.
+
+    Expected file format is a newline-delimited seed list.
+    """
+    kps = []
+    with open(path) as f:
+        for seed in f:
+            kps.append(Keypair(seed))
+    return kps
 
 
 def spam(env, prioritizers, builders, length, tx_per_ledger):
@@ -64,7 +70,8 @@ def spam(env, prioritizers, builders, length, tx_per_ledger):
                                      rnd))
 
         # push this round's builders to the back of the queue.
-        # they will be reused in the next LEDGER_BUFFER ledger
+        # they will be reused in the next X  ledgers,
+        # where x = (spammer_seeds // tx_per_ledger)
         for b in round_builders:
             builders_queue.put(b)
 
@@ -178,48 +185,10 @@ def ledger_time(ledger, horizon):
 async def main():
     args = parse_args()
 
-    # init root account (funder) tx builder
+    prioritizer_kps = [Keypair(kp) for kp in load_accounts(args.prioritizer_seeds_file)]
+    spam_builders = [Keypair(kp) for kp in load_accounts(args.spammer_seeds_file)]
+
     env = KinEnvironment(NETWORK_NAME, args.horizon[0], args.passphrase)
-    root_builder = Builder(env.name, KinClient(env).horizon, MIN_FEE, root_account_seed(args.passphrase))
-    root_builder.sequence = root_builder.get_sequence()
-
-    # create channel accounts for mass creating accounts later on
-    # these accounts will consume the sequence number for the root builder
-    # so we can parallelize mass account creation
-    account_creator_channels = await create_accounts(env, [root_builder], root_builder.keypair, STARTING_BALANCE, args.horizon)
-
-    # create prioritizer accounts
-    #
-    # NOTE we create as many prioritizers as there are prioritized txs per
-    # ledger. each prioritizer will prioritzie a single tx
-    #
-    # NOTE we create TX_SET_SIZE - 1 prioritizers because there is at always
-    # one reserved tx for unprioritized
-    #
-    # TODO is this even necessary? can't we just add addresses which belong to
-    # uncreated accounts and be done with it?
-    prioritizer_accounts_num = TX_SET_SIZE - 1
-    logging.info('creating %d prioritizer accounts', prioritizer_accounts_num)
-    prioritizer_builders = await create_accounts(env, account_creator_channels, root_builder.keypair, 0, args.horizon)
-
-    # add prioritizer accounts to the whitelist
-    #
-    # NOTE prioritized accounts have a starting balance of 0 since they wont be
-    # submitting anything
-    prioritizer_kps = [Keypair(b.keypair.seed().decode()) for b in prioritizer_builders[:TX_SET_SIZE - 1]]
-    whitelist_builder = Builder(env.name, KinClient(env).horizon, MIN_FEE, args.whitelist_seed)
-    add_prioritizers(whitelist_builder, prioritizer_kps)
-
-    # create enough spam accounts to maintain stable transaction rate in each ledger.
-    # we assume each account will be able to submit a transaction every LEDGER_BUFFER ledgers.
-    # this is enough time for it to finish its previous tx submission and
-    # update its account sequence.
-    spam_accounts_num = args.txs_per_ledger * LEDGER_BUFFER
-    spam_builders = []
-    for _ in range(math.ceil((spam_accounts_num / 10_000))):
-        spam_builders.extend(await create_accounts(env, account_creator_channels, root_builder.keypair, STARTING_BALANCE, args.horizon))
-
-    # start the spamming test
     results = await spam(env, prioritizer_kps, spam_builders, args.length, args.txs_per_ledger)
 
     # save results into csv file
