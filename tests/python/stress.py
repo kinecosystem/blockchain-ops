@@ -22,7 +22,7 @@ AVG_BLOCK_TIME = 5  # seconds
 COOL_DOWN_AFTER_GET_SEQ = 10  # seconds
 
 
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 
 def parse_args():
