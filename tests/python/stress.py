@@ -1,7 +1,7 @@
 """Send prioritized and unprioritized transactions and verify prioritized transactions get priority when added to ledgers."""
 import argparse
 import asyncio
-import csv
+import json
 import logging
 import math
 import queue
@@ -11,8 +11,6 @@ from typing import List
 
 from kin import Keypair, Environment
 from kin.blockchain.builder import Builder
-from kin.blockchain.horizon import Horizon
-from kin.config import SDK_USER_AGENT
 
 from helpers import (TX_SET_SIZE, NETWORK_NAME, MIN_FEE,
                      send_txs_multiple_endpoints, get_sequences_multiple_endpoints)
@@ -33,7 +31,7 @@ def parse_args():
     parser.add_argument('--txs-per-ledger', required=True, type=int, help='Transaction rate to submit (spam) in parallel for every ledger round')
     parser.add_argument('--prioritizer-seeds-file', required=True, type=str, help='Filepath to prioritizer seeds file')
     parser.add_argument('--spammer-seeds-file', required=True, type=str, help='Filepath to spammer seeds file')
-    parser.add_argument('--csv', default='spam-results-{}.csv'.format(str(int(time.time()))), type=str, help='Spam results CSV output')
+    parser.add_argument('--out', default='spam-results-{}.json'.format(str(int(time.time()))), type=str, help='Spam results JSON output')
 
     parser.add_argument('--passphrase', type=str, help='Network passphrase')
     parser.add_argument('--horizon', action='append',
@@ -169,24 +167,6 @@ async def spam_round(horizon_endpoints, prioritizers: List[Keypair], prioritized
     return results
 
 
-LEDGERS = {}
-
-
-def ledger_time(ledger, horizon):
-    """Return ledger close time."""
-    # failed txs have ledger = None
-    # so we return an empty timestamp instead
-    if not ledger:
-        return ''
-
-    global LEDGERS
-    if ledger not in LEDGERS:
-        logging.debug('fetching ledger %d', ledger)
-        date_str = horizon.ledger(ledger)['closed_at']
-        LEDGERS[ledger] = datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%SZ').timestamp()
-    return LEDGERS[ledger]
-
-
 async def main():
     args = parse_args()
 
@@ -222,15 +202,11 @@ async def main():
     results = await spam(args.horizon, prioritizer_kps, spam_builders, args.length, args.txs_per_ledger)
     logging.info('done spamming')
 
-    # save results into csv file
-    logging.info('generating report csv')
-    horizon = Horizon(horizon_uri=args.horizon[0], user_agent=SDK_USER_AGENT)
-    with open(args.csv, 'w') as csvfile:
-        w = csv.DictWriter(csvfile, fieldnames=list(results[0][0].keys()) + ['ledger_time'])
-        w.writeheader()
+    logging.info('writing transaction results to file')
+    with open(args.out, 'w') as f:
         for spam_round in results:
             for tx in spam_round:
-                w.writerow({**tx, **{'ledger_time': ledger_time(tx['ledger'], horizon)}})
+                f.write('{}\n'.format(json.dumps(tx)))
 
     logging.info('done')
 
