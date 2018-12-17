@@ -209,7 +209,7 @@ async def main():
     stub_horizon = args.horizon[0]
     for kp, seq in zip(spam_kps, spam_sequences):
         b = Builder(NETWORK_NAME, stub_horizon, MIN_FEE, kp.secret_seed)
-        b.sequence = str(seq + 1)
+        b.sequence = str(seq)
         spam_builders.append(b)
 
     logging.info('sleeping for %ds to let horizon cool down after get sequence request surge', COOL_DOWN_AFTER_GET_SEQ)
