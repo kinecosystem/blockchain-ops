@@ -22,7 +22,8 @@ def parse_args():
 
     parser.add_argument('--accounts', required=True, type=int, help='Amount of accounts to create')
     parser.add_argument('--passphrase', required=True, type=str, help='Network passphrase')
-    parser.add_argument('--horizon', required=True, type=str, help='Horizon endpoint URL')
+    parser.add_argument('--horizon', action='append',
+                        help='Horizon endpoint URL (use multiple --horizon flags for multiple addresses)')
 
     return parser.parse_args()
 
@@ -30,10 +31,10 @@ def parse_args():
 async def main():
     """Create accounts and print their seeds to stdout."""
     args = parse_args()
-    env = Environment(NETWORK_NAME, args.horizon, args.passphrase)
+    env = Environment(NETWORK_NAME, (args.horizon)[0], args.passphrase)
     builder = Builder(NETWORK_NAME, KinClient(env).horizon, MIN_FEE, root_account_seed(args.passphrase))
     builder.sequence = builder.get_sequence()
-    kps = await create_accounts(builder, args.accounts, STARTING_BALANCE)
+    kps = await create_accounts(builder, args.horizon, args.accounts, STARTING_BALANCE)
 
     for kp in kps:
         print(kp.secret_seed)

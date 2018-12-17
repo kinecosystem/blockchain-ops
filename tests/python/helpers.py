@@ -61,7 +61,7 @@ async def generate_keypairs(n) -> List[Keypair]:
     return kps
 
 
-async def create_accounts(source: Builder, accounts_num, starting_balance):
+async def create_accounts(source: Builder, horizon_endpoints, accounts_num, starting_balance):
     """Asynchronously create accounts and return a Keypair instance for each created account."""
     logging.info('creating %d accounts', accounts_num)
 
@@ -89,7 +89,8 @@ async def create_accounts(source: Builder, accounts_num, starting_balance):
 
         # clean source builder for next transaction
         source.next()
-    await send_txs_multiple_endpoints([source.horizon.horizon_uri], xdrs, expected_statuses=[200])
+
+    await send_txs_multiple_endpoints(horizon_endpoints, xdrs, expected_statuses=[200])
 
     logging.info('created %d accounts', accounts_num)
     return kps
