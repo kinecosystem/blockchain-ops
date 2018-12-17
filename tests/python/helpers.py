@@ -145,7 +145,11 @@ async def get(session: aiohttp.ClientSession, url, expected_status=200):
     Fail if response isn't expected status code or format other than JSON.
     """
     async with session.get(url) as res:
-        res_data = await res.json()
+        try:
+            res_data = await res.json()
+        except aiohttp.client_exceptions.ContentTypeError as e:
+            logging.error(e)
+            logging.error(await res.text())
 
         if res.status != expected_status:
             logging.error('Error in HTTP GET request to %s: %s', url, res_data)
@@ -164,7 +168,6 @@ async def post(session: aiohttp.ClientSession, url, req_data, expected_statuses)
     """
     async with session.post(url, data=req_data) as res:
         res_data = await res.json()
-
         if res.status not in expected_statuses:
             logging.error('Error in HTTP POST request to %s with data %s: %s', url, req_data, res_data)
             raise RuntimeError('Error in HTTP POST request to {}'.format(url))
@@ -218,7 +221,15 @@ async def get_sequences_multiple_endpoints(endpoints, addresses):
 
     logging.info('finished getting sequence for %d accounts', len(addresses))
 
-    sequences = [int(r['sequence']) for r in results]
+    sequences = []
+    for r in results:
+        try:
+            seq = int(r['sequence'])
+        except KeyError:
+            # can occur if request failed
+            seq = 0
+        sequences.append(seq)
+
     return sequences
 
 
