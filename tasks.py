@@ -57,7 +57,7 @@ def is_image_exists(c, name):
     """Return true if given Docker image exists."""
     res = c.run('sudo docker images', hide='stdout')
     for image in res.stdout.split('\n'):
-        if name in image:
+        if name == image.split(' ')[0]:
             print('Image {name} exists'.format(name=name))
             return True
 
