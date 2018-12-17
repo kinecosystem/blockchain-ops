@@ -9,7 +9,7 @@ import time
 from datetime import datetime
 from typing import List
 
-from kin import Keypair
+from kin import Keypair, Environment
 from kin.blockchain.builder import Builder
 from kin.blockchain.horizon import Horizon
 from kin.config import SDK_USER_AGENT
@@ -189,6 +189,9 @@ def ledger_time(ledger, horizon):
 
 async def main():
     args = parse_args()
+
+    # setup network
+    Environment(NETWORK_NAME, args.horizon[0], args.passphrase)
 
     logging.info('loading prioritizer accounts')
     prioritizer_kps = [kp for kp in load_accounts(args.prioritizer_seeds_file)]
