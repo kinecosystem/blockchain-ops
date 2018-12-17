@@ -1,5 +1,7 @@
 import asyncio
+import concurrent.futures
 import logging
+import multiprocessing
 import math
 from hashlib import sha256
 from typing import List
@@ -29,6 +31,36 @@ def derive_root_account(passphrase):
     return Keypair(seed)
 
 
+# XXX concurrent.futures behavior: why can't this function be a local function in generate_keypairs()?
+def keypair_list(n):
+    return [Keypair() for _ in range(n)]
+
+
+async def generate_keypairs(n) -> List[Keypair]:
+    """Generate Keypairs efficiently using all available CPUs."""
+    logging.info('generating %d keypairs', n)
+
+    # split amounts of keypairs to create to multiple inputs,
+    # one for each cpu
+    cpus = multiprocessing.cpu_count()
+    d, m = n // cpus, n % cpus
+    keypair_amounts = [d]*cpus + [m]*(1 if m else 0)
+
+    # generate keypairs across multiple cpus
+    loop = asyncio.get_running_loop()
+    futurs = []  # futures
+    with concurrent.futures.ProcessPoolExecutor() as pool:
+        futurs = [loop.run_in_executor(pool, keypair_list, amount) for amount in keypair_amounts]
+
+    # aggregate results
+    kps = []
+    for kp in futurs:
+        kps.extend(await kp)
+
+    logging.info('%d keypairs generated', n)
+    return kps
+
+
 async def create_accounts(source: Builder, accounts_num, starting_balance):
     """Asynchronously create accounts and return a Keypair instance for each created account."""
     logging.info('creating %d accounts', accounts_num)
@@ -38,16 +70,16 @@ async def create_accounts(source: Builder, accounts_num, starting_balance):
     # that tx's XDR.
     # then, continue creating accounts using a new tx, and so on.
     # we stop when we create all ops required according to given accounts_num.
-    kps = [Keypair() for _ in range(accounts_num)]
-    xdrs = []
-    batch_amount = (len(kps)+1) // (MAX_OPS+1)
-    for batch_index in range(batch_amount):
-        start = batch_index * MAX_OPS
-        end = min(batch_index+1)*MAX_OPS, len(kps)
+    def batch(iterable, n=1):
+        l = len(iterable)
+        for ndx in range(0, l, n):
+            yield iterable[ndx:min(ndx + n, l)]
 
-        batch_kps = kps[start:end]
+    kps = await generate_keypairs(accounts_num)
+    xdrs = []
+    for batch_kps in batch(kps, MAX_OPS):
         for kp in batch_kps:
-            source.append_create_account_op(source=source.addres(),
+            source.append_create_account_op(source=source.address,
                                             destination=kp.public_address,
                                             starting_balance=str(starting_balance))
 
@@ -57,17 +89,30 @@ async def create_accounts(source: Builder, accounts_num, starting_balance):
 
         # clean source builder for next transaction
         source.next()
-
-    await send_txs(source.horizon.horizon_uri, xdrs, expected_statuses=[200])
+    await send_txs_multiple_endpoints([source.horizon.horizon_uri], xdrs, expected_statuses=[200])
 
     logging.info('created %d accounts', accounts_num)
     return kps
 
 
-def generate_builders(kps: List[Keypair], env_name, horizon) -> List[Builder]:
+def next_builder(b: Builder) -> Builder:
+    """Reimplementation of kin.blockchain.Builder.next() that returns a new builder."""
+    next_builder = Builder(network=b.network,
+                           horizon=b.horizon,
+                           fee=b.fee,
+                           secret=b.keypair.seed().decode(),
+                           address=b.address)
+
+    next_builder.keypair = b.keypair
+    next_builder.sequence = str(int(b.sequence)+1)
+
+    return next_builder
+
+
+async def generate_builders(kps: List[Keypair], env_name, horizon) -> List[Builder]:
     """Receive Keypair list and return Builder list with updated sequence numbers."""
     # fetch sequence numbers asynchronously for all created accounts
-    sequences = await get_sequences(horizon, [kp.public_address for kp in kps])
+    sequences = await get_sequences_multiple_endpoints([horizon], [kp.public_address for kp in kps])
 
     # create tx builders with up-to-date sequence number
     builders = []
@@ -134,25 +179,41 @@ class LoggingClientSession(aiohttp.ClientSession):
         return await super()._request(method, url, **kwargs)
 
 
-async def send_txs(endpoint, xdrs, expected_statuses=[200, 504]):
-    """Send multiple async transaction XDRs to given endpoint."""
+async def send_txs_multiple_endpoints(endpoints, xdrs, expected_statuses=[200, 504]):
+    """Send multiple async transaction XDRs submitting to one of given endpoints.
+
+    endpoints are iterated one after the other in a round robin manner.
+    """
     logging.info('sending %d transactions', len(xdrs))
 
     async with LoggingClientSession(connector=aiohttp.TCPConnector(limit=5000)) as session:
-        url = '{}/transactions'.format(endpoint)
-        results = await asyncio.gather(*[post(session, url, {'tx': xdr.decode()}, expected_statuses) for xdr in xdrs])
+        urls = ['{}/transactions'.format(e) for e in endpoints]
+        results = []
+        for i, xdr in enumerate(xdrs):
+            # submit to one of the urls in a round robin manner
+            results.append(post(session, urls[i % len(urls)], {'tx': xdr.decode()}, expected_statuses))
+
+        results = await asyncio.gather(*results)
 
     logging.info('%d transactions sent', len(xdrs))
     return results
 
 
-async def get_sequences(endpoint, addresses):
-    """Get sequence for multiple accounts."""
+async def get_sequences_multiple_endpoints(endpoints, addresses):
+    """Get sequence for multiple accounts, using one of given endpoints.
+
+    endpoints are iterated one after the other in a round robin manner.
+    """
     logging.info('getting sequence for %d accounts', len(addresses))
 
     async with LoggingClientSession() as session:
-        url = '{}/accounts'.format(endpoint)
-        results = await asyncio.gather(*[get(session, '{}/{}'.format(url, address)) for address in addresses])
+        urls = ['{}/accounts'.format(e) for e in endpoints]
+        results = []
+        for i, address in enumerate(addresses):
+            # send request to one of the urls in a round robin manner
+            results.append(get(session, '{}/{}'.format(urls[i % len(urls)], address)))
+
+        results = await asyncio.gather(*results)
 
     logging.info('finished getting sequence for %d accounts', len(addresses))
 

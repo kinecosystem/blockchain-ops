@@ -9,13 +9,17 @@ import time
 from datetime import datetime
 from typing import List
 
-from kin import KinClient, Environment as KinEnvironment, Keypair
+from kin import Keypair
+from kin.blockchain.builder import Builder
+from kin.blockchain.horizon import Horizon
+from kin.config import SDK_USER_AGENT
 
-from helpers import (TX_SET_SIZE, NETWORK_NAME,
-                     send_txs, get_sequences)
+from helpers import (TX_SET_SIZE, NETWORK_NAME, MIN_FEE,
+                     send_txs_multiple_endpoints, get_sequences_multiple_endpoints)
 
 
 AVG_BLOCK_TIME = 5  # seconds
+COOL_DOWN_AFTER_GET_SEQ = 10  # seconds
 
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
@@ -46,11 +50,11 @@ def load_accounts(path) -> List[Keypair]:
     kps = []
     with open(path) as f:
         for seed in f:
-            kps.append(Keypair(seed))
+            kps.append(Keypair(seed.strip()))
     return kps
 
 
-def spam(env, prioritizers, builders, length, tx_per_ledger):
+def spam(horizon_endpoints, prioritizers, builders, length, tx_per_ledger):
     """Have each account submit transactions every 5s (avg block time) for given length in seconds."""
     coroutines = []
 
@@ -64,7 +68,8 @@ def spam(env, prioritizers, builders, length, tx_per_ledger):
     for rnd in range(rounds):
         round_builders = [builders_queue.get() for _ in range(tx_per_ledger)]
 
-        coroutines.append(spam_round(env, prioritizers,
+        coroutines.append(spam_round(horizon_endpoints,
+                                     prioritizers,
                                      round_builders[:TX_SET_SIZE - 1],
                                      round_builders[TX_SET_SIZE - 1:tx_per_ledger],
                                      rnd))
@@ -81,7 +86,7 @@ def spam(env, prioritizers, builders, length, tx_per_ledger):
 # all transactions are payments to the same address
 #
 # TODO can this potentially create deadlocks when applying them?
-async def spam_round(env, prioritizers: List[Keypair], prioritized_builders, unprioritized_builders, rnd):
+async def spam_round(horizon_endpoints, prioritizers: List[Keypair], prioritized_builders, unprioritized_builders, rnd):
     """Send prioritized and unprioritzied transactions for a single ledger.
 
     All prioritized transactions are expected to be included in the next ledger.
@@ -95,6 +100,7 @@ async def spam_round(env, prioritizers: List[Keypair], prioritized_builders, unp
     # this round should be started only after all previous ledgers have been
     # added, so we sleep until then
     await asyncio.sleep(rnd * AVG_BLOCK_TIME)
+    logging.info('round %d', rnd)
 
     # generate unprioritized payment transactions
     # we submit them first because we want to test if prioritized transactions
@@ -131,7 +137,7 @@ async def spam_round(env, prioritizers: List[Keypair], prioritized_builders, unp
 
     # some transactions can fail with HTTP 500 Server Error or HTTP 504 Server
     # Timeout, so don't raise an exception if this happens
-    tx_results = await send_txs(env.horizon_uri, xdrs, expected_statuses=[200, 500, 504])
+    tx_results = await send_txs_multiple_endpoints(horizon_endpoints, xdrs, expected_statuses=[200, 500, 504])
 
     # fetch builder sequence number.
     #
@@ -139,8 +145,7 @@ async def spam_round(env, prioritizers: List[Keypair], prioritized_builders, unp
     # when we reach this stage,specifically unprioritized ones.
     # thus, it is unknown if the sequence has increased or not
     all_builders = prioritized_builders + unprioritized_builders
-    sequences = await get_sequences(prioritized_builders[0].horizon.horizon_uri,
-                                    [b.address for b in all_builders])
+    sequences = await get_sequences_multiple_endpoints(horizon_endpoints, [b.address for b in all_builders])
 
     # update builder sequence number
     for i, _ in enumerate(all_builders):
@@ -185,20 +190,46 @@ def ledger_time(ledger, horizon):
 async def main():
     args = parse_args()
 
-    prioritizer_kps = [Keypair(kp) for kp in load_accounts(args.prioritizer_seeds_file)]
-    spam_builders = [Keypair(kp) for kp in load_accounts(args.spammer_seeds_file)]
+    logging.info('loading prioritizer accounts')
+    prioritizer_kps = [kp for kp in load_accounts(args.prioritizer_seeds_file)]
+    logging.info('%d prioritizer accounts loaded', len(prioritizer_kps))
 
-    env = KinEnvironment(NETWORK_NAME, args.horizon[0], args.passphrase)
-    results = await spam(env, prioritizer_kps, spam_builders, args.length, args.txs_per_ledger)
+    logging.info('loading spammer accounts')
+    spam_kps = load_accounts(args.spammer_seeds_file)
+    logging.info('%d spammer accounts loaded', len(spam_kps))
+
+    logging.info('fetching sequence number for spammer accounts')
+    spam_sequences = await get_sequences_multiple_endpoints(args.horizon, [kp.public_address for kp in spam_kps])
+
+    logging.info('generating spammer builders')
+    spam_builders = []
+
+    # we're not submitting using the builder - just generating the xdr,
+    # so each builder's horizon instance is irrelevant
+    stub_horizon = args.horizon[0]
+    for kp, seq in zip(spam_kps, spam_sequences):
+        b = Builder(NETWORK_NAME, stub_horizon, MIN_FEE, kp.secret_seed)
+        b.sequence = str(seq + 1)
+        spam_builders.append(b)
+
+    logging.info('sleeping for %ds to let horizon cool down after get sequence request surge', COOL_DOWN_AFTER_GET_SEQ)
+    time.sleep(COOL_DOWN_AFTER_GET_SEQ)
+
+    logging.info('starting spam')
+    results = await spam(args.horizon, prioritizer_kps, spam_builders, args.length, args.txs_per_ledger)
+    logging.info('done spamming')
 
     # save results into csv file
-    horizon = KinClient(env).horizon
+    logging.info('generating report csv')
+    horizon = Horizon(horizon_uri=args.horizon[0], user_agent=SDK_USER_AGENT)
     with open(args.csv, 'w') as csvfile:
         w = csv.DictWriter(csvfile, fieldnames=list(results[0][0].keys()) + ['ledger_time'])
         w.writeheader()
         for spam_round in results:
             for tx in spam_round:
                 w.writerow({**tx, **{'ledger_time': ledger_time(tx['ledger'], horizon)}})
+
+    logging.info('done')
 
 
 if __name__ == '__main__':
