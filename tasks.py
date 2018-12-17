@@ -156,7 +156,7 @@ def build_horizon(c, version, branch='kinecosystem/master', production=True):
         #
         # NOTE docker compose doesn't have a way of knowing if an image was already
         # built, so we search for it manually
-        if not production and is_image_exists(c, 'images_stellar-core'):
+        if not production and is_image_exists(c, 'images_horizon'):
             return
 
         init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', branch)
