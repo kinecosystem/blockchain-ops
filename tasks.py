@@ -43,6 +43,7 @@ def glide(c, version='v0.13.2'):
 
     print('Glide downloaded')
 
+
 @task
 def vendor(c):
     """Vendor go dependencies."""
@@ -275,7 +276,6 @@ def root_account_seed(_, passphrase):
 def address_from_seed(_, seed):
     """Print account address according to given seed."""
     print(kin_base.Keypair.from_seed(seed).address().decode())
-
 
 
 def create_whitelist_account():
