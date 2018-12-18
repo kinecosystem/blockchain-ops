@@ -271,6 +271,13 @@ def root_account_seed(_, passphrase):
     print(derive_root_account_seed(passphrase))
 
 
+@task
+def address_from_seed(_, seed):
+    """Print account address according to given seed."""
+    print(kin_base.Keypair.from_seed(seed).address().decode())
+
+
+
 def create_whitelist_account():
     """Create whitelist account for prioritizing transactions in tests."""
     print('Creating whitelist account')
