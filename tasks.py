@@ -260,6 +260,12 @@ def protocol_version_9():
     upgrade('protocolversion', 'protocol_version', 9)
 
 
+def tx_set_size_500():
+    """Set transactino set size to 500."""
+    print('Setting transaction set size to 500')
+    upgrade('maxtxsize', 'max_tx_set_size', 500)
+
+
 def derive_root_account_seed(passphrase):
     """Return the root account seed based on the given network passphrase."""
     network_hash = sha256(passphrase.encode()).digest()
@@ -339,6 +345,7 @@ def network(_):
     """Initialize a new local test network with single core and horizon instances."""
     base_reserve_0()
     protocol_version_9()
+    tx_set_size_500()
     create_whitelist_account()
 
     print('Root account seed: {}'.format(derive_root_account_seed('private testnet')))
