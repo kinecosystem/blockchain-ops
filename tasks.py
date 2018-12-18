@@ -27,7 +27,7 @@ def glide(c, version='v0.13.2'):
     elif os_name == 'darwin':
         arch = 'darwin-amd64'
     else:
-        raise Failure(os_name_res, reason='Only supported on OSx and Linux')
+        raise Failure(os_name, reason='Only supported on OSx and Linux')
     print('Glide arch: {arch}'.format(arch=arch))
 
     # avoid redownloading file if exists
