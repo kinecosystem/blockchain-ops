@@ -308,7 +308,7 @@ def create_whitelist_account():
     builder.submit()
 
 
-@task(pre=[call(build_core, version='kinecosystem/master', branch='kinecosystem/master', production=False)])
+@task(pre=[call(build_core, version='master', branch='kinecosystem/master', production=False)])
 def start_core(c):
     """Start a local test Core instance."""
     with c.cd('images'):
@@ -331,7 +331,7 @@ def start_core(c):
         c.run('sudo docker-compose up -d stellar-core', hide='stderr')
 
 
-@task(pre=[call(build_go, version='kinecosystem/master', branch='kinecosystem/master', app='horizon', production=False)])
+@task(pre=[call(build_go, version='master', branch='kinecosystem/master', app='horizon', production=False)])
 def start_horizon(c):
     """Start a local test Horizon instance."""
     with c.cd('images'):
@@ -350,7 +350,7 @@ def start_horizon(c):
             root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
 
 
-@task(pre=[call(build_go, version='kinecosystem/master', branch='kinecosystem/master', app='friendbot', production=False)])
+@task(pre=[call(build_go, version='master', branch='kinecosystem/master', app='friendbot', production=False)])
 def start_friendbot(c):
     """Start a local test Friendbot instance."""
     with c.cd('images'):
