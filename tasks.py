@@ -215,6 +215,10 @@ def push_dockerhub(c, app, version, latest=True):
         c.run('sudo docker push kinecosystem/horizon:{version}'.format(version=version))
         if latest:
             c.run('sudo docker push kinecosystem/horizon:latest')
+    elif app.lower() == 'friendbot':
+        c.run('sudo docker push kinecosystem/friendbot:{version}'.format(version=version))
+        if latest:
+            c.run('sudo docker push kinecosystem/friendbot:latest')
     else:
         Exit('Unknown application {}'.format(app))
 
@@ -343,7 +347,17 @@ def start_horizon(c):
             root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
 
 
-@task(rm_network, start_core, start_horizon)
+@task(pre=[call(build_go, version='kinecosystem/master', branch='kinecosystem/master', app='friendbot', production=False)])
+def start_friendbot(c):
+    """Start a local test Friendbot instance."""
+    with c.cd('images'):
+        # start friendbot
+        print('Starting Friendbot')
+        c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d friendbot'.format(
+            root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
+
+
+@task(rm_network, start_core, start_horizon, start_friendbot)
 def network(_):
     """Initialize a new local test network with single core and horizon instances."""
     base_reserve_0()
