@@ -120,7 +120,9 @@ services:
   # friendbot was originally part of horizon
   # but extracted to its own microservice since horizon v0.12.2
   friendbot:
-    image: kinecosystem/friendbot
+    build:
+      dockerfile: dockerfiles/Dockerfile.friendbot
+      context: .
     ports:
       - 8001:8000
     links:
@@ -128,7 +130,11 @@ services:
     volumes:
       - ./volumes/friendbot/opt/friendbot:/opt/friendbot
     environment:
-      ROOT_ACCOUNT_SEED: "${ROOT_ACCOUNT_SEED}"
+      FRIENDBOT_SEED: '${ROOT_ACCOUNT_SEED}'
+      PORT: '8000'
+      NETWORK_PASSPHRASE: private testnet
+      HORIZON_ADDRESS: http://horizon:8000
+      STARTING_BALANCE: '10.00'
     restart: on-failure
     logging:
       driver: json-file

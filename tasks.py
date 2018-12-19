@@ -143,8 +143,8 @@ def build_core(c, version, branch='kinecosystem/master', production=True):
 
 
 @task
-def build_horizon(c, version, branch='kinecosystem/master', production=True):
-    """Build Horizon binary docker image.
+def build_go(c, version, branch='kinecosystem/master', app='horizon', production=True):
+    """Build Horizon binary docker images and other misc. Golang apps.
 
     By default, builds a Docker image tagged ready for production.
 
@@ -157,7 +157,7 @@ def build_horizon(c, version, branch='kinecosystem/master', production=True):
         #
         # NOTE docker compose doesn't have a way of knowing if an image was already
         # built, so we search for it manually
-        if not production and is_image_exists(c, 'images_horizon'):
+        if not production and is_image_exists(c, 'images_{}'.format(app)):
             return
 
         init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', branch)
@@ -173,13 +173,16 @@ def build_horizon(c, version, branch='kinecosystem/master', production=True):
              '-X \\"github.com/kinecosystem/go/support/app.version={version}\\"'
              ' \''
              ).format(timestamp=datetime.now(timezone.utc).isoformat(), version=version),
-            '-o', './horizon', './services/horizon"',
+            '-o', './{}'.format(app), './services/{}"'.format(app),
         ])
 
-        print('Building Horizon')
+        print('Building {}'.format(app.capitalize()))
 
         if production:
             # build
+            #
+            # NOTE horizon-build docker image is used to build any Golang app
+            # since they share the same dependencies
             c.run('sudo docker build '
                   '-f dockerfiles/Dockerfile.horizon-build '
                   '-t kinecosystem/horizon-build '
@@ -191,14 +194,14 @@ def build_horizon(c, version, branch='kinecosystem/master', production=True):
                   '{}'.format(os.getcwd(), c.cwd, cmd))
 
             c.run('sudo docker build '
-                  '-f dockerfiles/Dockerfile.horizon '
-                  '-t kinecosystem/horizon:latest '
-                  '-t kinecosystem/horizon:{version} '
-                  '.'.format(version=version))
+                  '-f dockerfiles/Dockerfile.{app} '
+                  '-t kinecosystem/{app}:latest '
+                  '-t kinecosystem/{app}:{version} '
+                  '.'.format(app=app, version=version))
         else:
             # build using docker compose for local test network
             c.run('sudo docker-compose run horizon-build {cmd}'.format(cmd=cmd))
-            c.run('sudo docker-compose build horizon')
+            c.run('sudo docker-compose build {}'.format(app))
 
 
 @task
@@ -212,6 +215,10 @@ def push_dockerhub(c, app, version, latest=True):
         c.run('sudo docker push kinecosystem/horizon:{version}'.format(version=version))
         if latest:
             c.run('sudo docker push kinecosystem/horizon:latest')
+    elif app.lower() == 'friendbot':
+        c.run('sudo docker push kinecosystem/friendbot:{version}'.format(version=version))
+        if latest:
+            c.run('sudo docker push kinecosystem/friendbot:latest')
     else:
         Exit('Unknown application {}'.format(app))
 
@@ -298,7 +305,7 @@ def create_whitelist_account():
     builder.submit()
 
 
-@task(pre=[call(build_core, version='kinecosystem/master', production=False)])
+@task(pre=[call(build_core, version='kinecosystem/master', branch='kinecosystem/master', production=False)])
 def start_core(c):
     """Start a local test Core instance."""
     with c.cd('images'):
@@ -321,7 +328,7 @@ def start_core(c):
         c.run('sudo docker-compose up -d stellar-core', hide='stderr')
 
 
-@task(pre=[call(build_horizon, version='kinecosystem/master', production=False)])
+@task(pre=[call(build_go, version='kinecosystem/master', branch='kinecosystem/master', app='horizon', production=False)])
 def start_horizon(c):
     """Start a local test Horizon instance."""
     with c.cd('images'):
@@ -340,7 +347,17 @@ def start_horizon(c):
             root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
 
 
-@task(rm_network, start_core, start_horizon)
+@task(pre=[call(build_go, version='kinecosystem/master', branch='kinecosystem/master', app='friendbot', production=False)])
+def start_friendbot(c):
+    """Start a local test Friendbot instance."""
+    with c.cd('images'):
+        # start friendbot
+        print('Starting Friendbot')
+        c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d friendbot'.format(
+            root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
+
+
+@task(rm_network, start_core, start_horizon, start_friendbot)
 def network(_):
     """Initialize a new local test network with single core and horizon instances."""
     base_reserve_0()
