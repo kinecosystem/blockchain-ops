@@ -216,7 +216,7 @@ async def send_txs_multiple_endpoints(endpoints, xdrs, expected_statuses=[200, 5
         results = []
         for i, xdr in enumerate(xdrs):
             # submit to one of the urls in a round robin manner
-            results.append(post(session, urls[i % len(urls)], {'tx': xdr.decode()}, expected_statuses))
+            results.append(post(session, urls[i % len(urls)], {'tx': xdr}, expected_statuses))
 
         results = await asyncio.gather(*results)
 
