@@ -5,7 +5,7 @@ services:
   stellar-core-telegraf:
     environment:
      - NODE_NAME="{{stellar_core.network.name}}" #note that this only works if a single core is deployed
-    image: kinecosystem/stellar-core-telegraf:v1.0.16
+    image: kinecosystem/stellar-core-telegraf:v1.0.23
     environment:
       NODE_NAME: "{{stellar_core.network.name}}"
     container_name: stellar_core_telegraf
@@ -19,7 +19,7 @@ services:
         max-file: "3"
 
   stellar-core:
-    image: kinecosystem/stellar-core:kinecosystem-v1.0.0-stellar-v9.2.0
+    image: kinecosystem/stellar-core:kinecosystem-v2.0.0-stellar-v9.2.0
     container_name: stellar_core
     ports:
       - 11625:11625

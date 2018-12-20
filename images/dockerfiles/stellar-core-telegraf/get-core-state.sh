@@ -15,4 +15,4 @@ elif [ "$result" = "Stopping" ]; then
 elif [ "$result" = "Booting" ]; then
    state=6
 fi
-echo 'state, state='$state
+echo 'state state='$state

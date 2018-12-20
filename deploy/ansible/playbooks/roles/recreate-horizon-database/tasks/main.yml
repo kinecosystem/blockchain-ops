@@ -1,0 +1,22 @@
+---
+- debug:
+    msg: "{{this_node}}"
+
+- pip:
+    name: psycopg2
+
+- name: remove db
+  postgresql_db:
+    db: "{{this_node.db.name}}"
+    state: absent 
+    login_host: "{{this_node.db.host}}"
+    login_user: "{{this_node.db.user}}"
+    login_password: "{{this_node.db.password}}"
+
+- name: create db
+  postgresql_db:
+    db: "{{this_node.db.name}}"
+    state: present
+    login_host: "{{this_node.db.host}}"
+    login_user: "{{this_node.db.user}}"
+    login_password: "{{this_node.db.password}}"

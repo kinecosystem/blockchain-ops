@@ -1,0 +1,23 @@
+---
+- debug:
+    msg: "{{this_node.stellar_core}}"
+
+- pip:
+    name: psycopg2
+
+- name: remove db
+  postgresql_db:
+    db: "{{this_node.stellar_core.db.name}}"
+    state: absent 
+    login_host: "{{this_node.stellar_core.db.host}}"
+    login_user: "{{this_node.stellar_core.db.user}}"
+    login_password: "{{this_node.stellar_core.db.password}}"
+
+- name: create db
+  postgresql_db:
+    db: "{{this_node.stellar_core.db.name}}"
+    state: present 
+    login_host: "{{this_node.stellar_core.db.host}}"
+    login_user: "{{this_node.stellar_core.db.user}}"
+    login_password: "{{this_node.stellar_core.db.password}}"
+

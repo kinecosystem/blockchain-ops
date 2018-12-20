@@ -3,7 +3,6 @@
 # Global tags can be specified here in key="value" format.
 [tags]
   node_name = "${NODE_NAME}" # take from env
-  app_name = "horizon"
 
 # Configuration for telegraf agent
 [agent]
@@ -55,15 +54,15 @@
 #                                  INPUTS                                     #
 ###############################################################################
 
-[[inputs.system]]
 
 [[inputs.exec]]
   ## Commands array
   commands = [
     "/tmp/check_latency.sh",
+    "/tmp/get_load5.sh",
   ]
 
-  name_prefix = "stellar_core_"
+  name_prefix = "horizon_"
 
   ## Timeout for each command to complete.
   timeout = "5s"
@@ -82,6 +81,8 @@
 [[inputs.statsd]]
   ## Protocol, must be "tcp", "udp4", "udp6" or "udp" (default=udp)
   protocol = "udp"
+  
+  name_prefix = "horizon_"
 
   ## MaxTCPConnection - applicable when protocol is set to tcp (default=250)
   max_tcp_connections = 250
@@ -122,8 +123,8 @@
   ## Statsd data translation templates, more info can be read here:
   ## https://github.com/influxdata/telegraf/blob/master/docs/TEMPLATE_PATTERN.md
   templates = [
-       "request_count.* measurement.request_method.node_name",
-       "response_time.* measurement.request_method.node_name",
+       "request_count.* measurement.request_method.status_code.node_name",
+       "response_time.* measurement.request_method.status_code.node_name",
   ]
 
   ## Number of UDP messages allowed to queue up, once filled,
