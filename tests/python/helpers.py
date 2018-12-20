@@ -8,7 +8,7 @@ from typing import List
 
 import aiohttp
 
-from kin import Keypair, KinClient
+from kin import Keypair
 from kin.blockchain.builder import Builder
 from kin_base import Keypair as BaseKeypair
 
@@ -48,7 +48,7 @@ def load_accounts(path) -> List[Keypair]:
     return kps
 
 
-async def generate_keypairs(n) -> List[Keypair]:
+def generate_keypairs(n) -> List[Keypair]:
     """Generate Keypairs efficiently using all available CPUs."""
     logging.info('generating %d keypairs', n)
 
@@ -59,23 +59,69 @@ async def generate_keypairs(n) -> List[Keypair]:
     keypair_amounts = [d]*cpus + [m]*(1 if m else 0)
 
     # generate keypairs across multiple cpus
-    loop = asyncio.get_running_loop()
-    futurs = []  # futures
-    with concurrent.futures.ProcessPoolExecutor() as pool:
-        futurs = [loop.run_in_executor(pool, keypair_list, amount) for amount in keypair_amounts]
+    with concurrent.futures.ProcessPoolExecutor() as process_pool:
+        futurs = []
+        for amount in keypair_amounts:
+            f = process_pool.submit(keypair_list, amount)
+            futurs.append(f)
 
-    # aggregate results
+    kp_batches, _ = concurrent.futures.wait(futurs)
     kps = []
-    for kp in futurs:
-        kps.extend(await kp)
+    for batch in kp_batches:
+        kps.extend(batch.result())
 
     logging.info('%d keypairs generated', n)
     return kps
 
 
-async def create_accounts(source: Builder, horizon_endpoints, accounts_num, starting_balance):
-    """Asynchronously create accounts and return a Keypair instance for each created account."""
-    logging.info('creating %d accounts', accounts_num)
+def _build_and_sign(source_kp, channel, kps, starting_balance):
+    for kp in kps:
+        channel.append_create_account_op(source=source_kp.public_address,
+                                         destination=kp.public_address,
+                                         starting_balance=str(starting_balance))
+
+    channel_seed = channel.keypair.seed().decode()
+    channel.sign(secret=channel_seed)
+    if channel_seed != source_kp.secret_seed:
+        channel.sign(secret=source_kp.secret_seed)
+
+    xdr = channel.gen_xdr().decode()
+    channel.clear()
+
+    return xdr
+
+
+async def channel_create_accounts(pool, session, queue, source_kp: Keypair, kps: List[Keypair], starting_balance, horizon_endpoint):
+    """Create MAX_OPS accounts in a single transaction using given channel and horizon endpoint."""
+    # get avaiable channel i.e. one which isn't currently in the process of submitting a tx
+    # and use it to async submit a single create account tx.
+    channel = await queue.get()
+    logging.debug('using channel %s to create accounts', channel)
+
+    # sign transaction with channel and source accounts,
+    # utilizing all availables cpus (tx signing is computationally intensive)
+    loop = asyncio.get_running_loop()
+    xdr = await loop.run_in_executor(pool, _build_and_sign, source_kp, channel, kps, starting_balance)
+
+    # submit tx
+    await post(session, '{}/transactions'.format(horizon_endpoint), {'tx': xdr}, [200])
+
+    # update sequence number
+    res = await get(session, '{}/accounts/{}'.format(horizon_endpoint, channel.keypair.address().decode()))
+    channel.sequence = int(res['sequence'])
+
+    # make channel available for another transaction
+    await queue.put(channel)
+    logging.debug('channel %s finished submitting current create account transaction', channel)
+
+
+async def create_accounts(source_kp: Keypair, account_kps: List[Keypair], channel_builders: List[Builder], horizon_endpoints: List[str], starting_balance: int):
+    """Asynchronously create accounts and return a Keypair instance for each created account.
+
+    Accounts are created using given channel builders (as sequence number consumers)
+    and source keypair as funding source account.
+    """
+    logging.info('creating %d accounts', len(account_kps))
 
     # generate txs, squeezing as much "create account" ops as possible to each one.
     # when each tx is full with as much ops as it can include, sign and generate
@@ -87,68 +133,31 @@ async def create_accounts(source: Builder, horizon_endpoints, accounts_num, star
         for ndx in range(0, l, n):
             yield iterable[ndx:min(ndx + n, l)]
 
-    kps = await generate_keypairs(accounts_num)
-    xdrs = []
-    for batch_kps in batch(kps, MAX_OPS):
-        for kp in batch_kps:
-            source.append_create_account_op(source=source.address,
-                                            destination=kp.public_address,
-                                            starting_balance=str(starting_balance))
+    # put channels in queue.
+    # each channel will be used to submit create account txs asynchronously,
+    # and will continue submitting more txs after he's done with the previous
+    # txs
+    channel_queue = asyncio.Queue()
+    for c in channel_builders:
+        await channel_queue.put(c)
 
-        # sign with channel and root account
-        source.sign(secret=source.keypair.seed().decode())
-        xdrs.append(source.gen_xdr())
+    with concurrent.futures.ProcessPoolExecutor() as process_pool:
+        async with LoggingClientSession(connector=aiohttp.TCPConnector(limit=len(channel_builders))) as session:
+            futurs = []
+            for i, kp_batch in enumerate(batch(account_kps, MAX_OPS)):
+                coro = channel_create_accounts(
+                    process_pool, session, channel_queue, source_kp, kp_batch, starting_balance, horizon_endpoints[i % len(horizon_endpoints)])
 
-        # clean source builder for next transaction
-        source.next()
+                futurs.append(asyncio.create_task(coro))
 
-    await send_txs_multiple_endpoints(horizon_endpoints, xdrs, expected_statuses=[200])
+            # wait for all remaining transactions to finish
+            await asyncio.gather(*futurs)
 
-    logging.info('created %d accounts', accounts_num)
-    return kps
+    # sanity check: since all txs have already finished, all channels should be
+    # back in the queue
+    assert channel_queue.qsize() == len(channel_builders)
 
-
-def next_builder(b: Builder) -> Builder:
-    """Reimplementation of kin.blockchain.Builder.next() that returns a new builder."""
-    next_builder = Builder(network=b.network,
-                           horizon=b.horizon,
-                           fee=b.fee,
-                           secret=b.keypair.seed().decode(),
-                           address=b.address)
-
-    next_builder.keypair = b.keypair
-    next_builder.sequence = str(int(b.sequence)+1)
-
-    return next_builder
-
-
-async def generate_builders(kps: List[Keypair], env_name, horizon) -> List[Builder]:
-    """Receive Keypair list and return Builder list with updated sequence numbers."""
-    # fetch sequence numbers asynchronously for all created accounts
-    sequences = await get_sequences_multiple_endpoints([horizon], [kp.public_address for kp in kps])
-
-    # create tx builders with up-to-date sequence number
-    builders = []
-    for i, kp in enumerate(kps):
-        builder = Builder(env_name, horizon, MIN_FEE, kp.secret_seed)
-        builder.sequence = sequences[i]
-        builders.append(builder)
-
-    for b in builders:
-        logging.debug('created builder %s', b.address)
-
-    return builders
-
-
-def init_tx_builders(env, kps, sequences):
-    """Initialize transaction builders for each given seed."""
-    builders = []
-    for i, kp in enumerate(kps):
-        client = KinClient(env)
-        builder = Builder(env.name, client.horizon, MIN_FEE, kp.secret_seed)
-        builder.sequence = sequences[i]
-        builders.append(builder)
-    return builders
+    logging.info('created %d accounts', len(account_kps))
 
 
 async def get(session: aiohttp.ClientSession, url, expected_status=200):
