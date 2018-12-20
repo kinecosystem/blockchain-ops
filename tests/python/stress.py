@@ -30,8 +30,8 @@ def parse_args():
 
     parser.add_argument('--length', required=True, type=int, help='Test length in seconds')
     parser.add_argument('--txs-per-ledger', required=True, type=int, help='Transaction rate to submit (spam) in parallel for every ledger round')
-    parser.add_argument('--prioritizer-seeds-file', required=True, type=str, help='Filepath to prioritizer seeds file')
-    parser.add_argument('--spammer-seeds-file', required=True, type=str, help='Filepath to spammer seeds file')
+    parser.add_argument('--prioritizer-seeds-file', required=True, type=str, help='File path to prioritizer seeds file')
+    parser.add_argument('--spammer-seeds-file', required=True, type=str, help='File path to spammer seeds file')
     parser.add_argument('--out', default='spam-results-{}.json'.format(str(int(time.time()))), type=str, help='Spam results JSON output')
 
     parser.add_argument('--passphrase', type=str, help='Network passphrase')
