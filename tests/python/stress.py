@@ -13,7 +13,8 @@ from kin import Keypair, Environment
 from kin.blockchain.builder import Builder
 
 from helpers import (TX_SET_SIZE, NETWORK_NAME, MIN_FEE,
-                     send_txs_multiple_endpoints, get_sequences_multiple_endpoints)
+                     load_accounts, send_txs_multiple_endpoints,
+                     get_sequences_multiple_endpoints)
 
 
 AVG_BLOCK_TIME = 5  # seconds
@@ -38,18 +39,6 @@ def parse_args():
                         help='Horizon endpoint URL (use multiple --horizon flags for multiple addresses)')
 
     return parser.parse_args()
-
-
-def load_accounts(path) -> List[Keypair]:
-    """Load seeds from file path and return Keypair list.
-
-    Expected file format is a newline-delimited seed list.
-    """
-    kps = []
-    with open(path) as f:
-        for seed in f:
-            kps.append(Keypair(seed.strip()))
-    return kps
 
 
 def spam(horizon_endpoints, prioritizers, builders, length, tx_per_ledger):

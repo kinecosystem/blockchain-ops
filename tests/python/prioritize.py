@@ -1,12 +1,12 @@
 """Receive seeds and add them as prioritizers to whitelist account."""
 import argparse
 import logging
-from typing import List
 
-from kin import KinClient, Environment as KinEnvironment, Keypair
+from kin import KinClient, Environment as KinEnvironment
 from kin.blockchain.builder import Builder
 
-from helpers import NETWORK_NAME, MIN_FEE, add_prioritizers
+from helpers import (NETWORK_NAME, MIN_FEE,
+                     add_prioritizers, load_accounts)
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -22,18 +22,6 @@ def parse_args():
     parser.add_argument('--horizon', required=True, type=str, help='Horizon endpoint URL')
 
     return parser.parse_args()
-
-
-def load_accounts(path) -> List[Keypair]:
-    """Load seeds from file path and return Keypair list.
-
-    Expected file format is a newline-delimited seed list.
-    """
-    kps = []
-    with open(path) as f:
-        for seed in f:
-            kps.append(Keypair(seed.strip()))
-    return kps
 
 
 def main():

@@ -36,6 +36,18 @@ def keypair_list(n):
     return [Keypair() for _ in range(n)]
 
 
+def load_accounts(path) -> List[Keypair]:
+    """Load seeds from file path and return Keypair list.
+
+    Expected file format is a newline-delimited seed list.
+    """
+    kps = []
+    with open(path) as f:
+        for seed in f:
+            kps.append(Keypair(seed.strip()))
+    return kps
+
+
 async def generate_keypairs(n) -> List[Keypair]:
     """Generate Keypairs efficiently using all available CPUs."""
     logging.info('generating %d keypairs', n)
