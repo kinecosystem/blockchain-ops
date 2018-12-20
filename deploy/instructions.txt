@@ -44,7 +44,7 @@ aws kms delete-alias --region us-west-1  --alias-name alias/socialfoundrykin
 
 4. RDS passwords must be alphanumeric
 
-5. Amazon has this strange policy where new accounts can create large instances. there are 2 kinds of failures: either the account is 'not verified' or there's an actual limit on creating the instance type (happens in smaller regions). in the first case, email 'aws-verification@amazon.com', in the seconds case, you can ask to raise the limit. it can take a few hours for them to fix it.
+5. Amazon has this strange policy where new accounts can't create large instances. there are 2 kinds of failures: either the account is 'not verified' or there's an actual limit on creating the instance type (happens in smaller regions like us-west-2). in the first case, email 'aws-verification@amazon.com', in the seconds case, you can ask to raise the limit. it can take a few hours for them to fix it.
 
 6. getting access denied on new-workspace? you forgot the create the bucket. or maybe you placed it in the wrong place. or mis-spelled its name.
 
