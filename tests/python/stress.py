@@ -20,7 +20,9 @@ def parse_args():
 
     parser.add_argument('--xdrs-file', type=str, help='Transaction XDR list file, in JSON lines format')
     parser.add_argument('--out', default='spam-results-{}.json'.format(str(int(time.time()))), type=str, help='Spam results JSON output')
-    parser.add_argument('--horizon', required=True, action='append', help='Horizon endpoint URL (use multiple --horizon flags for multiple addresses)')
+    parser.add_argument('--endpoint', required=True, action='append',
+                        help='Endpoint URLs for submitting transactions (use multiple --endpoint flags for multiple addresses)')
+    parser.add_argument('--submit-to-core', action='store_true', help='Submit to Core instead of Horizon')
 
     return parser.parse_args()
 
@@ -34,10 +36,11 @@ def load_spam_rounds(path):
     return spam_rounds
 
 
-async def spam(horizon_endpoints, spam_rounds):
+async def spam(endpoints, submit_to_horizon, spam_rounds):
+    """Receive transaction XDR objects and submit them when their expected ledger arrives."""
     futurs = []
     for rnd, tx_metadata in enumerate(spam_rounds):
-        f = spam_round(tx_metadata, horizon_endpoints, rnd)
+        f = spam_round(tx_metadata, endpoints, submit_to_horizon, rnd)
 
         futurs.append(f)
 
@@ -45,7 +48,8 @@ async def spam(horizon_endpoints, spam_rounds):
     return results
 
 
-async def spam_round(tx_metadata, horizon_endpoints, rnd):
+async def spam_round(tx_metadata, endpoints, submit_to_horizon, rnd):
+    """Receive transaction XDR objects for a specific future ledger and submit them when that ledger time arrives."""
     xdrs = [tx['xdr'] for tx in tx_metadata.values()]
 
     # start the spam round only when the expected ledger time arrives
@@ -58,7 +62,11 @@ async def spam_round(tx_metadata, horizon_endpoints, rnd):
     logging.info('spam round %d', rnd)
 
     submission_time = time.time()
-    tx_results = await send_txs_multiple_endpoints(horizon_endpoints, xdrs, expected_statuses=[200, 500, 504])
+    tx_results = await send_txs_multiple_endpoints(
+        endpoints,
+        xdrs,
+        submit_to_horizon,
+        [200, 500, 504] if submit_to_horizon else [200])
 
     logging.debug('done submitting %d transactions for round %d', len(xdrs), rnd)
 
@@ -80,13 +88,17 @@ async def spam_round(tx_metadata, horizon_endpoints, rnd):
 
 
 async def main():
+    """Load spam transaction XDR objects for all spam rounds and submitting to the network in a timely manner."""
     args = parse_args()
 
     logging.info('load spam transaction xdr objects for spam rounds')
     spam_rounds = load_spam_rounds(args.xdrs_file)
 
     logging.info('starting spam')
-    results = await spam(args.horizon, spam_rounds)
+    results = await spam(
+        args.endpoint,
+        submit_to_horizon=(not args.submit_to_core),
+        spam_rounds=spam_rounds)
     logging.info('done spamming')
 
     logging.info('writing transaction results to file')
