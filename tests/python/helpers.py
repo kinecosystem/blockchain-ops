@@ -55,7 +55,7 @@ def generate_keypairs(n) -> List[Keypair]:
     # split amounts of keypairs to create to multiple inputs,
     # one for each cpu
     cpus = multiprocessing.cpu_count()
-    d, m = n // cpus, n % cpus
+    d, m = n // cpus, n % cpus  # d[iv], m[od]
     keypair_amounts = [d]*cpus + [m]*(1 if m else 0)
 
     # generate keypairs across multiple cpus
