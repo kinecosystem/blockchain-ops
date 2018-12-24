@@ -73,16 +73,38 @@ async def spam_round(tx_metadata, endpoints, submit_to_horizon, rnd):
     # create tx result object for each tx for reviewing later on
     results = []
     for (tx_hash, tx), tx_res in zip(tx_metadata.items(), tx_results):
-        try:
-            ledger = tx_res['ledger']
-        except KeyError:  # probably 504
-            ledger = None
+        ledger, status, error = "", "", ""
+
+        if submit_to_horizon:
+            try:
+                ledger = tx_res['ledger']
+            except KeyError:  # probably 504
+                pass
+        else:  # submit to core
+            try:
+                status = tx_res['status']
+            except KeyError as e:
+                # shouldn't happen, core should always reply with this structure
+                logging.error(e)
+                logging.error(tx_res)
+
+            try:
+                error = tx_res['error']
+            except KeyError:  # can happen if status != ERROR
+                pass
 
         results.append({'hash': tx_hash,
                         'round': tx['round'],
                         'prioritized': tx['prioritized'],
+                        'submission_time': submission_time,
+
+                        # if submitting to horizon
                         'ledger': ledger,
-                        'submission_time': submission_time})
+
+                        # if submitting to core
+                        'status': status,
+                        'error': error,
+                        })
 
     return results
 
