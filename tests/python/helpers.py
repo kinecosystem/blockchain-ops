@@ -1,3 +1,5 @@
+# TODO split these into module files with explicit names other than generic "helpers"
+"""Common helper functions for tests."""
 import asyncio
 import concurrent.futures
 import logging
@@ -32,7 +34,8 @@ def derive_root_account(passphrase):
 
 
 # XXX concurrent.futures behavior: why can't this function be a local function in generate_keypairs()?
-def keypair_list(n):
+def keypair_list(n) -> List[Keypair]:
+    """Return Keypair list according to given amount."""
     return [Keypair() for _ in range(n)]
 
 
@@ -255,6 +258,7 @@ async def get_sequences_multiple_endpoints(endpoints, addresses):
 
 
 def get_latest_ledger(client):
+    """Return latest ledger dictionary using given KinClient."""
     params = {'order': 'desc', 'limit': 1}
     return client.horizon.ledgers(params=params)['_embedded']['records'][0]
 
@@ -281,7 +285,3 @@ def add_prioritizers(builder: Builder, kps: List[Keypair]):
         builder.clear()
 
     logging.info('%d prioritizers added', len(kps))
-
-
-# TODO
-# def remove_whitelisters(builder: Builder, kps: List[kin_base.Keypair]): pass
