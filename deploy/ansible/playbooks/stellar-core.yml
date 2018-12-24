@@ -7,5 +7,6 @@
     - awscli
     - docker
 
-    - datadog-stellar-core
+    #- datadog-stellar-core
+    - telegraf-client
     - stellar-core

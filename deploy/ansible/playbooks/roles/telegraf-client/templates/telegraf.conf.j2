@@ -1,10 +1,12 @@
+{% set this_node = stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+
 # Telegraf configuration for stellar core:
 # this configuration does one thing: it reports the /info metrics from the core
 # to the Kin Ecosystem metric collection endpoint, every 10 seconds
 
 # Global tags can be specified here in key="value" format.
 [tags]
-  node_name = "$NODE_NAME" # take from env
+  node_name = "{{this_node.name}}"
 
 # Configuration for telegraf agent
 [agent]
@@ -55,49 +57,5 @@
 ###############################################################################
 #                                  INPUTS                                     #
 ###############################################################################
-
-# parse json from http
-[[inputs.http]]
-  ## One or more URLs from which to read formatted metrics
-  urls = [
-    "http://stellar-core:11626/info"
-  ]
-
-  ## HTTP method
-  # method = "GET"
-
-  name_prefix = "stellar_core_"
-
-  data_format = "json"
-
-  ## Query is a GJSON path that specifies a specific chunk of JSON to be
-  ## parsed, if not specified the whole document will be parsed.
-  ##
-  ## GJSON query paths are described here:
-  ##   https://github.com/tidwall/gjson#path-syntax
-  json_query = "info.ledger"
-
-[[inputs.exec]]
-  ## Commands array
-  commands = [
-    "/tmp/get_core_state.sh",
-    "/tmp/get_core_startedOn.sh",
-    "/tmp/get_load5.sh",
-  ]
-
-  name_prefix = "stellar_core_"
-
-  ## Timeout for each command to complete.
-  timeout = "5s"
-
-  ## measurement name suffix (for separating different commands)
-  #name_suffix = "_mycollector"
-
-  ## Data format to consume.
-  ## Each data format has its own unique set of configuration options, read
-  ## more about them here:
-  ## https://github.com/influxdata/telegraf/blob/master/docs/DATA_FORMATS_INPUT.md
-  data_format = "influx"
-
-
+[[inputs.system]]
 # vim: ft=toml

@@ -5,7 +5,7 @@ services:
   stellar-core-telegraf:
     environment:
      - NODE_NAME="{{stellar_core.network.name}}" #note that this only works if a single core is deployed
-    image: kinecosystem/stellar-core-telegraf:v1.0.23
+    image: kinecosystem/stellar-core-telegraf:v1.0.24
     environment:
       NODE_NAME: "{{stellar_core.network.name}}"
     container_name: stellar_core_telegraf
