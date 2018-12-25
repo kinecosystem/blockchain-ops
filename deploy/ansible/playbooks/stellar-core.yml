@@ -6,6 +6,7 @@
     - common-packages
     - awscli
     - docker
+    - add_pg_dump_96
 
     - datadog-stellar-core
     - stellar-core
