@@ -1,0 +1,18 @@
+{% set this_node = stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+#!/usr/bin/env bash
+
+# get the latest XXX line from the core app, tar them and upload to S3.
+# you can also provide the number of lines as the first (and only) parameters
+
+if [ ! -z $1 ] 
+then 
+    num_lines_to_get=$1
+else
+    num_lines_to_get=1000000
+fi
+echo "getting the last $num_lines_to_get lines from the core logs..." 
+
+temp_file=$(tempfile)_core_logs
+docker-compose logs --tail=$num_lines_to_get  stellar-core > $temp_file;
+tar cfz $temp_file.tar $temp_file
+aws s3 cp $temp_file.tar {{this_node.archive.put_address}}temp/; rm $temp_file $temp_file.tar
