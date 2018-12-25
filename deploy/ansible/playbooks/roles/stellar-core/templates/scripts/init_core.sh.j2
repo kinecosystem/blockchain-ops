@@ -1,4 +1,16 @@
+{% set this_node = stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+
 #!/usr/bin/env bash
+
+echo "-------------------------"
+echo "erasing local buckets..."
+echo "-------------------------"
+rm /opt/stellar-core/volumes/stellar-core/buckets -rf
+exit_status=$?
+if [ $exit_status -ne 0 ]; then
+    echo "failed to erase local buckets."
+    exit $exit_status
+fi
 
 echo "-------------------------"
 echo "erasing core db..."
@@ -11,6 +23,18 @@ if [ $exit_status -ne 0 ]; then
 fi
 
 echo "-------------------------"
+echo "erasing s3 bucket"
+echo "-------------------------"
+# aws s3 rm s3://stellar-core-kikkinfed-ee65 --recursive
+aws s3 rm {{this_node.archive.put_address}} --recursive
+exit_status=$?
+if [ $exit_status -ne 0 ]; then
+    echo "failed to erase s3 bucket"
+    exit $exit_status
+fi
+
+
+echo "-------------------------"
 echo "erasing history bucket..."
 echo "-------------------------"
 docker-compose run --rm stellar-core --newhist my-bucket
@@ -19,6 +43,7 @@ if [ $exit_status -ne 0 ]; then
     echo "failed to erase bucket. bailing."
     exit $exit_status
 fi
+
 
 echo "-----------------------------------------------"
 read -r -p "Want to force SCP? [y/N] " response
@@ -42,20 +67,19 @@ case "$response" in
     echo "----------------"
     echo "starting core..."
     echo "----------------"
-	docker-compose up -d
+    docker-compose down;docker-compose up -d
 
-	exit_status=$?
-	if [ $exit_status -ne 0 ]; then
-	    echo "failed to start core. bailing."
-	    exit $exit_status
-	else
-		echo "docker ps output:"
-		docker ps
-	fi
+    exit_status=$?
+    if [ $exit_status -ne 0 ]; then
+        echo "failed to start core. bailing."
+        exit $exit_status
+    else
+        echo "docker ps output:"
+        docker ps
+    fi
         ;;
     *)
         echo "ok. bye now!"
         exit
         ;;
 esac
-

@@ -5,6 +5,12 @@
     state: directory
     mode: 0655
 
+- name: create stellar-core scripts directory
+  file:
+    path: /opt/stellar-core/scripts
+    state: directory
+    mode: 0655
+
 - name: template stellar-core.cfg
   template:
     src: stellar-core.cfg.j2
@@ -30,10 +36,22 @@
     pull: yes
     stopped: yes
 
-- name: copy init_core script to remote
-  copy:
-    src: "{{ role_path }}/files/opt/stellar-core/init_core.sh"
-    dest: /opt/stellar-core/init_core.sh
+- name: template init_core script to remote
+  template:
+    src: scripts/init_core.sh.j2
+    dest: /opt/stellar-core/scripts/init_core.sh
+    mode: 0700
+
+- name: template upload_core_logs script to remote
+  template:
+    src: scripts/upload_core_logs.sh.j2
+    dest: /opt/stellar-core/scripts/upload_core_logs.sh
+    mode: 0700
+
+- name: template upload_core_db script to remote
+  template:
+    src: scripts/upload_core_db.sh.j2
+    dest: /opt/stellar-core/scripts/upload_core_db.sh
     mode: 0700
 
 - name: initialize database
