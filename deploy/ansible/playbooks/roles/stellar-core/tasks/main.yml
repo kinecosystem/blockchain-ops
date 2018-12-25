@@ -54,6 +54,12 @@
     dest: /opt/stellar-core/scripts/upload_core_db.sh
     mode: 0700
 
+- name: template set_core_log_level script to remote
+  template:
+    src: scripts/set_core_log_level.sh.j2
+    dest: /opt/stellar-core/scripts/set_core_log_level.sh
+    mode: 0700
+
 - name: initialize database
   command: docker-compose run --rm stellar-core --newdb
   args:
