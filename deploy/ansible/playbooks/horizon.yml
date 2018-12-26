@@ -6,6 +6,7 @@
     - optimize-network
     - common-packages
     - docker
+    - awscli
     - datadog-horizon
     - add-pg_dump-96
     - horizon-telegraf-client

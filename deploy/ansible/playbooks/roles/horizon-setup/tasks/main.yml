@@ -6,6 +6,24 @@
     state: directory
     mode: 0655
 
+- name: create horizon scripts directory
+  file:
+    path: /opt/horizon/scripts
+    state: directory
+    mode: 0655
+
+- name: template upload_horizon_logs script to remote
+  template:
+    src: scripts/upload_horizon_logs.sh.j2
+    dest: /opt/horizon/scripts/upload_horizon_logs.sh
+    mode: 0700
+
+- name: template upload_horizon_db script to remote
+  template:
+    src: scripts/upload_horizon_db.sh.j2
+    dest: /opt/horizon/scripts/upload_horizon_db.sh
+    mode: 0700
+
 - name: template docker-compose.yml
   template:
     src: docker-compose.yml.j2
