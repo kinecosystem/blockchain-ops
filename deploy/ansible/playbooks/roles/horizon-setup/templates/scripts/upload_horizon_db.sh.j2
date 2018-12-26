@@ -1,0 +1,8 @@
+{% set this_node = horizon.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+
+#!/usr/bin/env bash
+
+temp_file=$(tempfile)_horizon_db_dump
+nice /usr/lib/postgresql/9.6/bin/pg_dump postgresql://{{this_node.db.user}}:{{this_node.db.password}}@{{this_node.db.host}}/{{this_node.db.name}} > $temp_file
+tar cfz $temp_file.tar $temp_file
+aws s3 cp $temp_file.tar {{this_node.s3_bucket_url}}temp/; rm $temp_file $temp_file.tar

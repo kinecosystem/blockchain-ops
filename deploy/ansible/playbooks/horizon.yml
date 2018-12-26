@@ -6,6 +6,7 @@
     - optimize-network
     - common-packages
     - docker
+    - awscli
     - datadog-horizon
     - add_pg_dump_96
 
