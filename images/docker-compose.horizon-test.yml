@@ -1,0 +1,33 @@
+# this should be linked to your $GOPATH/src/github.com/kinecosystem/go
+version: "3"
+
+services:
+  horizon-dev:
+    image: images_horizon-dev
+    # build:
+    #   dockerfile: dockerfiles/Dockerfile.horizon-dev
+    #   context: .
+    environment:
+      MYSQL_HOST: 127.0.0.1
+    volumes:
+      - ./:/go/src/github.com/kinecosystem/go
+      - ./volumes/postgresql/var/run/postgresql:/var/run/postgresql
+    network_mode: host
+
+  postgresql:
+    image: postgres:9.6-alpine
+    network_mode: host
+    environment:
+      POSTGRES_USER: root
+    volumes:
+      - ./volumes/postgresql/var/run/postgresql:/var/run/postgresql
+
+  mysql:
+    image: mysql:5
+    network_mode: host
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+
+  redis:
+    image: redis:5
+    network_mode: host
