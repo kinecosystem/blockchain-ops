@@ -110,7 +110,12 @@ async def channel_create_accounts(pool, session, queue, source_kp: Keypair, kps:
     await post(session, '{}/transactions'.format(horizon_endpoint), {'tx': xdr}, [200])
 
     # update sequence number
-    res = await get(session, '{}/accounts/{}'.format(horizon_endpoint, channel.keypair.address().decode()))
+    res = await get(
+        session,
+        '{}/accounts/{}'.format(horizon_endpoint, channel.keypair.address().decode()),
+        None,
+        [200])
+
     channel.sequence = int(res['sequence'])
 
     # make channel available for another transaction
@@ -163,26 +168,26 @@ async def create_accounts(source_kp: Keypair, account_kps: List[Keypair], channe
     logging.info('created %d accounts', len(account_kps))
 
 
-async def get(session: aiohttp.ClientSession, url, expected_status=200):
+async def get(session: aiohttp.ClientSession, url, req_params, expected_statuses: List[int]):
     """Send an HTTP GET request and return response JSON data.
 
     Fail if response isn't expected status code or format other than JSON.
     """
-    async with session.get(url) as res:
+    async with session.get(url, params=req_params) as res:
         try:
             res_data = await res.json()
         except aiohttp.client_exceptions.ContentTypeError as e:
             logging.error(e)
             logging.error(await res.text())
 
-        if res.status != expected_status:
+        if res.status not in expected_statuses:
             logging.error('Error in HTTP GET request to %s: %s', url, res_data)
             raise RuntimeError('Error in HTTP GET request to {}'.format(url))
 
     return res_data
 
 
-async def post(session: aiohttp.ClientSession, url, req_data, expected_statuses):
+async def post(session: aiohttp.ClientSession, url, req_data, expected_statuses: List[int]):
     """Send an HTTP POST request with given data and return response JSON data.
 
     Fail if response isn't expected status code or format other than JSON.
@@ -191,7 +196,12 @@ async def post(session: aiohttp.ClientSession, url, req_data, expected_statuses)
     wasn't added to the next three ledgers.
     """
     async with session.post(url, data=req_data) as res:
-        res_data = await res.json()
+        try:
+            res_data = await res.json()
+        except aiohttp.client_exceptions.ContentTypeError as e:
+            logging.error(e)
+            logging.error(await res.text())
+
         if res.status not in expected_statuses:
             logging.error('Error in HTTP POST request to %s with data %s: %s', url, req_data, res_data)
             raise RuntimeError('Error in HTTP POST request to {}'.format(url))
@@ -207,19 +217,33 @@ class LoggingClientSession(aiohttp.ClientSession):
         return await super()._request(method, url, **kwargs)
 
 
-async def send_txs_multiple_endpoints(endpoints, xdrs, expected_statuses=[200, 504]):
+async def send_txs_multiple_endpoints(endpoints, xdrs, submit_to_horizon=True, expected_statuses=(200, 504)):
     """Send multiple async transaction XDRs submitting to one of given endpoints.
 
     endpoints are iterated one after the other in a round robin manner.
+
+    Can submit both to Horizon (HTTP POST) or Core (HTTP GET).
     """
     logging.info('sending %d transactions', len(xdrs))
 
     async with LoggingClientSession(connector=aiohttp.TCPConnector(limit=5000)) as session:
-        urls = ['{}/transactions'.format(e) for e in endpoints]
+        # generate urls
+        if submit_to_horizon:
+            urls = ['{}/transactions'.format(e) for e in endpoints]
+        else:  # submit to core
+            urls = ['{}/tx'.format(e) for e in endpoints]
+
+        # submit to one of the urls in a round robin manner
         results = []
         for i, xdr in enumerate(xdrs):
-            # submit to one of the urls in a round robin manner
-            results.append(post(session, urls[i % len(urls)], {'tx': xdr}, expected_statuses))
+            url = urls[i % len(urls)]
+
+            if submit_to_horizon:
+                coro = post(session, url, {'tx': xdr}, expected_statuses)
+            else:  # submit to core
+                coro = get(session, url, {'blob': xdr}, expected_statuses)
+
+            results.append(coro)
 
         results = await asyncio.gather(*results)
 
@@ -239,7 +263,9 @@ async def get_sequences_multiple_endpoints(endpoints, addresses):
         results = []
         for i, address in enumerate(addresses):
             # send request to one of the urls in a round robin manner
-            results.append(get(session, '{}/{}'.format(urls[i % len(urls)], address)))
+            url = urls[i % len(urls)]
+            coro = get(session, '{}/{}'.format(url, address), None, [200])
+            results.append(coro)
 
         results = await asyncio.gather(*results)
 
