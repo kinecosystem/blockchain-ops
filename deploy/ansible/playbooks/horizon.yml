@@ -7,8 +7,9 @@
     - common-packages
     - docker
     - awscli
-    - datadog-horizon
+    #- datadog-horizon
     - add-pg-dump-96
+    - horizon-native-telegraf
 
     # NOTE must come before horizon-start because of a bug that overrides
     # horizon group_var after calling docker_service

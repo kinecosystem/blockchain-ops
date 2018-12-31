@@ -6,7 +6,7 @@
     - common-packages
     - awscli
     - docker
-    - add_pg_dump_96
+    - add-pg_dump-96
 
     #- datadog-stellar-core
     - core-native-telegraf

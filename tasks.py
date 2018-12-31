@@ -80,8 +80,8 @@ def is_git_dir_modified(c):
 
 def git_dir_checkout_branch(c, branch):
     """Checkout a specific branch for given repo directory."""
-    print('Fetching origin/{}'.format(branch))
-    c.run('git fetch origin {}'.format(branch))
+    print('Pulling origin/{}'.format(branch))
+    c.run('git pull origin {}'.format(branch))
 
     print('Checking out kinecosystem/master')
     c.run('git checkout {}'.format(branch))

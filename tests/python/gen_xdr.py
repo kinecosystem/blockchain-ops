@@ -8,6 +8,7 @@ import argparse
 import asyncio
 import concurrent.futures
 import json
+import itertools
 import logging
 import math
 import time
@@ -21,6 +22,7 @@ from helpers import (TX_SET_SIZE, NETWORK_NAME, MIN_FEE,
 
 
 AVG_BLOCK_TIME = 5  # seconds
+PAYMENT_AMOUNT = 1
 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -105,8 +107,14 @@ async def generate_spam_round_tx_xdrs(pool, prioritizers: List[Keypair], priorit
     """
     logging.info('generating transaction xdrs for round %d', rnd)
 
-    payment_amount = 1
-    payment_dest = prioritizers[0]  # all transactions are payments to the same address
+    # make a cyclic list of builders.
+    # we will use this list to fetch a destination address for each payment tx,
+    # making all builders send a tx to the next builder right after them
+    # in line in a cyclic manner. this is done in order to cycle through
+    # destination addresses instead of sending call txs to a single destination
+    # account.
+    cycl = itertools.cycle(unprioritized_builders)
+    next(cycl)  # make sure the next cycle call will return the next builder after the current one
 
     # generate unprioritized payment transactions
     # we generate them first, thus will submit them first,
@@ -114,9 +122,11 @@ async def generate_spam_round_tx_xdrs(pool, prioritizers: List[Keypair], priorit
     loop = asyncio.get_running_loop()
     futurs = []
     for builder in unprioritized_builders:
+        dest_address = next(cycl).keypair.address().decode()
+
         f = loop.run_in_executor(
             pool, build_and_sign,
-            builder, payment_dest.public_address, payment_amount, None)
+            builder, dest_address, PAYMENT_AMOUNT, None)
         futurs.append(f)
 
     if not futurs:
@@ -128,10 +138,13 @@ async def generate_spam_round_tx_xdrs(pool, prioritizers: List[Keypair], priorit
 
     # generate prioritized transactions
     futurs = []
+    cycl = itertools.cycle(prioritized_builders)
     for builder, prioritizer in zip(prioritized_builders, prioritizers):
+        dest_address = next(cycl).keypair.address().decode()
+
         f = loop.run_in_executor(
             pool, build_and_sign,
-            builder, payment_dest.public_address, payment_amount, prioritizer.secret_seed)
+            builder, dest_address, PAYMENT_AMOUNT, prioritizer.secret_seed)
         futurs.append(f)
 
     if not futurs:
