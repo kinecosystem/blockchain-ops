@@ -16,7 +16,8 @@ version: "3"
 services:
   horizon-telegraf:
     environment:
-      NODE_NAME: "<node-name-goes-here>"
+      NODE_NAME: "<node-name-goes-here, like ecosystem2300>"
+      NETWORK_NAME: "<network-name-goes-here, like ecosystem>"
       TARGET_URL: "http://<core-url-goes-here>:11626/info"
     image: kinecosystem/horizon-telegraf
     restart: always

@@ -25,7 +25,6 @@ fi
 echo "-------------------------"
 echo "erasing s3 bucket"
 echo "-------------------------"
-# aws s3 rm s3://stellar-core-kikkinfed-ee65 --recursive
 aws s3 rm {{this_node.archive.put_address}} --recursive
 exit_status=$?
 if [ $exit_status -ne 0 ]; then
@@ -74,6 +73,11 @@ case "$response" in
         echo "failed to start core. bailing."
         exit $exit_status
     else
+        echo "waiting 10 seconds..."
+        sleep 10
+        echo "sending command to set protocol version, max-tx-size and base-resereve"
+        curl 'http://localhost:11626/upgrades?mode=set&upgradetime=1970-01-01T00:00:00Z&basereserve=0&maxtxsize=500&protocolversion=9'
+
         echo "docker ps output:"
         docker ps
     fi

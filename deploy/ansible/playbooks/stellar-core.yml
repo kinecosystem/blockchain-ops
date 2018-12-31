@@ -9,5 +9,5 @@
     - add_pg_dump_96
 
     #- datadog-stellar-core
-    - telegraf-client
+    - core-native-telegraf
     - stellar-core

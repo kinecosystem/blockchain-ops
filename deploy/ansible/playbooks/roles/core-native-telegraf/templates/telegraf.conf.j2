@@ -1,8 +1,7 @@
 {% set this_node = stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
 
 # Telegraf configuration for stellar core:
-# this configuration does one thing: it reports the /info metrics from the core
-# to the Kin Ecosystem metric collection endpoint, every 10 seconds
+# this clients run natively on the host and collects the system metrics
 
 # Global tags can be specified here in key="value" format.
 [tags]
@@ -58,4 +57,8 @@
 #                                  INPUTS                                     #
 ###############################################################################
 [[inputs.system]]
+[[inputs.mem]]
+[[inputs.net]]
+[[inputs.netstat]]
+[[inputs.disk]]
 # vim: ft=toml

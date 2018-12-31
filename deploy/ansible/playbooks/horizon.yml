@@ -8,7 +8,7 @@
     - docker
     - awscli
     - datadog-horizon
-    - add_pg_dump_96
+    - add-pg-dump-96
 
     # NOTE must come before horizon-start because of a bug that overrides
     # horizon group_var after calling docker_service
