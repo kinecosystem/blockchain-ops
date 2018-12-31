@@ -60,6 +60,8 @@
     dest: /opt/stellar-core/scripts/set_core_log_level.sh
     mode: 0700
 
+- meta: end_play ## stops the play here ##
+
 - name: initialize database
   command: docker-compose run --rm stellar-core --newdb
   args:
