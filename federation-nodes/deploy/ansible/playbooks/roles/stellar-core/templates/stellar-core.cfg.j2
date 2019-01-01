@@ -11,7 +11,10 @@ https://github.com/stellar/stellar-core/blob/master/docs/stellar-core_testnet.cf
 HTTP_PORT=11626
 PUBLIC_HTTP_PORT=true
 
+WHITELIST="{{stellar_core.whitelist_account}}"
+
 LOG_FILE_PATH=""
+
 COMMANDS=["ll?level={{stellar_core.log_level|default("warn")}}"]
 
 DATABASE="postgresql://dbname={{this_node.db.name}} host={{this_node.db.host}} user={{this_node.db.user}} password={{this_node.db.password}}"
@@ -21,14 +24,12 @@ NETWORK_PASSPHRASE="{{stellar_core.network.passphrase}}"
 TARGET_PEER_CONNECTIONS= {{preexisting_nodes|length}}
 
 KNOWN_PEERS=[
-
 {% for node in preexisting_nodes %}
-   "{{node.host}}"
-{% if not loop.last %},{% endif %}
+ "{{node.host}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
-UNSAFE_QUORUM=false
 
 {% if stellar_core.catchup_complete|default(false) %}
 CATCHUP_COMPLETE=true
@@ -45,9 +46,9 @@ NODE_IS_VALIDATOR=false
 {% endif %}
 
 NODE_NAMES=[
-
 {% for node in preexisting_nodes %}
-	"{{node.address}}  {{node.name}}"{% if not loop.last %},{% endif %}
+ "{{node.address}}  {{node.name}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
@@ -56,8 +57,10 @@ NODE_NAMES=[
 THRESHOLD_PERCENT={{stellar_core.threshold_percent|default(67)}}
 VALIDATORS=[
  "${{this_node.name}}",
- {% for node in preexisting_nodes %}
- 	"${{node.name}}"{% if not loop.last %},{% endif %}
+
+{% for node in preexisting_nodes %}
+ "${{node.name}}"{% if not loop.last %},{% endif %}
+
 {% endfor %}
 
 ]
