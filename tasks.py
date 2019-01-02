@@ -80,6 +80,9 @@ def is_git_dir_modified(c):
 
 def git_dir_checkout_branch(c, branch):
     """Checkout a specific branch for given repo directory."""
+    print('Fetching updates from Git repository')
+    c.run('git fetch --all')
+
     print('Pulling origin/{}'.format(branch))
     c.run('git pull origin {}'.format(branch))
 
