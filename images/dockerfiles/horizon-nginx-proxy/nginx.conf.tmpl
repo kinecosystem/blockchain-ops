@@ -34,7 +34,7 @@ http {
       proxy_set_header Connection "";
       proxy_set_header Host   ${HOST};
       proxy_pass ${PROXY_PASS_URL};
-      statsd_timing "response_time.$request_method.${NODE_NAME}" "$upstream_response_time";
+      statsd_timing "response_time.$request_method.$status.${NODE_NAME}" "$upstream_response_time";
 
       # if the request is for sse, return 200 instead of 504
       #
