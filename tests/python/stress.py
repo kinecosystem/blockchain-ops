@@ -20,7 +20,7 @@ def parse_args():
     parser.add_argument('--endpoint', required=True, action='append',
                         help='Endpoint URLs for submitting transactions (use multiple --endpoint flags for multiple addresses)')
     parser.add_argument('--submit-to-core', action='store_true', help='Submit to Core instead of Horizon')
-    parser.add_argument('--avg-block-time', default=5, help='Average block time. Controls the time delay between every spam round and the one just after that')
+    parser.add_argument('--avg-block-time', type=int, default=5, help='Average block time. Controls the time delay between every spam round and the one just after that')
 
     return parser.parse_args()
 
