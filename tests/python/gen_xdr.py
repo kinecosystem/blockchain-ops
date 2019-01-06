@@ -21,7 +21,6 @@ from helpers import (TX_SET_SIZE, NETWORK_NAME, MIN_FEE,
                      load_accounts, get_sequences_multiple_endpoints)
 
 
-AVG_BLOCK_TIME = 5  # seconds
 PAYMENT_AMOUNT = 1
 
 
@@ -37,6 +36,7 @@ def parse_args():
     parser.add_argument('--prioritizer-seeds-file', required=True, type=str, help='File path to prioritizer seeds file')
     parser.add_argument('--spammer-seeds-file', required=True, type=str, help='File path to spammer seeds file')
     parser.add_argument('--out', default='spam-results-{}.json'.format(str(int(time.time()))), type=str, help='Spam results JSON output')
+    parser.add_argument('--avg-block-time', type=int, default=5, help='Average block time. Controls the time delay between every spam round and the one just after that')
 
     parser.add_argument('--passphrase', type=str, help='Network passphrase')
     parser.add_argument('--horizon', action='append',
@@ -45,14 +45,14 @@ def parse_args():
     return parser.parse_args()
 
 
-async def generate_spam_tx_xdrs(prioritizers, builders, length, tx_per_ledger):
+async def generate_spam_tx_xdrs(prioritizers, builders, length, tx_per_ledger, avg_block_time):
     """Generate transaction XDR objects for each builder according to given spam rate.
 
     NOTE each spam builder generates a single XDR, thus it should be used only once during a spam test.
     This is to avoid sequence number collissions in case transactions do not get processed,
     which is possible for unprioritized transactions and other unknown cases (which this test attempts to uncover).
     """
-    rounds_num = math.ceil(length // AVG_BLOCK_TIME)
+    rounds_num = math.ceil(length // avg_block_time)
     if len(builders) != tx_per_ledger * rounds_num:
         raise RuntimeError('Amount of spammer seeds should exactly match (transactions per ledger * spam round numbers)')
 
@@ -185,7 +185,7 @@ async def main():
         spam_builders.append(b)
 
     logging.info('generating spam transaction xdrs')
-    spam_rounds = await generate_spam_tx_xdrs(prioritizer_kps, spam_builders, args.length, args.txs_per_ledger)
+    spam_rounds = await generate_spam_tx_xdrs(prioritizer_kps, spam_builders, args.length, args.txs_per_ledger, args.avg_block_time)
     logging.info('done generating spam transaction xdrs')
 
     logging.info('writing transaction xdrs to file %s', args.out)
