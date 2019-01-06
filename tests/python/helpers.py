@@ -251,6 +251,16 @@ async def send_txs_multiple_endpoints(endpoints, xdrs, submit_to_horizon=True, e
     return results
 
 
+# TODO remove this function and use send_txs_multiple_endpoints
+async def send_txs(txs):
+    """Send transactions asynchronously and return responses."""
+    with concurrent.futures.ThreadPoolExecutor() as pool:
+        loop = asyncio.get_running_loop()
+        futurs = [loop.run_in_executor(pool, tx.submit) for tx in txs]
+        for _ in await asyncio.gather(*futurs):
+            return futurs
+
+
 async def get_sequences_multiple_endpoints(endpoints, addresses):
     """Get sequence for multiple accounts, using one of given endpoints.
 
