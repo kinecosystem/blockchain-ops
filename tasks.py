@@ -381,3 +381,35 @@ def network(_):
 
     print('Root account seed: {}'.format(derive_root_account_seed(PASSPHRASE)))
     print('Network is up')
+
+
+@task
+def test_core(c):
+    """Run tests for Core."""
+    def test_python(c, filename):
+        """Run a single python test file in tests/python."""
+        test_dir = 'tests/python'
+        filepath = '{}/{}'.format(test_dir, filename)
+
+        print('Restarting network before executing test {}'.format(filepath))
+        rm_network(c)
+        start_core(c)
+        start_horizon(c)
+        network(c)
+
+        with c.cd(test_dir):
+            print('Executing test {}'.format(filepath))
+            c.run('pipenv run python {filename} "{passphrase}" {whitelist_seed}'.format(
+                filename=filename,
+                passphrase=PASSPHRASE,
+                whitelist_seed=WHITELIST_SEED))
+
+    test_python(c, 'test_base_reserve.py')
+    test_python(c, 'test_tx_order_by_fee.py')
+    test_python(c, 'test_tx_order_by_whitelist.py')
+    test_python(c, 'test_tx_priority_for_whitelist_holder.py')
+    test_python(c, 'test_whitelist_affected_on_next_ledger.py')
+
+    # XXX obsolete
+    # see source file for more information
+    # test_python(c, 'test_multiple_cores.py')

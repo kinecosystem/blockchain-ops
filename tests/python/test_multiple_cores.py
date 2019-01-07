@@ -1,4 +1,5 @@
 """Tests several actions with transactions on multiple kin-cores"""
+# XXX this test is rendered obsolete (it's redundant) by the stress.py
 
 import sys
 import asyncio
