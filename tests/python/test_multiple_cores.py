@@ -3,11 +3,16 @@
 
 import sys
 import asyncio
+import logging
 import time
 
 from kin import KinClient, Environment, Keypair, KinErrors
 from kin.blockchain.builder import Builder
 from helpers import derive_root_account, send_txs, get_latest_ledger
+
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+
 
 clients = []
 

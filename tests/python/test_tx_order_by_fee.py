@@ -2,6 +2,7 @@
 
 import sys
 import asyncio
+import logging
 from concurrent.futures import ThreadPoolExecutor
 
 from kin import KinClient, Environment, Keypair
@@ -11,6 +12,10 @@ from helpers import derive_root_account
 import requests
 
 import time
+
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+
 
 PASSPHRASE = sys.argv[1]
 
