@@ -29,6 +29,7 @@ def parse_args():
 
 
 def ledger_transactions_created_at(ledger, horizon):
+    """Paginate and return a {hash: created_at} dictionary for all transactions in given ledger number."""
     MAX_RESULTS = 200  # horizon hardcoded limit
 
     logging.debug('fetching transactions for ledger %d', ledger)
