@@ -66,7 +66,7 @@ async def main():
 
     initial_ledger = get_latest_ledger(client)['sequence']
 
-    print(f'Adding account to whitelist on ledger: {initial_ledger + 2}')
+    print(f'Adding account to whitelist on ledger: {initial_ledger + 1}')
 
     builder = Builder('LOCAL', client.horizon, fee=minimum_fee, secret=WHITELIST_MANAGER_KEYPAIR.secret_seed)
     builder.get_sequence()
@@ -79,7 +79,7 @@ async def main():
     while initial_ledger + 1 == get_latest_ledger(client)['sequence']:
         time.sleep(0.5)
 
-    print(f'Submitting tx from test account on ledger: {initial_ledger + 3}')
+    print(f'Submitting tx from test account on ledger: {initial_ledger + 2}')
 
     builder = Builder('LOCAL',client.horizon, fee=0, secret=test_account.secret_seed)
     builder.append_manage_data_op('test','test'.encode())
@@ -90,7 +90,11 @@ async def main():
     while initial_ledger + 2 == get_latest_ledger(client)['sequence']:
         time.sleep(0.5)
 
-    populated_ledger_txs = client.horizon.ledger_transactions(initial_ledger + 3)['_embedded']['records']
+    # wait sometime for horizon to finish ingesting initial_ledger + 2
+    # (the response from horizon above doesn't mean ingestion is over)
+    time.sleep(5)
+
+    populated_ledger_txs = client.horizon.ledger_transactions(initial_ledger + 2)['_embedded']['records']
     assert len(populated_ledger_txs) == 1
     assert populated_ledger_txs[0]['fee_paid'] == 0
 
