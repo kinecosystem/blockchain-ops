@@ -1,10 +1,15 @@
 """Tests several actions with an account with 0 balance"""
 
+import logging
 import sys
 
 from kin import KinClient, Environment, Keypair, KinErrors
 from kin.blockchain.builder import Builder
 from helpers import derive_root_account
+
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(message)s')
+
 
 PASSPHRASE = sys.argv[1]
 WHITELIST_MANAGER_KEYPAIR = Keypair(sys.argv[2])

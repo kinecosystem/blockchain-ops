@@ -10,9 +10,17 @@ import requests
 from invoke import task, call
 from invoke.exceptions import Exit, Failure
 
+import kin_base
 from kin import KinClient, Environment as KinEnvironment
 from kin.blockchain.builder import Builder
-import kin_base
+
+
+PASSPHRASE = 'private testnet'
+WHITELIST_SEED = 'SDT3NSHBLRUKT5V6KXP7HTPCHPB6LPUVTWVHSKQJKHXUA3IOUJMCTLBQ'
+WHITELIST_ADDRESS = kin_base.Keypair.from_seed(WHITELIST_SEED).address().decode()
+
+HORIZON_ENDPOINT = 'http://localhost:8000'
+CORE_ENDPOINT = 'http://localhost:11626'
 
 
 @task
@@ -244,11 +252,11 @@ def rm_network(c):
 def upgrade(param, ledger_param, value):
     """Apply Core network parameter upgrade."""
     while True:
-        r = requests.get('http://localhost:11626/upgrades',
+        r = requests.get('{}/upgrades'.format(CORE_ENDPOINT),
                          params={'mode': 'set', 'upgradetime': '1970-01-01T00:00:00Z', param: value})
         r.raise_for_status()
 
-        r = requests.get('http://localhost:8000/ledgers?order=desc&limit=1',
+        r = requests.get('{}/ledgers?order=desc&limit=1'.format(HORIZON_ENDPOINT),
                          params={'order': 'desc', 'limit': 1})
         r.raise_for_status()
         res = r.json()
@@ -301,12 +309,12 @@ def create_whitelist_account():
     """Create whitelist account for prioritizing transactions in tests."""
     print('Creating whitelist account')
 
-    env = KinEnvironment('LOCAL', 'http://localhost:8000', 'private testnet')
+    env = KinEnvironment('LOCAL', HORIZON_ENDPOINT, PASSPHRASE)
     root_client = KinClient(env)
-    root_seed = derive_root_account_seed('private testnet')
+    root_seed = derive_root_account_seed(PASSPHRASE)
     builder = Builder(env.name, root_client.horizon, 100, root_seed)
 
-    builder.append_create_account_op('GBR7K7S6N6C2A4I4URBXM43W7IIOK6ZZD5SAGC7LBRCUCDMICTYMK4LO', str(100e5))
+    builder.append_create_account_op(WHITELIST_ADDRESS, str(100e5))
     builder.sign()
     builder.submit()
 
@@ -350,7 +358,7 @@ def start_horizon(c):
         # this fixes it
         print('Starting Horizon')
         c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d horizon'.format(
-            root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
+            root_account_seed=derive_root_account_seed(PASSPHRASE)), hide='stderr')
 
 
 @task(pre=[call(build_go, version='master', branch='kinecosystem/master', app='friendbot', production=False)])
@@ -360,7 +368,7 @@ def start_friendbot(c):
         # start friendbot
         print('Starting Friendbot')
         c.run('ROOT_ACCOUNT_SEED="{root_account_seed}" sudo -E docker-compose up -d friendbot'.format(
-            root_account_seed=derive_root_account_seed('private testnet')), hide='stderr')
+            root_account_seed=derive_root_account_seed(PASSPHRASE)), hide='stderr')
 
 
 @task(rm_network, start_core, start_horizon, start_friendbot)
@@ -371,5 +379,37 @@ def network(_):
     tx_set_size_500()
     create_whitelist_account()
 
-    print('Root account seed: {}'.format(derive_root_account_seed('private testnet')))
+    print('Root account seed: {}'.format(derive_root_account_seed(PASSPHRASE)))
     print('Network is up')
+
+
+@task
+def test_core(c):
+    """Run tests for Core."""
+    def test_python(c, filename):
+        """Run a single python test file in tests/python."""
+        test_dir = 'tests/python'
+        filepath = '{}/{}'.format(test_dir, filename)
+
+        print('Restarting network before executing test {}'.format(filepath))
+        rm_network(c)
+        start_core(c)
+        start_horizon(c)
+        network(c)
+
+        with c.cd(test_dir):
+            print('Executing test {}'.format(filepath))
+            c.run('pipenv run python {filename} "{passphrase}" {whitelist_seed}'.format(
+                filename=filename,
+                passphrase=PASSPHRASE,
+                whitelist_seed=WHITELIST_SEED))
+
+    test_python(c, 'test_base_reserve.py')
+    test_python(c, 'test_tx_order_by_fee.py')
+    test_python(c, 'test_tx_order_by_whitelist.py')
+    test_python(c, 'test_tx_priority_for_whitelist_holder.py')
+    test_python(c, 'test_whitelist_affected_on_next_ledger.py')
+
+    # XXX obsolete
+    # see source file for more information
+    # test_python(c, 'test_multiple_cores.py')
