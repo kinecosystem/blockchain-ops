@@ -383,7 +383,7 @@ def network(_):
     print('Network is up')
 
 
-@task
+@task(post=[rm_network])
 def test_core(c):
     """Run tests for Core."""
     def test_python(c, filename):
