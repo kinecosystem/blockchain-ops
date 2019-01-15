@@ -91,11 +91,11 @@ def git_dir_checkout_branch(c, branch):
     print('Fetching updates from Git repository')
     c.run('git fetch --all')
 
-    print('Pulling origin/{}'.format(branch))
-    c.run('git pull origin {}'.format(branch))
-
     print('Checking out kinecosystem/master')
     c.run('git checkout {}'.format(branch))
+
+    print('Pulling origin/{}'.format(branch))
+    c.run('git pull origin {}'.format(branch))
 
 
 def init_git_repo(c, git_url, dir_name, branch='kinecosystem/master'):
