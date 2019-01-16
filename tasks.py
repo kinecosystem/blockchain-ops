@@ -10,14 +10,14 @@ import requests
 from invoke import task, call
 from invoke.exceptions import Exit, Failure
 
-import kin_base
+from kin_base import Keypair as BaseKeypair, Builder as BaseBuilder
 from kin import KinClient, Environment as KinEnvironment
 from kin.blockchain.builder import Builder
 
 
 PASSPHRASE = 'private testnet'
 WHITELIST_SEED = 'SDT3NSHBLRUKT5V6KXP7HTPCHPB6LPUVTWVHSKQJKHXUA3IOUJMCTLBQ'
-WHITELIST_ADDRESS = kin_base.Keypair.from_seed(WHITELIST_SEED).address().decode()
+WHITELIST_ADDRESS = BaseKeypair.from_seed(WHITELIST_SEED).address().decode()
 
 HORIZON_ENDPOINT = 'http://localhost:8000'
 CORE_ENDPOINT = 'http://localhost:11626'
@@ -290,7 +290,7 @@ def tx_set_size_500():
 def derive_root_account_seed(passphrase):
     """Return the root account seed based on the given network passphrase."""
     network_hash = sha256(passphrase.encode()).digest()
-    return kin_base.Keypair.from_raw_seed(network_hash).seed().decode()
+    return BaseKeypair.from_raw_seed(network_hash).seed().decode()
 
 
 @task
@@ -302,7 +302,26 @@ def root_account_seed(_, passphrase):
 @task
 def address_from_seed(_, seed):
     """Print account address according to given seed."""
-    print(kin_base.Keypair.from_seed(seed).address().decode())
+    print(BaseKeypair.from_seed(seed).address().decode())
+
+
+@task
+def generate_whitelist_address_xdr(_, passphrase, whitelist_address, account_sequence, address_to_whitelist):
+    """Generate Append Data operation XDR, used to whitelist an address."""
+    # initialize tx builder
+    #
+    # NOTE fee is 0 because it's a transaction on the whitelist account which
+    # is always prioritized
+    builder = BaseBuilder(network=passphrase, address=whitelist_address, sequence=int(account_sequence) + 1, fee=0)
+
+    # build "Append Data" transaction with (address, hint) key:value pair.
+    kp = BaseKeypair.from_address(address_to_whitelist)
+    builder.append_manage_data_op(kp.address().decode(), kp.signature_hint())
+
+    # generate xdr
+    xdr = builder.gen_xdr()
+
+    print(xdr.decode())
 
 
 def create_whitelist_account():
