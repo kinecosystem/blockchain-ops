@@ -312,7 +312,7 @@ def generate_whitelist_address_xdr(_, passphrase, whitelist_address, account_seq
     #
     # NOTE fee is 0 because it's a transaction on the whitelist account which
     # is always prioritized
-    builder = BaseBuilder(network=passphrase, address=whitelist_address, sequence=int(account_sequence) + 1, fee=0)
+    builder = BaseBuilder(network=passphrase, address=whitelist_address, sequence=int(account_sequence), fee=0)
 
     # build "Append Data" transaction with (address, hint) key:value pair.
     kp = BaseKeypair.from_address(address_to_whitelist)
