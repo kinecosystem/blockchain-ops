@@ -24,6 +24,7 @@ BUILD_VERSION = os.environ['BUILD_VERSION']
 REQUEST_TIMEOUT = float(os.environ['REQUEST_TIMEOUT'])
 MAX_HEALTHY_DIFF = 10
 
+
 def make_reply(msg, code):
     """Create a JSON reply for /status."""
     reply = {
@@ -51,7 +52,7 @@ def status():
 
         core_latest_ledger = int(response.json()['core_latest_ledger'])
         history_latest_ledger = int(response.json()['history_latest_ledger'])
-        is_horizon_healthy = (core_latest_ledger - history_latest_ledger < MAX_HEALTHY_DIFF)
+        is_horizon_healthy = (core_latest_ledger - history_latest_ledger) < MAX_HEALTHY_DIFF
         horizon_status_str = 'synced' if is_horizon_healthy else 'not synced'
 
         msg = 'Core, Horizon status is: ({}, {})'.format(core_status_str, horizon_status_str)
