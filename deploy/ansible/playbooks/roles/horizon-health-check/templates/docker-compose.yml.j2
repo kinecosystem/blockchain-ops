@@ -5,16 +5,18 @@ version: "3"
 
 services:
   horizon-health-check:
-    image: kinecosystem/horizon-health-check:d54af56
+    command: pipenv run gunicorn -b 0.0.0.0:8001 main:APP
+
+    image: kinecosystem/horizon-health-check:b79778a
     container_name: horizon-health-check
 
-    ports:
-      - 8001:8000
+    network_mode: host
 
     environment:
-      BUILD_VERSION: d54af56
+      BUILD_VERSION: b79778a
       REQUEST_TIMEOUT: 2
       CORE_INFO_URL: {{this_node.stellar_core.url}}/info
+      HORIZON_INFO_URL: http://localhost:80/
 
     restart: always
     logging:

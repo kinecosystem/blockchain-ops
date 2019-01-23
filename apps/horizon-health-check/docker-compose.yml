@@ -3,10 +3,11 @@ version: "3"
 
 services:
   horizon_health_check:
-    image: kinecosystem/horizon-health-check:d54af56
+    image: kinecosystem/horizon-health-check:b79778a
     ports:
       - 8000:8000
     environment:
       BUILD_VERSION: c8407ce
       REQUEST_TIMEOUT: 2
       CORE_INFO_URL: http://xxxxx:11626/info
+      HORIZON_INFO_URL: http://xxxxx:80/
