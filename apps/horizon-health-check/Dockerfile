@@ -10,5 +10,3 @@ RUN pip install pipenv \
     && apk del -q .build-deps
 
 EXPOSE 8000
-
-CMD pipenv run gunicorn -b 0.0.0.0:8000 main:APP
