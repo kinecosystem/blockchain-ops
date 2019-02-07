@@ -24,42 +24,18 @@ CORE_ENDPOINT = 'http://localhost:11626'
 
 
 @task
-def glide(c, version='v0.13.2'):
-    """Download glide."""
-    print('Downloading glide')
-
-    # find glide version, copied from glide installation script
-    os_name = platform.system().lower()
-    if os_name == 'linux':
-        arch = 'linux-amd64'
-    elif os_name == 'darwin':
-        arch = 'darwin-amd64'
-    else:
-        raise Failure(os_name, reason='Only supported on OSx and Linux')
-    print('Glide arch: {arch}'.format(arch=arch))
-
-    # avoid redownloading file if exists
-    if os.path.isfile('{cwd}/glide'.format(cwd=c.cwd)):
-        print('Glide exists')
-        return
-
-    c.run('curl -sSLo glide.tar.gz https://github.com/Masterminds/glide/releases/download/{version}/glide-{version}-{arch}.tar.gz'.format(
-        version=version, arch=arch), hide='stdout')
-    c.run('tar -zxf ./glide.tar.gz', hide='stdout')
-    c.run('mv ./{arch}/glide ./glide'.format(arch=arch), hide='stdout')
-    c.run('rm -rf ./{arch} ./glide.tar.gz'.format(arch=arch), hide='stdout')
-
-    print('Glide downloaded')
-
-
-@task
-def vendor(c):
+def vendor(c, production=True):
     """Vendor go dependencies."""
-    glide(c)
-
     print('Vendoring dependencies')
     if not os.path.isdir('{}/vendor'.format(c.cwd)):
-        c.run('./glide install', hide='stderr')
+        if production:
+            c.run('sudo docker run '
+                  '--rm '
+                  '-v {}/{}/volumes/go-git:/go/src/github.com/kinecosystem/go '
+                  'kinecosystem/horizon-build '
+                  'dep ensure'.format(os.getcwd(), c.cwd))
+        else:
+            c.run('sudo docker-compose run horizon-build dep ensure')
 
 
 def is_image_exists(c, name):
@@ -177,7 +153,7 @@ def build_go(c, version, branch='kinecosystem/master', app='horizon', production
         init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', branch)
 
         with c.cd('volumes/go-git'):
-            vendor(c)
+            vendor(c, production)
 
         cmd = ' '.join([
             'bash', '-c',
