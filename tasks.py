@@ -180,7 +180,8 @@ def build_go(c, version, branch='kinecosystem/master', app='horizon', production
 
             c.run('sudo docker run '
                   '--rm '
-                  '-v {}/{}/volumes/go-git:/go/src/github.com/kinecosystem/go kinecosystem/horizon-build '
+                  '-v {}/{}/volumes/go-git:/go/src/github.com/kinecosystem/go '
+                  'kinecosystem/horizon-build '
                   '{}'.format(os.getcwd(), c.cwd, cmd))
 
             c.run('sudo docker build '
