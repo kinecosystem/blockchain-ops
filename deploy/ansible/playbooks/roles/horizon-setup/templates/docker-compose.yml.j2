@@ -17,7 +17,7 @@ services:
       LOG_LEVEL: "{{horizon.log_level|default('warn')}}"
       INGEST: "true"
       PER_HOUR_RATE_LIMIT: "10000000"
-      HISTORY_RETENTION_COUNT: "900000"
+      HISTORY_RETENTION_COUNT: "9000"
       NETWORK_PASSPHRASE: "{{horizon.network.passphrase}}"
       FRIENDBOT_URL: '{{horizon.friendbot_url|default("")}}'
       CURSOR_NAME: "HORIZON" # must be all caps and unique across all horizons sharing the same core
