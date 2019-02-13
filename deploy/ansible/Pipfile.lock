@@ -185,7 +185,7 @@
                 "sha256:24fb31c947de85fbdeca09e222d41206781581fb0bdf118d2ef18f6e414cd388",
                 "sha256:33e36775a6c71790ba7692a73f948b329cf9295a72b0102144b031114bd2a4f3"
             ],
-            "version": "==2.4.1"
+            "version": "==2.4.2"
         },
         "pyasn1": {
             "hashes": [
