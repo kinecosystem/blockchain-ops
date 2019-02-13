@@ -3,6 +3,7 @@
   roles:
     - sync-clock
     - apt-get-update
+    - apt-get-upgrade
     - optimize-network
     - common-packages
     - docker
