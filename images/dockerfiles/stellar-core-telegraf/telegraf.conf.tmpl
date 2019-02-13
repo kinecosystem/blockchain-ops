@@ -59,6 +59,9 @@
 
 # parse json from http
 [[inputs.http]]
+  
+  interval = "4s" # send these metrics every 4 seconds to get all ledgers
+
   ## One or more URLs from which to read formatted metrics
   urls = [
     "http://stellar-core:11626/info"
