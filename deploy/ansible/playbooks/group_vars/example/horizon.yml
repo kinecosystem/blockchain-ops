@@ -20,3 +20,4 @@ horizon:
           user: stellar
           password: xxx
           host: xxx
+          cursor_name: 'HORIZON'
