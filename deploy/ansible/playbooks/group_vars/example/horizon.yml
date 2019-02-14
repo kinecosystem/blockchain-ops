@@ -7,7 +7,7 @@ horizon:
   nodes:
     - name: local
       aws_region: us-east-1
-      s3_bucket_url: s3://something #NOTE: you'll need to manually allow the node to access this bucket. terraform doesn't do thisyet. 
+      s3_bucket_url: s3://something
       db:
         name: xxx
         user: stellar
