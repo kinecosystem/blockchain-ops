@@ -20,4 +20,8 @@ horizon:
           user: stellar
           password: xxx
           host: xxx
+          # cursor name defines the ingestion cursor from core, used by horizon
+          # it must be unique for every instance in the horizon cluster that
+          # communicates with a single core machine. this is in order to not
+          # have horizons override each other's ingestions.
           cursor_name: 'HORIZON'
