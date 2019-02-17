@@ -4,7 +4,7 @@ version: "3"
 
 services:
   horizon:
-    image: kinecosystem/horizon:kinecosystem-v2.0.0-stellar-v9.2.0
+    image: kinecosystem/horizon:kinecosystem-v2.0.0-stellar-v0.15.4
     container_name: horizon
     network_mode: host  # listens on port 8000
     volumes:
@@ -17,10 +17,10 @@ services:
       LOG_LEVEL: "{{horizon.log_level|default('warn')}}"
       INGEST: "true"
       PER_HOUR_RATE_LIMIT: "10000000"
-      HISTORY_RETENTION_COUNT: "900000"
+      HISTORY_RETENTION_COUNT: "9000"
       NETWORK_PASSPHRASE: "{{horizon.network.passphrase}}"
       FRIENDBOT_URL: '{{horizon.friendbot_url|default("")}}'
-      CURSOR_NAME: "HORIZON" # must be all caps and unique across all horizons sharing the same core
+      CURSOR_NAME: "{{this_node.stellar_core.db.cursor_name}}"
 
     restart: always
     logging:

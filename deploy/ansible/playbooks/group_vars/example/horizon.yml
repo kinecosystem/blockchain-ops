@@ -7,7 +7,7 @@ horizon:
   nodes:
     - name: local
       aws_region: us-east-1
-      s3_bucket_url: s3://something #NOTE: you'll need to manually allow the node to access this bucket. terraform doesn't do thisyet. 
+      s3_bucket_url: s3://something
       db:
         name: xxx
         user: stellar
@@ -20,3 +20,8 @@ horizon:
           user: stellar
           password: xxx
           host: xxx
+          # cursor name defines the ingestion cursor from core, used by horizon
+          # it must be unique for every instance in the horizon cluster that
+          # communicates with a single core machine. this is in order to not
+          # have horizons override each other's ingestions.
+          cursor_name: 'HORIZON'
