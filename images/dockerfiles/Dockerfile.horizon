@@ -22,5 +22,6 @@ ENV DATABASE_URL= \
     CURSOR_NAME=
 
 ENTRYPOINT ["/usr/local/bin/horizon"]
+CMD ["serve"]
 
 COPY ./volumes/go-git/horizon /usr/local/bin/
