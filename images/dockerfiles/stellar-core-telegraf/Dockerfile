@@ -1,4 +1,4 @@
-FROM telegraf:1.8.3-alpine
+FROM telegraf:1.9.4-alpine
 RUN apk add --no-cache curl gettext jq
 COPY ./telegraf.conf.tmpl /etc/telegraf/telegraf.conf.tmpl
 COPY ./get-core-state.sh /tmp/get_core_state.sh

@@ -28,7 +28,7 @@ horizon:
   # ...
 
 horizon-nginx-proxy:
-  image: kinecosystem/horizon-nginx-statsd:v1  # or any other version
+  image: kinecosystem/horizon-nginx-statsd:v1.0.7  # or any other version
   ports:
     - 8000:8000
   environment:

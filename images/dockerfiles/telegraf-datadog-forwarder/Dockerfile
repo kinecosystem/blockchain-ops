@@ -1,4 +1,4 @@
-FROM telegraf:1.9.3-alpine
+FROM telegraf:1.9.4-alpine
 RUN apk add --no-cache gettext
 COPY ./telegraf.conf.tmpl /etc/telegraf
 EXPOSE 8086

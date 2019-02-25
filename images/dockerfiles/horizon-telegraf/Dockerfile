@@ -1,4 +1,4 @@
-FROM telegraf:1.8.3-alpine
+FROM telegraf:1.9.4-alpine
 RUN apk add --no-cache curl gettext
 COPY ./telegraf.conf.tmpl /etc/telegraf/telegraf.conf.tmpl
 COPY ./check-latency.sh.tmpl /tmp/check_latency.sh.tmpl
