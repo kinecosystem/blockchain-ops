@@ -1,5 +1,5 @@
 # TODO: ccache, run as calling user instead of root
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 RUN BUILD_DEPS="git build-essential pkg-config autoconf automake libtool bison flex libpq-dev clang++-5.0 gcc-5 g++-5 cpp-5 pandoc perl postgresql-client"; \
     apt-get -qq update && apt-get -qq install $BUILD_DEPS
