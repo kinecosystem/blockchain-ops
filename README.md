@@ -91,16 +91,17 @@ Before launching a single node or more, it is important to decide on the followi
 ## Install and Run Core
 
 1. [Configure Core](https://www.stellar.org/developers/stellar-core/software/admin.html).
-    - See [Kin Mainnet example configuration](apps/docker-quickstart/README.md) from our [Docker quickstart image](https://hub.docker.com/r/kinecosystem/blockchain-quickstart/).
-    - See [Stellar's generic and detailed configuration example](https://github.com/stellar/stellar-core/blob/master/docs/stellar-core_example.cfg).
-1. See how to [install and run Core](https://github.com/stellar/stellar-core/blob/master/INSTALL.md).
+    - See [Kin Mainnet example configuration](apps/docker-quickstart/pubnet/core/etc/stellar-core.cfg) from our [Docker quickstart image](https://hub.docker.com/r/kinecosystem/blockchain-quickstart/).
+    - See [Stellar's generic configuration example](https://github.com/stellar/stellar-core/blob/master/docs/stellar-core_example.cfg).
+1. See how to [install and run Core](https://github.com/kinecosystem/core/blob/master/INSTALL.md).
     - Kin Foundation runs Core using Docker.
-    - See [our Dockerfile](images/dockerfiles/Dockerfile.stellar-core) as an example on how to build on Ubuntu.
+    - See [our Dockerfile](ansible/playbooks/roles/dockerfiles/Dockerfile.stellar-core) and the [additional build image](ansible/playbooks/roles/dockerfiles/Dockerfile.stellar-core-build) for an example on how to build and run on Ubuntu.
+    - See the [Docker Compose template file](deploy/ansible/playbooks/roles/stellar-core/templates/docker-compose.yml.j2) for an exampe on how to run Core.
 1. Read on [hardware requirements](https://www.stellar.org/developers/guides/hardware.html) and launch the required infrastructure:
     1. Launch a cloud instance such as AWS EC2, used for running the Core application.
     1. Launch a PostgreSQL database instance such as AWS RDS, used for storing ledger state and other operational information by the Core application.
     1. Create an AWS S3 bucket, used for storing the history archive.
-1. Repeat the above process for other Core nodes in your system.
+1. Repeat the above process for other Core nodes on your system.
 1. Finally, see Core's [Administration Guide](https://www.stellar.org/developers/stellar-core/software/admin.html).
 
 ## Horizon
@@ -108,8 +109,8 @@ Before launching a single node or more, it is important to decide on the followi
 1. Launch an EC2 and RDS instance, similar to the above.
 1. [Configure Horizon](https://www.stellar.org/developers/horizon/reference/admin.html#configuring)
     - Similar to Core, we run Horizon using Docker.
-    - See [images/Dockerfile.Horizon](images/Dockerfile.horizon) and [images/docker-compose.yml](images/docker-compose.yml)
-as an example on how to build and configure Horizon on Ubuntu.
+    - See [images/Dockerfile.Horizon](images/Dockerfile.horizon) and the [additional build image](images/Dockerfile.horizon-build) for an example on how to build and run Horizon on Ubuntu.
+    - See the [Docker Compose template file](deploy/ansible/playbooks/roles/horizon-setup/templates/docker-compose.yml.j2) for an example on how to build and configure Horizon on Ubuntu.
 1. Finally, see Horizon's [Administration Guide](https://www.stellar.org/developers/horizon/reference/admin.html).
 
 ## Automation
@@ -131,7 +132,7 @@ See [deploy/ansible/](deploy/ansible) directory for further resources.
 
 ### Terraform
 
-Similar to Ansible, our Terraform code can serve as a step-by-step guide to properly configure the cloud infrastructure in use.
+Similar to Ansible, our Terraform code can serve as a guidelines to properly configure the cloud infrastructure on your preferred provider.
 
 See [deploy/terraform/](deploy/terraform) directory for more information.
 Please keep the [security concerns guide](#security-concerns) in mind when launching infrastructure.
@@ -184,7 +185,7 @@ Horizon's RDS should have a single user set up:
 1. User for Horizon access with read/write permissions to the "horizon" database.
 1. RDS admin user should not be used in production.
 
-### S3
+### History Archive - S3
 
 1. The history archive should be publicly readable globally, and specifically available for other nodes to catch up.
 1. Write access should only be given to the Core instance managing the archive.
