@@ -21,8 +21,8 @@ The image uses the following software:
 
 - Postgresql 9.6 is used for storing both Core and Horizon data.
 - [Core](https://github.com/kinecosystem/core)
-- [Horizon](https://github.com/kinecosystem/horizon)
-- Supervisord is used from managing the processes of the services above.
+- [Horizon](https://github.com/kinecosystem/go)
+- Supervisord is used for managing the processes of the services above.
 
 ## Usage
 
