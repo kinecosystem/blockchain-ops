@@ -5,6 +5,7 @@ This includes infrastructure automation and orchestration to launch and manage t
 
 ## Directory Structure
 
+- [apps/docker-quickstart/](apps/docker-quickstart) - Simple way to incorporate Core and Horizon into your private infrastructure.
 - [images/](images) - Docker images for running all the various apps in the Kin network i.e. Validator, HTTP API Frontend, etc.
 Also includes automation for running a test network on your local machine for testing purposes.
 - [deploy/terraform/](deploy/terraform) - Automation code for launching Kin network infrastructure.
@@ -51,3 +52,4 @@ Kin Faucet, similar to friendbot, is a web application the funds accounts with K
 
 1. Read the [instalation guide](INSTALL.md).
 1. Go through the [security checklist](SECURITY.md).
+1. Check out our [Docker quickstart image](apps/docker-quickstart/README.md).
