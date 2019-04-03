@@ -1,11 +1,12 @@
 FROM stellar/base:latest
 
-ENV STELLAR_CORE_VERSION kinecosystem-v2.0.1-stellar-v9.2.0
-ENV HORIZON_VERSION kinecosystem/horizon-v2.0.0-stellar-v0.16.1
-
+# postgresql
 EXPOSE 5432
+# horizon
 EXPOSE 8000
+# core p2p
 EXPOSE 11625
+# core http / admin
 EXPOSE 11626
 
 ADD dependencies /
