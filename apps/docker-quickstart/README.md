@@ -21,9 +21,9 @@ This image provide a default, non-validating, ephemeral configuration that shoul
 
 The image uses the following software:
 
-- Postgresql 9.6 is used for storing both Core and Horizon data.
 - [Core](https://github.com/kinecosystem/core)
 - [Horizon](https://github.com/kinecosystem/go)
+- Postgresql 9.6 is used for storing both Core and Horizon data.
 - Supervisord is used for managing the processes of the services above.
 
 ## Usage
@@ -52,7 +52,7 @@ Starting an ephemeral node is simple, just craft a `docker run` command to launc
 $ docker run --rm -it -p "8000:8000" --name kin kinecosystem/blockchain-quickstart --testnet
 ```  
 
-As part of launching, an ephemeral mode container will generate a random password for securing the postgresql service and will output it to standard out.  You may use this password (provided you have exposed the postgresql port) to access the running postgresql database (See the section "Accessing Databases" below).
+as part of launching, an ephemeral mode container will generate a random password for securing the postgresql service and will output it to standard out.  you may use this password (provided you have exposed the postgresql port) to access the running postgresql database (see the section "accessing databases" below).
 
 ### Persistent mode
 
@@ -61,10 +61,10 @@ In comparison to ephemeral mode, persistent mode is more complicated to operate,
 Starting a persistent mode container is the same as the ephemeral mode with one exception:
 
 ```shell
-docker run --rm -it -p "8000:8000" -v "/home/scott/stellar:/opt/stellar" --name kin kinecosystem/blockchain-quickstart --testnet
+docker run --rm -it -p "8000:8000" -v "/home/me/kin:/opt/stellar" --name kin kinecosystem/blockchain-quickstart --testnet
 ```
 
-The `-v` option in the example above tells docker to mount the host directory `/home/scott/kin` into the container at the `/opt/kin` path.  You may customize the host directory to any location you like, simply make sure to use the same value every time you launch the container.  Also note: an absolute directory path is required.  The second portion of the volume mount (`/opt/stellar`) should never be changed.  This special directory is checked by the container to see if it is mounted from the host system which is used to see if we should launch in ephemeral or persistent mode.
+The `-v` option in the example above tells docker to mount the host directory `/home/me/kin` into the container at the `/opt/stellar` path.  You may customize the host directory to any location you like, simply make sure to use the same value every time you launch the container.  Also note: an absolute directory path is required.  The second portion of the volume mount (`/opt/stellar`) should never be changed.  This special directory is checked by the container to see if it is mounted from the host system which is used to see if we should launch in ephemeral or persistent mode.
 
 Upon launching a persistent mode container for the first time, the launch script will notice that the mounted volume is empty.  This will trigger an interactive initialization process to populate the initial configuration for the container.  This interactive initialization adds some complications to the setup process because in most cases you won't want to run the container interactively during normal operation, but rather in the background.  We recommend the following steps to setup a persistent mode node:
 
@@ -74,7 +74,7 @@ Upon launching a persistent mode container for the first time, the launch script
 
 ### Customizing configurations
 
-To customize the configurations that both stellar-core and horizon use, you must use persistent mode.  The default configurations will be copied into the data directory upon launching a persistent mode container for the first time.  Use the diagram below to learn about the various configuration files that can be customized.
+To customize the configurations that both core and horizon use, you must use persistent mode.  The default configurations will be copied into the data directory upon launching a persistent mode container for the first time.  Use the diagram below to learn about the various configuration files that can be customized.
 
 ```
   /opt/stellar
@@ -120,9 +120,9 @@ Exposing the network ports used by your running container comes with potential r
 
 It is safe to open the horizon http port.  Horizon is designed to listen on an internet-facing interface and has provides no privileged operations on the port.
 
-The HTTP port for stellar-core should only be exposed to a trusted network, as it provides no security itself.  An attacker that can make requests to the port will be able to perform administrative commands such as forcing a catchup or changing the logging level and more, many of which could be used to disrupt operations or deny service.
+The HTTP port for core should only be exposed to a trusted network, as it provides no security itself.  An attacker that can make requests to the port will be able to perform administrative commands such as forcing a catchup or changing the logging level and more, many of which could be used to disrupt operations or deny service.
 
-The peer port for stellar-core however can be exposed, and ideally would be routable from the internet.  This would allow external peers to initiate connections to your node, improving connectivity of the overlay network.  However, this is not required as your container will also establish outgoing connections to peers.
+The peer port for core however can be exposed, and ideally would be routable from the internet.  This would allow external peers to initiate connections to your node, improving connectivity of the overlay network.  However, this is not required as your container will also establish outgoing connections to peers.
 
 
 ## Accessing and debugging a running container
@@ -165,16 +165,16 @@ Logs can be found within the container at the path `/var/log/supervisor/`.  A fi
 
 ### Accessing databases
 
-The point of this project is to make running Kin's software within your own infrastructure easier, so that your software can more easily integrate with the Kin network.  In many cases, you can integrate with horizon's REST API, but often times you'll want direct access to the database either horizon or stellar-core provide.  This allows you to craft your own custom sql queries against the Kin network data.
+The point of this project is to make running Kin's software within your own infrastructure easier, so that your software can more easily integrate with the Kin network.  In many cases, you can integrate with horizon's REST API, but often times you'll want direct access to the database either horizon or core provide.  This allows you to craft your own custom sql queries against the Kin network data.
 
-This image manages two postgres databases:  `core` for stellar-core's data and `horizon` for horizon's data.  The username to use when connecting with your postgresql client or library is `stellar`. The password to use is dependent upon the mode your container is running in:  Persistent mode uses a password supplied by you and ephemeral mode generates a password and prints it to the console upon container startup.
+This image manages two postgres databases:  `core` for core's data and `horizon` for horizon's data.  The username to use when connecting with your postgresql client or library is `stellar`. The password to use is dependent upon the mode your container is running in:  Persistent mode uses a password supplied by you and ephemeral mode generates a password and prints it to the console upon container startup.
 
 
 ## Example launch commands
 
 Below is a list of various ways you might want to launch the quickstart container annotated to illustrate what options are enabled.  It's also recommended that you should learn and get familiar with the docker command.
 
-*Launch an ephemeral pubnet node in the background:*
+*Launch an ephemeral mainnet node in the background:*
 ```
 $ docker run -d -p "8000:8000" --name kin kinecosystem/blockchain-quickstart --mainnet
 ```
