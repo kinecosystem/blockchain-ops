@@ -215,8 +215,8 @@ function init_stellar_core() {
 	# override catchup:
 	if [[ -z "${CATCHUP_RECENT_NUM}" ]]; then
 	  # use default value
-	  echo 'CATCHUP_RECENT_NUM is not defined. defaulting to 1000'
-	  export CATCHUP_RECENT_NUM=100
+	  echo 'CATCHUP_RECENT_NUM is not defined. defaulting to 0'
+	  export CATCHUP_RECENT_NUM=0
 	else
 	  # use user-defined value from env
 	  echo 'setting catchup to '${CATCHUP_RECENT_NUM}
