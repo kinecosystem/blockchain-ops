@@ -51,6 +51,9 @@ function process_args() {
 	  --pubnet)
 	    NETWORK="pubnet"
 	    ;;
+	  --mainnet)
+	    NETWORK="pubnet"
+	    ;;
 	  --standalone)
 	    NETWORK="standalone"
 	    ;;

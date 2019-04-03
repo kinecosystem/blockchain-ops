@@ -30,7 +30,7 @@ The image uses the following software:
 
 To use this project successfully, you should first decide a few things:
 
-First, decide whether you want your container to be part of the public, production Kin network (referred to as the _pubnet_) or the test network (called _testnet_) that we recommend you use while developing software because you need not worry about losing money on the testnet. Additionally, we have added a standalone network (called standalone) which allows you to run your own private Kin network. In standalone network mode, you can optionally pass `--protocol-version {version}` parameter to run a specific protocol version (defaults to latest version). You'll provide either `--pubnet`, `--testnet` or `--standalone` as a command line flag when starting the container to determine which network (and base configuration file) to use.
+First, decide whether you want your container to be part of the public, production Kin network (referred to as the _mainnet_) or the test network (called _testnet_) that we recommend you use while developing software because you need not worry about losing money on the testnet. Additionally, we have added a standalone network (called standalone) which allows you to run your own private Kin network. In standalone network mode, you can optionally pass `--protocol-version {version}` parameter to run a specific protocol version (defaults to latest version). You'll provide either `--mainnet`, `--testnet` or `--standalone` as a command line flag when starting the container to determine which network (and base configuration file) to use.
 
 Next, you must decide whether you will use a docker volume or not.  When not using a volume, we say that the container is in _ephemeral mode_, that is, nothing will be persisted between runs of the container. _Persistent mode_ is the alternative, which should be used in the case that you need to either customize your configuration (such as to add a validation seed) or would like avoid a slow catchup to the Kin network in the case of a crash or server restart.  We recommend persistent mode for anything besides a development or test environment.
 
@@ -176,7 +176,7 @@ Below is a list of various ways you might want to launch the quickstart containe
 
 *Launch an ephemeral pubnet node in the background:*
 ```
-$ docker run -d -p "8000:8000" --name kin kinecosystem/blockchain-quickstart --pubnet
+$ docker run -d -p "8000:8000" --name kin kinecosystem/blockchain-quickstart --mainnet
 ```
 
 *Launch an ephemeral testnet node in the foreground, exposing all ports:*
@@ -194,7 +194,7 @@ $ docker run --rm -it \
 $ docker run -it --rm \
     -v "/str:/opt/stellar" \
     --name stellar \
-    kineosystem/blockchain-quickstart --pubnet
+    kineosystem/blockchain-quickstart --mainnet
 ```
 
 *Start a background persistent container for an already initialized host directory:*
@@ -203,5 +203,5 @@ $ docker run -d \
     -v "/str:/opt/stellar" \
     -p "8000:8000" \
     --name stellar \
-    kineosystem/blockchain-quickstart --pubnet
+    kineosystem/blockchain-quickstart --mainnet
 ```
