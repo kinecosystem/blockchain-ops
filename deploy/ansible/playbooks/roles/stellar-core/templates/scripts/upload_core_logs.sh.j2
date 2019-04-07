@@ -1,4 +1,5 @@
 {% set this_node = stellar_core.nodes|selectattr("name", "equalto", inventory_hostname)|first %}
+
 #!/usr/bin/env bash
 
 # get the latest XXX line from the core app, tar them and upload to S3.

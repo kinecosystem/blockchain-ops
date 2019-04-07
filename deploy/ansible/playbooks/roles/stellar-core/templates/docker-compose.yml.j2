@@ -2,10 +2,10 @@ version: "3"
 
 services:
   stellar-core-metrics-exporter:
-    image: kinecosystem/stellar-core-metrics-exporter:v1.0.0
+    image: "kinecosystem/stellar-core-metrics-exporter:v1.0.0"
     container_name: stellar_core_metrics_exporter
     links:
-     - "stellar-core:stellar-core"
+      - "stellar-core:stellar-core"
     restart: always
     ports:
       - 9473:9473
@@ -16,14 +16,14 @@ services:
         max-file: "3"
 
   stellar-core-telegraf:
-    image: kinecosystem/stellar-core-telegraf:v1.0.29
+    image: "kinecosystem/stellar-core-telegraf:v1.0.29"
     environment:
       NODE_NAME: "{{stellar_core.network.name}}"
       NETWORK_NAME: "fed"
     container_name: stellar_core_telegraf
     links:
-     - "stellar-core:stellar-core"
-     - "stellar-core-metrics-exporter:stellar-core-metrics-exporter"
+      - "stellar-core:stellar-core"
+      - "stellar-core-metrics-exporter:stellar-core-metrics-exporter"
     restart: always
     logging:
       driver: json-file
@@ -32,7 +32,7 @@ services:
         max-file: "3"
 
   stellar-core:
-    image: kinecosystem/stellar-core:kinecosystem-v2.0.1-stellar-v9.2.0-ubuntu-18.04
+    image: "kinecosystem/stellar-core:kinecosystem-v2.0.1-stellar-v9.2.0-ubuntu-18.04"
     container_name: stellar_core
     ports:
       - 11625:11625
@@ -45,3 +45,6 @@ services:
       options:
         max-size: 100m
         max-file: "3"
+
+
+# vi: ft=yaml

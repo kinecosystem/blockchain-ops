@@ -15,6 +15,7 @@ case "$1" in
             echo $"Usage: set_core_log_level {debug|info}"
             exit 1
 esac
+
 curl 'http://localhost:11626/ll?level='$log_level
 echo 'current log level:'
 curl 'http://localhost:11626/ll?level'
