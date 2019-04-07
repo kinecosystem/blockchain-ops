@@ -1,13 +1,14 @@
+---
 version: "3"
 
 services:
 
   stellar-core-telegraf:
     environment:
-     - NODE_NAME="stellar-core"
+      - NODE_NAME="stellar-core"
     image: kinecosystem/stellar-core-telegraf:latest
     links:
-     - stellar-core
+      - stellar-core
     restart: on-failure
     logging:
       driver: json-file
