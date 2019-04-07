@@ -8,4 +8,4 @@
 
 - name: install lnav
   apt:
-    deb: https://github.com/tstack/lnav/releases/download/v0.8.3/lnav_0.8.3_amd64.deb
+    deb: https://github.com/tstack/lnav/releases/download/v0.8.4/lnav_0.8.4_amd64.deb
