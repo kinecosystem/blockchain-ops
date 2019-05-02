@@ -4,12 +4,53 @@ version: "3"
 services:
 
   stellar-core-telegraf:
+    build:
+      dockerfile: Dockerfile
+      context: ./dockerfiles/stellar-core-telegraf
     environment:
-      - NODE_NAME="stellar-core"
-    image: kinecosystem/stellar-core-telegraf:latest
+      NODE_NAME: "stellar-core"
+      NETWORK_NAME: "local"
+      RDS_DB_INSTANCE_IDENTIFIER: "my-rds"
+      HISTORY_WELL_KNOWN_FILE_URL: "https://s3.amazonaws.com/MY-CORE-NODE/.well-known/stellar-history.json"
     links:
       - stellar-core
+      - stellar-core-metrics-exporter
+      - telegraf-forwarder
+    volumes:
+      - ./volumes/stellar-core-telegraf/tmp:/tmp
     restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
+
+  telegraf-forwarder:
+    build:
+      dockerfile: Dockerfile
+      context: ./dockerfiles/telegraf-datadog-forwarder
+    environment:
+      DATADOG_API_KEY: ''
+      AWS_BI_ACCOUNT_ACCESS_KEY: ''
+      AWS_BI_ACCOUNT_SECRET_KEY: ''
+    volumes:
+      - ./volumes/telegraf-datadog-forwarder/tmp:/tmp
+    restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
+
+  stellar-core-metrics-exporter:
+    build:
+      dockerfile: Dockerfile
+      context: ./dockerfiles/stellar-core-metrics-exporter
+    links:
+      - stellar-core
+    ports:
+      - 9473:9473
+    restart: always
     logging:
       driver: json-file
       options:
@@ -91,6 +132,29 @@ services:
       POSTGRES_USER: stellar
       POSTGRES_PASSWORD: "12345678"
       POSTGRES_DB: horizon
+
+  horizon-telegraf:
+    build:
+      dockerfile: Dockerfile
+      context: ./dockerfiles/horizon-telegraf
+    environment:
+      NODE_NAME: "horizon"
+      NETWORK_NAME: "local"
+      TARGET_URL: "stellar-core:11626/info"
+      RDS_DB_INSTANCE_IDENTIFIER: "my-rds"
+      REGION_NAME: "local-region"
+    links:
+      - horizon
+      - stellar-core
+      - telegraf-forwarder
+    volumes:
+      - ./volumes/horizon-telegraf/tmp:/tmp
+    restart: on-failure
+    logging:
+      driver: json-file
+      options:
+        max-size: 100m
+        max-file: "3"
 
   stellar-core-build:
     build:
