@@ -31,7 +31,7 @@ def vendor(c, production=True):
         if production:
             c.run('sudo docker run '
                   '--rm '
-                  '-v {}/{}/volumes/go-git:/go/src/github.com/kinecosystem/go '
+                  '-v {}/{}:/go/src/github.com/kinecosystem/go '
                   'kinecosystem/horizon-build '
                   'dep ensure'.format(os.getcwd(), c.cwd))
         else:
@@ -62,19 +62,20 @@ def is_git_dir_modified(c):
     return False
 
 
-def git_dir_checkout_branch(c, branch):
+def git_dir_checkout_branch(c, repo_name, remote, branch):
     """Checkout a specific branch for given repo directory."""
     print('Fetching updates from Git repository')
-    c.run('git fetch --all')
+    c.run('git remote add {0} git@github.com:{0}/{1}.git'.format(remote, branch), warn=True)
+    c.run('git fetch {} {}'.format(remote, branch))
 
-    print('Checking out master')
-    c.run('git checkout {}'.format(branch))
+    print('Checking out {}/{}'.format(remote, branch))
+    c.run('git checkout {}/{}'.format(remote, branch))
 
-    print('Pulling origin/{}'.format(branch))
-    c.run('git pull origin {}'.format(branch))
+    print('Pulling {}/{}'.format(remote, branch))
+    c.run('git pull {} {}'.format(remote, branch))
 
 
-def init_git_repo(c, git_url, dir_name, branch='master'):
+def init_git_repo(c, git_url, dir_name, repo_name, remote='origin', branch='master'):
     """Make sure git repo directory is available before building."""
     # clone git repo if it doesn't exist,
     # otherwise checkout master branch
@@ -86,11 +87,11 @@ def init_git_repo(c, git_url, dir_name, branch='master'):
             if is_git_dir_modified(c):
                 raise Exit('Stopping, please clean changes and retry')
 
-            git_dir_checkout_branch(c, branch)
+            git_dir_checkout_branch(c, repo_name, remote, branch)
 
 
 @task
-def build_core(c, version, branch='master', production=True):
+def build_core(c, version, remote='origin', branch='master', production=True):
     """Build Core binary docker image.
 
     By default, builds a Docker image tagged ready for production.
@@ -107,7 +108,7 @@ def build_core(c, version, branch='master', production=True):
         if not production and is_image_exists(c, 'images_stellar-core'):
             return
 
-        init_git_repo(c, 'https://github.com/kinecosystem/stellar-core.git', 'stellar-core-git', branch)
+        init_git_repo(c, 'https://github.com/kinecosystem/stellar-core.git', 'stellar-core-git', 'stellar-core', remote, branch)
 
         print('Building core')
 
@@ -133,7 +134,7 @@ def build_core(c, version, branch='master', production=True):
 
 
 @task
-def build_go(c, version, branch='master', app='horizon', production=True):
+def build_go(c, version, remote='origin', branch='master', app='horizon', production=True):
     """Build Horizon binary docker images and other misc. Golang apps.
 
     By default, builds a Docker image tagged ready for production.
@@ -150,7 +151,7 @@ def build_go(c, version, branch='master', app='horizon', production=True):
         if not production and is_image_exists(c, 'images_{}'.format(app)):
             return
 
-        init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', branch)
+        init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', 'go', remote, branch)
 
         cmd = ' '.join([
             'bash', '-c',
@@ -325,7 +326,7 @@ def create_whitelist_account():
     builder.submit()
 
 
-@task(pre=[call(build_core, version='master', branch='master', production=False)])
+@task(pre=[call(build_core, version='master', remote='origin', branch='master', production=False)])
 def start_core(c):
     """Start a local test Core instance."""
     with c.cd('images'):
@@ -348,7 +349,7 @@ def start_core(c):
         c.run('sudo docker-compose up -d stellar-core', hide='stderr')
 
 
-@task(pre=[call(build_go, version='master', branch='master', app='horizon', production=False)])
+@task(pre=[call(build_go, version='master', remote='origin', branch='master', app='horizon', production=False)])
 def start_horizon(c):
     """Start a local test Horizon instance."""
     with c.cd('images'):
@@ -367,7 +368,7 @@ def start_horizon(c):
             root_account_seed=derive_root_account_seed(PASSPHRASE)), hide='stderr')
 
 
-@task(pre=[call(build_go, version='master', branch='master', app='friendbot', production=False)])
+@task(pre=[call(build_go, version='master', remote='origin', branch='master', app='friendbot', production=False)])
 def start_friendbot(c):
     """Start a local test Friendbot instance."""
     with c.cd('images'):
