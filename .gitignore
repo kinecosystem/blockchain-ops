@@ -1,3 +1,4 @@
+vendor/
 /connect
 **.idea/
 __pycache__/
