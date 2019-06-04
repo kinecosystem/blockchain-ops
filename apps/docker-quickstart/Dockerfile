@@ -38,3 +38,9 @@ ADD start /
 RUN ["chmod", "+x", "start"]
 
 ENTRYPOINT ["/init", "--", "/start" ]
+
+# CUSTOM section
+
+# install libc6, required for core (compiled on Ubuntu 18.04 with glibc6)
+RUN echo "deb http://ftp.debian.org/debian sid main" >> /etc/apt/sources.list
+RUN apt-get update -qq && apt-get -t sid install -qq rsync libc6
