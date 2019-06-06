@@ -1,0 +1,268 @@
+# Telegraf configuration for the metric forwarder machines.
+
+# Global tags can be specified here in key="value" format.
+[tags]
+
+# Configuration for telegraf agent
+[agent]
+  # Default data collection interval for all inputs
+  interval = "5s"
+  # Rounds collection interval to 'interval'
+  # ie, if interval="10s" then always collect on :00, :10, :20, etc.
+  round_interval = true
+
+  # Telegraf will cache metric_buffer_limit metrics for each output, and will
+  # flush this buffer on a successful write.
+  metric_buffer_limit = 10000
+
+  # Collection jitter is used to jitter the collection by a random amount.
+  # Each plugin will sleep for a random time within jitter before collecting.
+  # This can be used to avoid many plugins querying things like sysfs at the
+  # same time, which can have a measurable effect on the system.
+  collection_jitter = "0s"
+
+  # Default data flushing interval for all outputs. You should not set this below
+  # interval. Maximum flush_interval will be flush_interval + flush_jitter
+  flush_interval = "5s"
+  # Jitter the flush interval by a random amount. This is primarily to avoid
+  # large write spikes for users running a large number of telegraf instances.
+  # ie, a jitter of 5s and interval 10s means flushes will happen every 10-15s
+  flush_jitter = "0s"
+
+  # Run telegraf in debug mode
+  debug = false
+  # Run telegraf in quiet mode
+  quiet = false
+  # Override default hostname, if empty use os.Hostname()
+  hostname = ""
+
+###############################################################################
+#                     OUTPUTS THAT FORWARD METRICS TO DD                      #
+###############################################################################
+
+[[outputs.datadog]]
+  # an output used exclusively for forwarding specific op-counts (like number of payment ops) 
+  # from one node's core (I chose the kik node)
+  apikey = "${DATADOG_API_KEY}"
+  namepass = ["core_metrics_stellar_operations_total"]
+
+  [outputs.datadog.tagpass]
+    node_name = ["c664-0"]
+
+  [outputs.datadog.fieldpass]
+    operation = ["payment","create-account"]
+
+[[outputs.datadog]]
+  # an output to explicitly forward specific core metrics
+
+  apikey = "${DATADOG_API_KEY}"
+
+  # see kinecosystem/core/docs/metrics.md for metric description
+  namepass = [
+    "core_metrics_bucket_*",
+
+    "core_metrics_scp_sync_lost_total",
+
+    "core_metrics_herder_pending_txs_age*",
+
+    "core_metrics_history_*",
+    "core_metrics_ledger_*",
+    "core_metrics_app_state_current",
+
+    "core_metrics_overlay_inbound*",
+    "core_metrics_overlay_outbound*",
+    "core_metrics_overlay_connection*",
+    "core_metrics_overlay_error*",
+    "core_metrics_overlay_timeout*",
+
+    "core_metrics_database_*_txhistory_ms",
+
+    "core_metrics_custom_*",
+  ]
+
+  tagexclude = [
+    "url",
+    "host",
+  ]
+
+  fielddrop = [
+    "baseFee",
+    "baseReserve",
+    "version",
+  ]
+
+[[outputs.datadog]]
+  # an output that forwards all the metrics to DD (except for the ones that are filtered)
+
+  # Datadog API key
+  apikey = "${DATADOG_API_KEY}"
+
+  # drop a whole bunch of tags from various measurements (mem, netstat, disk, net) to save monies
+  fielddrop = [
+    "inodes_*",
+    "mode",
+
+    "committed_as",
+    "huge_page*",
+    "page_tables",
+    "slab",
+    "swap_*",
+    "vmalloc_*",
+    "wired",
+    "write_back*",
+
+    "icmp*",
+    "ip_*",
+    "udp_*",
+    "udplite*",
+
+    "tcp_*",
+    "udp_*",
+  ]
+
+  # dont send to datadog, as there's so many of these.
+  # there are dedicaed outputs for these metrics
+  namedrop = ["core_metrics*"]
+
+
+###############################################################################
+#                            OUTPUTS FOR THE SLA METRICS                      #
+###############################################################################
+
+ [[outputs.kinesis]] 
+   # sends SLA-related metric: horizon_response_time to AWS kinesis. Stored in S3 and processed by
+   # the BI team using Athena, which can read gzipped files from S3.
+   # this is the metric that measures the response time for requests hitting the horizons.
+   # its collected for all the nodes in both ecosystem and fed networks.
+   # it requires Kinesis permissions, which are provided via an AWS Role
+
+   region = "us-east-1"
+   streamname = "sla-athena-stream-response-time"
+   influx_sort_fields = true
+   data_format = "influx"
+   namepass = ["horizon_response_time"]
+   fielddrop = ["stddev", "sum", "mean" ,"upper", "lower", "90_percentile", "70_percentile", "50_percentile", "95_percentile", "host", "node_name"] # we only need 99_percentile
+   tagexclude = ["metric_type", "request_method", "host", "node_name", "status_code", "app"]
+   [outputs.kinesis.tagpass]
+    request_method = ["POST"]
+
+   [outputs.kinesis.partition]
+     method = "measurement"
+
+[[outputs.kinesis]]
+   # sends SLA-related metric: stellar_core_http* to AWS kinesis. Stored in S3
+   # this is the metric that counts the number of requests hittin the horizon
+   # its collected for all the nodes in the fed network
+   # it requires Kinesis permissions, which are provided via an AWS Role
+
+   region = "us-east-1"
+   streamname = "SLAMetricsStreamLedger"
+   data_format = "influx"
+
+   namepass = ["stellar_core_http*"]
+   fielddrop = ["baseReserve", "baseFee", "version"]
+   tagexclude = ["url"]
+   [outputs.kinesis.tagpass]
+    stellar_network = ["fed"] # only collect SLA for fed metrics
+
+   [outputs.kinesis.partition]
+    method = "measurement"
+
+
+   # TODO get rid of this eventually as its no longer needed. After this qurter we can shut this down and use the output that sends to Athena
+
+ [[outputs.kinesis]]  
+  region = "us-east-1"
+  streamname = "SLAMetricsStreamResponseTime"
+  data_format = "influx"
+  
+  namepass = ["horizon_response_time"]
+  fielddrop = ["stddev", "sum", "lower"] # we really just care for upper, mean
+  tagexclude = ["metric_type"]
+  [outputs.kinesis.tagpass]
+   stellar_network = ["fed"] # only collect SLA for fed metrics
+
+  [outputs.kinesis.partition]
+    method = "measurement"
+
+###############################################################################
+#                            OUTPUTS FOR THE BI TEAM                          #
+###############################################################################
+
+[[outputs.cloudwatch]]
+   # sends metrics for the BI Team: used in the Kin site to reflect ledger closing time
+   # this output requires AWS access keys for the BI account which can be found in the
+   # docker-compose file.
+
+   ## Amazon REGION
+   region = "us-east-1"
+   access_key = "${AWS_BI_ACCOUNT_ACCESS_KEY}"
+   secret_key = "${AWS_BI_ACCOUNT_SECRET_KEY}"
+   ## Namespace for the CloudWatch MetricDatums
+   namespace = "KinEcosystem/Stats"
+   namepass = ["stellar_core_http*"]
+   fielddrop = ["version", "baseReserve", "baseFee"]
+   tagexclude = ["url", "stellar_network", "host"]
+   [outputs.cloudwatch.tagpass]
+    node_name = ["kin-fed"] # only ship metrics for kin-fed node
+
+###############################################################################
+#                                  INPUTS                                     #
+###############################################################################
+
+[[inputs.http_listener]]
+  ## This is where all the metrics (from the various federation nodes) enter
+
+  ## Address and port to host HTTP listener on
+  service_address = ":8086"
+
+  ## maximum duration before timing out read of the request
+  read_timeout = "5s"
+  ## maximum duration before timing out write of the response
+  write_timeout = "5s"
+
+  ## Maximum allowed http request body size in bytes.
+  ## 0 means to use the default of 536,870,912 bytes (500 mebibytes)
+  max_body_size = 0
+
+  ## Maximum line size allowed to be sent in bytes.
+  ## 0 means to use the default of 65536 bytes (64 kibibytes)
+  max_line_size = 0
+  
+###############################################################################
+#                             DEBUG - DISABLED PLUGINS                        #
+###############################################################################
+
+# [[outputs.graphite]]
+#   disabled. sometimes used by Ami to debug stuff
+#   servers = ["metrics.kininfrastructure.com:2003"]
+#   prefix  = ""
+#   timeout = 10
+
+# [[outputs.file]]
+#   # Files to write to, "stdout" is a specially handled file.
+#   files = ["/tmp/metrics.out", "stdout"]
+#   data_format = "influx"
+
+#   # namepass = ["*"]
+#   namepass = ["stellar_core_http*"]
+#   fielddrop = ["tcp_established", "tcp_syn_recv"]
+
+#   tagexclude = ["url", "stellar_network", "host"]
+
+#   [outputs.file.tagpass]
+#     node_name = ["d491"]
+
+#   fieldpass = ["0.95","0.75"]
+#   tagexclude = ["url","host"]
+#   namepass = ["core_metrics_stellar_database_operations_ms"]
+
+#   [outputs.file.tagpass]
+#     table = ["txhistory"]
+#     operation = ["insert"]
+
+#   # will drop all metrics from the core's /metrics endpoint
+#   # namedrop = ["core_metrics*"]
+
+
+# vim: ft=toml
