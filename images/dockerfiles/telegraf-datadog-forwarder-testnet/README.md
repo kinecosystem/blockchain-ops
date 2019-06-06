@@ -10,7 +10,7 @@ In docker-compose.yml, add the following service wherever you want your stats mo
 ```yaml
 services:
   telegraf-datadog-forwarder:
-    image: kinecosystem/telegraf-datadog-forwarder:testnet
+    image: kinecosystem/telegraf-datadog-forwarder-testnet:v1.0.0
     restart: always
     environment:
       DATADOG_API_KEY: "<api key>"
