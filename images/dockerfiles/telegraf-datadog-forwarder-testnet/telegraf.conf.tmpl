@@ -163,7 +163,7 @@
    fielddrop = ["baseReserve", "baseFee", "version"]
    tagexclude = ["url"]
    [outputs.kinesis.tagpass]
-    stellar_network = ["fed"] # only collect SLA for fed metrics
+    stellar_network = ["testnet"] # only collect SLA for fed metrics
 
    [outputs.kinesis.partition]
     method = "measurement"
@@ -180,7 +180,7 @@
   fielddrop = ["stddev", "sum", "lower"] # we really just care for upper, mean
   tagexclude = ["metric_type"]
   [outputs.kinesis.tagpass]
-   stellar_network = ["fed"] # only collect SLA for fed metrics
+   stellar_network = ["testnet"] # only collect SLA for fed metrics
 
   [outputs.kinesis.partition]
     method = "measurement"
@@ -204,7 +204,7 @@
    fielddrop = ["version", "baseReserve", "baseFee"]
    tagexclude = ["url", "stellar_network", "host"]
    [outputs.cloudwatch.tagpass]
-    node_name = ["kin-fed"] # only ship metrics for kin-fed node
+    node_name = ["c664-0"] # only ship metrics for kin-fed node
 
 ###############################################################################
 #                                  INPUTS                                     #
@@ -235,7 +235,7 @@
 
 # [[outputs.graphite]]
 #   disabled. sometimes used by Ami to debug stuff
-#   servers = ["metrics.kininfrastructure.com:2003"]
+#   servers = ["metrics-testnet.kininfrastructure.com:2003"]
 #   prefix  = ""
 #   timeout = 10
 
