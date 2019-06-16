@@ -28,7 +28,7 @@ docker run -d -p 8000:8000 kinecosystem/blockchain-quickstart:latest --mainnet
 
 The above command will download our `kinecosystem/blockchain-quickstart` Docker image from DockerHub.
 Then, it starts a container with Core, Horizon, and their related databases, along with the cofiguration used in the `docker run` command.
-Upon launch, Core will start syncing the Kin blockchain state: Account balances, transactions, etc. This should take around an hour.
+Upon launch, Core will start syncing the Kin blockchain state: Account balances, transactions, etc. For Mainnet this should take around an hour.
 
 Note that Horizon will only respond after Core completes network synchronization.
 
