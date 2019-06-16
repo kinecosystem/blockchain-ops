@@ -2,19 +2,6 @@
 
 [DockerHub image link](https://hub.docker.com/r/kinecosystem/blockchain-quickstart).
 
-## TL;DR
-
-Run an ephemeral horizon + core node on testnet with the following docker command:
-
-```bash
-docker run \
-    -d \
-    -p 8000:8000 \
-    -e CATCHUP_RECENT_NUM=1 \
-    -e HISTORY_RETENTION_COUNT=90000 \
-    kinecosystem/blockchain-quickstart:latest --testnet
-```
-
 This project provides a simple way to incorporate Core and Horizon into your private infrastructure, provided that you use Docker.
 
 This image provide a default, non-validating, ephemeral configuration that should work for most developers.  By configuring a container using this image with a host-based volume (described below in the "Usage" section) an operator gains access to full configuration customization and persistence of data.
@@ -25,6 +12,25 @@ The image uses the following software:
 - [Horizon](https://github.com/kinecosystem/go)
 - Postgresql 9.6 is used for storing both Core and Horizon data.
 - Supervisord is used for managing the processes of the services above.
+
+## TLDR
+
+- Install Docker
+- Run one of the following commands according to the network you wish to join (Testnet or Mainnet):
+
+```bash
+# Join the test network (testnet)
+docker run -d -p 8000:8000 kinecosystem/blockchain-quickstart:latest --testnet
+
+# Join the Kin blockchain (mainnet)
+docker run -d -p 8000:8000 kinecosystem/blockchain-quickstart:latest --mainnet
+```
+
+The above command will download our `kinecosystem/blockchain-quickstart` Docker image from DockerHub.
+Then, it starts a container with Core, Horizon, and their related databases, along with the cofiguration used in the `docker run` command.
+Upon launch, Core will start syncing the Kin blockchain state: Account balances, transactions, etc. This should take around an hour.
+
+Note that Horizon will only respond after Core completes network synchronization.
 
 ## Usage
 
