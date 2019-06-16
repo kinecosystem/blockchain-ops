@@ -205,3 +205,9 @@ Horizon's RDS should have a single user set up:
 - [Horizon Administration](https://www.stellar.org/developers/horizon/reference/admin.html)
 - [Stellar Node Performance Tips](https://galactictalk.org/d/279-effectively-run-your-stellar-validator-node-performance-tips)
 
+### Builing Core and Horizon with python Invoke
+
+This folder includes a tasks.py file which can be used to build linux horizon and core binaries. You'll need to have pipenv and invoke installed and then:
+     pipenv run invoke build-go --version a-name-for-the-version --branch repo-name/my-branch-name # builds horizon
+     pipenv run invoke build-core --version test --branch master # builds core
+     
