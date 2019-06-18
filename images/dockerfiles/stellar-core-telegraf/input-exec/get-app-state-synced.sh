@@ -16,4 +16,4 @@ case $state in
     *) synced='0' ;;
 esac
 
-printf 'app_state_synced synced=%d state=%s\n' $synced $state
+printf 'app_state_synced synced=%d,state=%s\n' $synced $state
