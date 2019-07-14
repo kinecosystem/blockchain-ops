@@ -239,7 +239,18 @@
   ## Maximum line size allowed to be sent in bytes.
   ## 0 means to use the default of 65536 bytes (64 kibibytes)
   max_line_size = 0
-  
+
+[[inputs.exec]]
+  # This input runs the scripts below which generates connectivity info every 10 minutes
+  interval = "1s"
+
+  ## Commands array
+  commands = ["/usr/bin/calc_ledger_close_time.sh"]
+
+  ## Timeout for each command to complete.
+  timeout = "5s"
+
+  data_format = "influx"
 ###############################################################################
 #                             DEBUG - DISABLED PLUGINS                        #
 ###############################################################################
