@@ -12,7 +12,6 @@ import requests
 from flask import Flask
 from flask_cors import CORS
 
-
 APP = Flask(__name__)
 CORS(APP)
 START_TIMESTAMP = time.time()
@@ -41,24 +40,36 @@ def make_reply(msg, code):
 def status():
     """Check if the stellar core is synced."""
     try:
-        response = requests.get(CORE_INFO_URL, timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
+        core_response = requests.get(CORE_INFO_URL, timeout=REQUEST_TIMEOUT)
+        core_response.raise_for_status()
+        core_info = core_response.json()['info']
+        is_core_synced = core_info['state'] == 'Synced!'
 
-        is_core_healthy = (response.json()['info']['state'] == 'Synced!')
-        core_status_str = 'synced' if is_core_healthy else 'not synced'
+        horizon_response = requests.get(HORIZON_INFO_URL, timeout=REQUEST_TIMEOUT)
+        horizon_response.raise_for_status()
 
-        response = requests.get(HORIZON_INFO_URL, timeout=REQUEST_TIMEOUT)
-        response.raise_for_status()
+        horizon_info = horizon_response.json()
+        core_latest_ledger = int(horizon_info['core_latest_ledger'])
+        history_latest_ledger = int(horizon_info['history_latest_ledger'])
+        is_horizon_synced = get_horizon_status(core_info, core_latest_ledger, history_latest_ledger)
 
-        core_latest_ledger = int(response.json()['core_latest_ledger'])
-        history_latest_ledger = int(response.json()['history_latest_ledger'])
-        is_horizon_healthy = (core_latest_ledger - history_latest_ledger) < MAX_HEALTHY_DIFF
-        horizon_status_str = 'synced' if is_horizon_healthy else 'not synced'
-
-        msg = 'Core, Horizon status is: ({}, {})'.format(core_status_str, horizon_status_str)
-
-        if is_core_healthy and is_horizon_healthy:
+        msg = generate_status_msg(is_core_synced, is_horizon_synced)
+        if is_core_synced and is_horizon_synced:
             return make_reply(msg, 200)
         return make_reply(msg, 503)
     except Exception as e:
-        return make_reply('Could not perform health check: {}'.format(str(e)), 503)
+        return make_reply(f'Could not perform health check: {str(e)}', 503)
+
+
+def generate_status_msg(is_core_synced, is_horizon_synced):
+    horizon_status = 'synced' if is_horizon_synced else 'not synced'
+    core_status = 'synced' if is_core_synced else 'not synced'
+    msg = f'Core, Horizon status is: ({core_status}, {horizon_status})'
+    return msg
+
+
+def get_horizon_status(core_info, core_latest_ledger, history_latest_ledger):
+    horizon_db_sync = (core_latest_ledger - history_latest_ledger) < MAX_HEALTHY_DIFF
+    # Check if core_latest_ledger from Horizon is in sync with the Ladger num
+    horizon_core_sync = (abs(core_info['ledger']['num'] - core_latest_ledger) < MAX_HEALTHY_DIFF)
+    return horizon_db_sync and horizon_core_sync
