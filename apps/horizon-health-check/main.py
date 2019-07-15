@@ -24,35 +24,15 @@ REQUEST_TIMEOUT = float(os.environ['REQUEST_TIMEOUT'])
 MAX_HEALTHY_DIFF = 10
 
 
-def make_reply(msg, code):
-    """Create a JSON reply for /status."""
-    reply = {
-        'status': 'Healthy' if code == 200 else 'Unhealthy',
-        'description': msg,
-        'start_timestamp': START_TIMESTAMP,
-        'build': BUILD_VERSION
-    }
-
-    return json.dumps(reply), code
-
-
 @APP.route("/status")
 def status():
     """Check if the stellar core is synced."""
     try:
-        core_response = requests.get(CORE_INFO_URL, timeout=REQUEST_TIMEOUT)
-        core_response.raise_for_status()
-        core_info = core_response.json()['info']
-        is_core_synced = core_info['state'] == 'Synced!'
+        core_info = get_data(CORE_INFO_URL)
+        horizon_info = get_data(HORIZON_INFO_URL)
 
-        horizon_response = requests.get(HORIZON_INFO_URL, timeout=REQUEST_TIMEOUT)
-        horizon_response.raise_for_status()
-
-        horizon_info = horizon_response.json()
-        core_latest_ledger = int(horizon_info['core_latest_ledger'])
-        history_latest_ledger = int(horizon_info['history_latest_ledger'])
-        is_horizon_synced = get_horizon_status(core_info, core_latest_ledger, history_latest_ledger)
-
+        is_core_synced = core_info['info']['state'] == 'Synced!'
+        is_horizon_synced = get_horizon_sync_status(core_info, horizon_info)
         msg = generate_status_msg(is_core_synced, is_horizon_synced)
         if is_core_synced and is_horizon_synced:
             return make_reply(msg, 200)
@@ -61,15 +41,38 @@ def status():
         return make_reply(f'Could not perform health check: {str(e)}', 503)
 
 
+def make_reply(msg, code):
+    """Create a JSON reply for /status."""
+    reply = {
+        'status': 'Healthy' if code == 200 else 'Unhealthy',
+        'description': msg,
+        'start_timestamp': START_TIMESTAMP,
+        'build': BUILD_VERSION
+    }
+    return json.dumps(reply), code
+
+
+def get_data(url):
+    """Get JSON data from resource"""
+    response = requests.get(url, timeout=REQUEST_TIMEOUT)
+    response.raise_for_status()
+    return response.json()
+
+
 def generate_status_msg(is_core_synced, is_horizon_synced):
+    """Create sync status message"""
     horizon_status = 'synced' if is_horizon_synced else 'not synced'
     core_status = 'synced' if is_core_synced else 'not synced'
     msg = f'Core, Horizon status is: ({core_status}, {horizon_status})'
     return msg
 
 
-def get_horizon_status(core_info, core_latest_ledger, history_latest_ledger):
-    horizon_db_sync = (core_latest_ledger - history_latest_ledger) < MAX_HEALTHY_DIFF
-    # Check if core_latest_ledger from Horizon is in sync with the Ladger num
-    horizon_core_sync = (abs(core_info['ledger']['num'] - core_latest_ledger) < MAX_HEALTHY_DIFF)
+def get_horizon_sync_status(core_info, horizon_info):
+    """Check if Horizon ledger count is aligned with Core current ledger"""
+    core_db_ledger = int(core_info['info']['ledger']['num'])
+    horizon_core_ledger = int(horizon_info['core_latest_ledger'])
+    horizon_db_ledger = int(horizon_info['history_latest_ledger'])
+
+    horizon_db_sync = abs(horizon_core_ledger - horizon_db_ledger) < MAX_HEALTHY_DIFF
+    horizon_core_sync = abs(core_db_ledger - horizon_db_ledger) < MAX_HEALTHY_DIFF
     return horizon_db_sync and horizon_core_sync
