@@ -251,6 +251,18 @@
   timeout = "2s"
 
   data_format = "influx"
+
+[[inputs.exec]]
+  # This input runs the scripts below which generates connectivity info every 10 minutes
+  interval = "2s"
+
+  ## Commands array
+  commands = ["/usr/bin/count_tx_ops.sh"]
+
+  ## Timeout for each command to complete.
+  timeout = "2s"
+
+  data_format = "influx"
 ###############################################################################
 #                             DEBUG - DISABLED PLUGINS                        #
 ###############################################################################
