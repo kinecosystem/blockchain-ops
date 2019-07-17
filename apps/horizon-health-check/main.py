@@ -17,10 +17,10 @@ CORS(APP)
 START_TIMESTAMP = time.time()
 
 # Load configuration from env variables
-CORE_INFO_URL = os.environ['CORE_INFO_URL']
-HORIZON_INFO_URL = os.environ['HORIZON_INFO_URL']
-BUILD_VERSION = os.environ['BUILD_VERSION']
-REQUEST_TIMEOUT = float(os.environ['REQUEST_TIMEOUT'])
+CORE_INFO_URL = os.environ.get('CORE_INFO_URL')
+HORIZON_INFO_URL = os.environ.get('HORIZON_INFO_URL')
+BUILD_VERSION = os.environ.get('BUILD_VERSION')
+REQUEST_TIMEOUT = float(os.environ.get('REQUEST_TIMEOUT', 2))
 MAX_HEALTHY_DIFF = 10
 
 
