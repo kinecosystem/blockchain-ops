@@ -7,7 +7,7 @@ RUN apk add -qU --no-cache gettext jq curl coreutils bc
 
 COPY ./entrypoint.sh /
 COPY ./telegraf.conf.tmpl /etc/telegraf
-COPY ./input-exec/calc_ledger_close_time.sh /usr/bin/
+COPY ./input-exec/*.sh /usr/bin/
 
 ENTRYPOINT []
 CMD /entrypoint.sh
