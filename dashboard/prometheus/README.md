@@ -1,14 +1,19 @@
 
 # Prometheus
 
-Prometheus is an open-source systems monitoring and alerting toolkit
+Prometheus is an open-source system for monitoring. its a time-series database and a graphing engine.
 [enter link description here](https://prometheus.io)
 
-We are using it to display Horizons and Core health on our site as time series graph on the kin.org website.
+We are using it to collect and store horizon and health metrics that are graphed on our kin.org website.
+At the moment, prometheus stores 2 kinds of metrics:
+ - blockchain health metrics (whether the horizons are up and healthy)
+ - reponse time and request counts for POST and GET requests
+ 
+Blockchain health is a metric that's gathered from a telegraf client that sits in Frankfurt and performs periodic HTTP requests into our horizons url.
 
 ## Configuration
-The Prometheus is running on docker-compose, installed on 2 instances (but not as a sync cluster, but rather two independent instances for high availability)
-Configuration files for Prometheus are part of the project.
+Prometheus is running on docker-compose, installed on 2 instances (not as a synced cluster, but rather as two independent instances for high availability)
+Configuration files for Prometheus are stored in this repo.
 
 ### Installation
 
@@ -17,14 +22,12 @@ Configuration files for Prometheus are part of the project.
  - LoadBalancer: ALB with 1 hour stickiness 
  - Domain: Route53 record on kin.org from  [https://prometheus-dashboard.kin.org/graph](https://prometheus-dashboard.kin.org/graph) to the ALB.
 
-## Monitoring dashboard
-Instances run Telegraf for local monitoring.
-Monitoring is forwarded to Datadog from the Telegraf forwarder.
-
+## Monitoring Prometheus:
+the Prometheus "cluster" itself is monitored in datadog. Each prometheus instnace runs a local Telegraf which forwards the metrics into DD via the metric-forwarder machine.
 
 ## Alerts
 Alerts exists on DataDog:
 
- - Disk space on instances
+ - Disk space on the prometheus instances
  - Load (5 minutes avg)
  - Access to the domain (Synthetics): [https://prometheus-dashboard.kin.org/graph](https://prometheus-dashboard.kin.org/graph)
