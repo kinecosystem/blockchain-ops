@@ -6,13 +6,16 @@ Prometheus is an open-source system for monitoring. its a time-series database a
 
 We are using it to collect and store horizon and health metrics that are graphed on our kin.org website.
 At the moment, prometheus stores 2 kinds of metrics:
- - blockchain health metrics (whether the horizons are up and healthy)
+ - blockchain health metrics - whether the horizons are up and healthy.
  - reponse time and request counts for POST and GET requests
+ 
+ All metrics should be kept for at least 180 days.
  
 Blockchain health is a metric that's gathered from a telegraf client that sits in Frankfurt and performs periodic HTTP requests into our horizons url.
 
 ## Configuration
 Prometheus is running on docker-compose, installed on 2 instances (not as a synced cluster, but rather as two independent instances for high availability)
+
 Configuration files for Prometheus are stored in this repo.
 
 ### Installation
