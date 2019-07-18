@@ -2,7 +2,7 @@
 # Prometheus
 
 Prometheus is an open-source system for monitoring. its a time-series database and a graphing engine.
-[enter link description here](https://prometheus.io)
+[link to the Prometheus project](https://prometheus.io)
 
 We are using it to collect and store horizon and health metrics that are graphed on our kin.org website.
 At the moment, prometheus stores 2 kinds of metrics:
