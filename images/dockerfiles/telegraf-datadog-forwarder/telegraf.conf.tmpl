@@ -51,58 +51,62 @@
 ###############################################################################
 #                     OUTPUTS THAT FORWARD METRICS TO DD                      #
 ###############################################################################
-
 [[outputs.datadog]]
-  # an output used exclusively for forwarding specific op-counts (like number of payment ops) 
-  # from one node's core (I chose the kik node)
+  # get all core metrics from all cores
   apikey = "${DATADOG_API_KEY}"
-  namepass = ["core_metrics_op_create_account_*","core_metrics_op_payment_*"]
+  namepass = ["core_metrics_*"]
 
-  [outputs.datadog.tagpass] # take only from kik node as this info is global
-    node_name = ["kikkinfed"]
+#[[outputs.datadog]]
+#  # an output used exclusively for forwarding specific op-counts (like number of payment ops) 
+#  # from one node's core (I chose the kik node)
+#  apikey = "${DATADOG_API_KEY}"
+#  namepass = ["core_metrics_op_create_account_*","core_metrics_op_payment_*"]
+#
+#  [outputs.datadog.tagpass] # take only from kik node as this info is global
+#    node_name = ["kikkinfed"]
 
 
-[[outputs.datadog]]
-  # an output to explicitly forward specific core metrics
-
-  apikey = "${DATADOG_API_KEY}"
-
-  # see kinecosystem/core/docs/metrics.md for metric description
-  namepass = [
-    "core_metrics_bucket_*",
-
-    "core_metrics_scp_sync_lost_total",
-
-    "core_metrics_herder_pending_txs_age*",
-
-    "core_metrics_history_*",
-    "core_metrics_ledger_*",
-    "core_metrics_app_state_current",
-
-    "core_metrics_overlay_inbound*",
-    "core_metrics_overlay_outbound*",
-    "core_metrics_overlay_connection*",
-    "core_metrics_overlay_error*",
-    "core_metrics_overlay_timeout*",
-    "core_metrics_overlay_memory_*_peers",
-
-    "core_metrics_database_*_txhistory_ms",
-
-    "core_metrics_custom_*",
-    "core_metrics_overlay_*_scp_message*",
-
-  ]
-
-  tagexclude = [
-    "url",
-    "host",
-  ]
-
-  fielddrop = [
-    "baseFee",
-    "baseReserve",
-    "version",
-  ]
+#[[outputs.datadog]]
+#  # an output to explicitly forward specific core metrics
+#
+#  apikey = "${DATADOG_API_KEY}"
+#
+#  # see kinecosystem/core/docs/metrics.md for metric description
+#  namepass = [
+#    "core_metrics_bucket_*",
+#
+#    "core_metrics_scp_sync_lost_total",
+#
+#    "core_metrics_herder_pending_txs_age*",
+#
+#    "core_metrics_history_*",
+#    "core_metrics_ledger_*",
+#    "core_metrics_app_state_current",
+#
+#    "core_metrics_overlay_inbound*",
+#    "core_metrics_overlay_outbound*",
+#    "core_metrics_overlay_connection*",
+#    "core_metrics_overlay_error*",
+#    "core_metrics_overlay_timeout*",
+#    "core_metrics_overlay_memory_*_peers",
+#
+#    "core_metrics_database_*_txhistory_ms",
+#
+#    "core_metrics_custom_*",
+#    "core_metrics_overlay_*_scp_message*",
+#
+#  ]
+#
+#  tagexclude = [
+#    "url",
+#    "host",
+#  ]
+#
+#  fielddrop = [
+#    "baseFee",
+#    "baseReserve",
+#    "version",
+#  ]
 
 [[outputs.datadog]]
   # an output that forwards all the metrics to DD (except for the ones that are filtered)
