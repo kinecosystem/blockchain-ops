@@ -1,0 +1,176 @@
+# Telegraf configuration for stellar core
+
+# Global tags can be specified here in key="value" format.
+[tags]
+  app = "core"
+  node_name = "$NODE_NAME" # take from env
+  stellar_network = "$NETWORK_NAME" # take from env
+
+# Configuration for telegraf agent
+[agent]
+  # Default data collection interval for all inputs
+  interval = "10s"
+  # Rounds collection interval to 'interval'
+  # ie, if interval="10s" then always collect on :00, :10, :20, etc.
+  round_interval = true
+
+  # Telegraf will cache metric_buffer_limit metrics for each output, and will
+  # flush this buffer on a successful write.
+  metric_buffer_limit = 10000
+
+  # Collection jitter is used to jitter the collection by a random amount.
+  # Each plugin will sleep for a random time within jitter before collecting.
+  # This can be used to avoid many plugins querying things like sysfs at the
+  # same time, which can have a measurable effect on the system.
+  collection_jitter = "0s"
+
+  # Default data flushing interval for all outputs. You should not set this below
+  # interval. Maximum flush_interval will be flush_interval + flush_jitter
+  flush_interval = "10s"
+  # Jitter the flush interval by a random amount. This is primarily to avoid
+  # large write spikes for users running a large number of telegraf instances.
+  # ie, a jitter of 5s and interval 10s means flushes will happen every 10-15s
+  flush_jitter = "0s"
+
+  # Run telegraf in debug mode
+  debug = false
+  # Run telegraf in quiet mode
+  quiet = false
+  # Override default hostname, if empty use os.Hostname()
+  hostname = ""
+
+###############################################################################
+#        OUTPUTS: SEND EVERYTHING TO THE METRICS-FORWARDERS                   #
+###############################################################################
+
+[[outputs.prometheus_client]]
+  ## Address to listen on.
+  listen = ":9274"
+###############################################################################
+#                                  INPUTS                                     #
+###############################################################################
+[[inputs.postgresql]]
+  address = "$CORE_DB_URL"
+
+[[inputs.http]]
+  # this input parses json from http. specifically, it gets the 'info.ledger' field
+  
+  interval = "4s" # send these metrics every 4 seconds to get all ledgers
+
+  ## One or more URLs from which to read formatted metrics
+  urls = [
+    "http://stellar-core:11626/info"
+  ]
+
+  # HTTP method
+  # method = "GET"
+
+  name_prefix = "core_metrics_custom_info_ledger_"
+
+  data_format = "json"
+
+  ## Query is a GJSON path that specifies a specific chunk of JSON to be
+  ## parsed, if not specified the whole document will be parsed.
+  ##
+  ## GJSON query paths are described here:
+  ##   https://github.com/tidwall/gjson#path-syntax
+  json_query = "info.ledger"
+
+[[inputs.http]]
+  # this input fetches the latest ledger that was published to history.
+  # it fetches it from history archive that belongs to the core where this
+  # telegraf agent is running from
+  interval = "10s"
+  urls = [ "$HISTORY_WELL_KNOWN_FILE_URL" ]
+  name_prefix = "core_metrics_custom_history_published_latest_ledger_"
+  data_format = "json"
+  fieldpass = ["currentLedger"]
+
+[[inputs.exec]]
+  # This input runs the scripts below which generate various metrics every 5 secs
+  commands = [
+    "/usr/bin/get-app-state-synced.sh",
+    "/usr/bin/get-core-info-started-on.sh",
+    "/usr/bin/get-info-quorum.sh",
+  ]
+
+  name_prefix = "core_metrics_custom_"
+
+  ## Timeout for each command to complete.
+  timeout = "5s"
+
+  data_format = "influx"
+
+[[inputs.exec]]
+  # This input runs the scripts below which generates connectivity info every 10 minutes
+  interval = "10m"
+
+  ## Commands array
+  commands = [
+    "/usr/bin/get-core-db-stats.sh",
+    "/usr/bin/get-queued-checkpoints.sh"
+  ]
+
+  name_prefix = "core_metrics_custom_"
+
+  ## Timeout for each command to complete.
+  timeout = "5s"
+
+  data_format = "influx"
+
+[[inputs.prometheus]]
+  # Scrapes ALL the metrics from the metrics exporter docker container.
+  urls = ["http://stellar-core-metrics-exporter:9473/metrics"]
+  name_prefix = "core_metrics_"
+
+[[inputs.cloudwatch]]
+  # grab RDS metrics for Core RDS
+  region = "$REGION_NAME"
+  period = '1m'
+  delay = '5m'
+  interval = '5m'
+  namespace = 'AWS/RDS'
+
+  [[inputs.cloudwatch.metrics]]
+    names = [
+      'BurstBalance',
+      'CPUUtilization',
+      'DatabaseConnections',
+      'DiskQueueDepth',
+      'FreeableMemory',
+      'FreeStorageSpace',
+      'MaximumUsedTransactionIDs',
+      'NetworkReceiveThroughput',
+      'NetworkTransmitThroughput',
+      'OldestReplicationSlotLag',
+      'ReadIOPS',
+      'ReadLatency',
+      'ReadThroughput',
+      'ReplicationSlotDiskUsage',
+      'SwapUsage',
+      'TransactionLogsDiskUsage',
+      'TransactionLogsGeneration',
+      'WriteIOPS',
+      'WriteLatency',
+      'WriteThroughput',
+    ]
+
+    [[inputs.cloudwatch.metrics.dimensions]]
+      name = 'DBInstanceIdentifier'
+      value = '$RDS_DB_INSTANCE_IDENTIFIER'
+
+[[inputs.ntpq]]
+  interval = '1m'
+  ## If false, set the -n ntpq flag. Can reduce metric gather times.
+  dns_lookup = false
+###############################################################################
+#                             DEBUG OUTPUTS                                   #
+###############################################################################
+
+# enable to debug
+# [[outputs.file]]
+#   files = ["/tmp/metrics.out", "stdout"]
+#   data_format = "influx"
+
+
+# vim: ft=toml
