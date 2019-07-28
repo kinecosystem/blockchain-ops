@@ -1,6 +1,7 @@
 """Create accounts using given channel seeds (as sequence number consumers) and root account seed (as source account)."""
 import asyncio
 import argparse
+import json
 import logging
 
 from kin import KinClient, Environment, Keypair
@@ -25,7 +26,7 @@ def parse_args():
     parser.add_argument('--accounts', required=True, type=int, help='Amount of accounts to create')
     parser.add_argument('--passphrase', required=True, type=str, help='Network passphrase')
     parser.add_argument('--horizon', action='append', help='Horizon endpoint URL (use multiple --horizon flags for multiple addresses)')
-
+    parser.add_argument('--json-output', required=False, type=bool, help='Export output to json format')
     return parser.parse_args()
 
 
@@ -55,8 +56,17 @@ async def main():
 
     await create_accounts(root_kp, kps, channel_builders, args.horizon, STARTING_BALANCE)
 
-    for kp in kps:
-        print(kp.secret_seed)
+    if args.json_output:
+        keypairs = []
+        for kp in kps:
+            keypairs.append({"address": kp.public_address, "seed": kp.secret_seed})
+
+        out = {"keypairs": keypairs}
+        print(json.dumps(out, indent=True))
+    else:
+        out = (kp.secret_seed for kp in kps)
+        print('\n'.join(list(out)))
+
 
 
 if __name__ == '__main__':
