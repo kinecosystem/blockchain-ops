@@ -11,6 +11,17 @@ scrape_configs:
     # this job collects http health stats from a telegraf client in frankfurt
     static_configs:
     - targets: ['healthcheck-frankfurt.kininfrastructure.com:9273']
+
+  - job_name: 'health-check-ohio'
+    # this job collects http health stats from a telegraf client in ohio
+    static_configs:
+    - targets: ['healthcheck-ohio.kininfrastructure.com:9273']
+
+  - job_name: 'health-check-tokyo'
+    # this job collects http health stats from a telegraf client in tokyo
+    static_configs:
+    - targets: ['healthcheck-tokyo.kininfrastructure.com:9273']
+
   - job_name: 'metrics-forwarder'
     # this job collects the horizon metrics (request count, response time) from the metrics-forwarder.
     # these metrics are then converted into time-series data inside prometheus (refer to the rules file)
