@@ -2,8 +2,7 @@
 
 This is a docker image that collects various measurements from the horizon instance.
 At the moment it collects:
-
-1. the latency of /info requests from the horizon to its core
+the ingestion distance - the diff between the core ledger and horizon ledger (as received from horizon)
 
 In addition, this telegraf also collects StatsD metrics from the Nginx app running on the Horizon instance.
 
@@ -20,7 +19,6 @@ services:
     environment:
       NODE_NAME: "<node-name-goes-here, like ecosystem2300>"
       NETWORK_NAME: "<network-name-goes-here, like ecosystem>"
-      TARGET_URL: "http://<core-url-goes-here>:11626/info"
       REGION_NAME: "us-east-1" # region at which the infrastructure is located, for cloudwatch metrics
     image: kinecosystem/horizon-telegraf
     restart: always

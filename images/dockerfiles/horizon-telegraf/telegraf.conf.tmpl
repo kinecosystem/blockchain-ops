@@ -62,13 +62,6 @@
   dns_lookup = false
 
 [[inputs.exec]]
-  # runs a script to measture the latency between horizon and its core's /info endpoint
-  commands = [ "/opt/telegraf/scripts/check-latency.sh", ]
-  name_prefix = "horizon_"
-  timeout = "5s"
-  data_format = "influx"
-
-[[inputs.exec]]
   # every second, sample the ingestion distance at horizon.
   # ingestion distance is the difference between the latest ledger in core
   # and the latest one ingested by horizon
