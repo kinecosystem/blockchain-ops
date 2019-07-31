@@ -24,7 +24,7 @@ services:
       NETWORK_NAME: "<network-name-goes-here, like ecosystem>"
       TARGET_URL: "http://<core-url-goes-here>:11626/info"
       REGION_NAME: "us-east-1" # region at which the infrastructure is located, for cloudwatch metrics
-    image: kinecosystem/horizon-telegraf
+    image: kinecosystem/horizon-telegraf-test-env:v1.0.0
     restart: always
     logging:
       driver: json-file
