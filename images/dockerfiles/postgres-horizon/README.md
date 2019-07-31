@@ -8,7 +8,7 @@ In docker-compose, inside the Horizon app.
 
 ```yaml
 services:
-  image: postgres-horizon:v1.0.0
+  image: kinecosystem/postgres-horizon:v1.0.0
     environment:
       POSTGRES_USER: DB-USER
       POSTGRES_PASSWORD: "DB-PASSWORD"
