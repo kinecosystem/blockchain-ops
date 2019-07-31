@@ -1,0 +1,153 @@
+# this telegraf client runs some simple network latency checks and reports them
+
+# Global tags can be specified here in key="value" format.
+[tags]
+  app = "horizon"
+  node_name = "${NODE_NAME}" # take from env
+  stellar_network = "${NETWORK_NAME}" # take from env
+
+# Configuration for telegraf agent
+[agent]
+  # Default data collection interval for all inputs
+  interval = "10s"
+  # Rounds collection interval to 'interval'
+  # ie, if interval="10s" then always collect on :00, :10, :20, etc.
+  round_interval = true
+
+  # Telegraf will cache metric_buffer_limit metrics for each output, and will
+  # flush this buffer on a successful write.
+  metric_buffer_limit = 10000
+
+  # Collection jitter is used to jitter the collection by a random amount.
+  # Each plugin will sleep for a random time within jitter before collecting.
+  # This can be used to avoid many plugins querying things like sysfs at the
+  # same time, which can have a measurable effect on the system.
+  collection_jitter = "0s"
+
+  # Default data flushing interval for all outputs. You should not set this below
+  # interval. Maximum flush_interval will be flush_interval + flush_jitter
+  flush_interval = "60s"
+  # Jitter the flush interval by a random amount. This is primarily to avoid
+  # large write spikes for users running a large number of telegraf instances.
+  # ie, a jitter of 5s and interval 10s means flushes will happen every 10-15s
+  flush_jitter = "0s"
+
+  # Run telegraf in debug mode
+  debug = false
+  # Run telegraf in quiet mode
+  quiet = false
+  # Override default hostname, if empty use os.Hostname()
+  hostname = ""
+
+###############################################################################
+#            OUTPUT: SEND EVERYTHING TO THE METRICS-FORWARDERS                #
+###############################################################################
+
+[[outputs.prometheus_client]]
+  ## Address to listen on.
+  listen = ":9274"
+
+###############################################################################
+#                                  INPUTS                                     #
+###############################################################################
+[[inputs.ntpq]]
+  interval = '1m'
+  dns_lookup = false
+
+[[inputs.exec]]
+  commands = [ "/opt/telegraf/scripts/check-latency.sh", ]
+  name_prefix = "horizon_"
+  timeout = "5s"
+  data_format = "influx"
+
+[[inputs.exec]]
+  commands = [ "/opt/telegraf/scripts/get-ingestion-distance.sh", ]
+  interval = "1s"
+  name_prefix = "horizon_"
+  timeout = "1s"
+  data_format = "influx"
+
+[[inputs.statsd]]
+  protocol = "udp"
+  
+  name_prefix = "horizon_"
+
+  interval = "60s"
+
+  max_tcp_connections = 250
+
+  tcp_keep_alive = false
+
+
+  service_address = ":8125"
+
+  delete_gauges = true
+  delete_counters = true
+  delete_sets = true
+  delete_timings = true
+
+  percentiles = [50, 70, 90, 95, 99]
+
+  metric_separator = "_"
+
+  parse_data_dog_tags = false
+
+  templates = [
+       "request_count.* measurement.request_method.status_code.node_name",
+       "response_time.* measurement.request_method.status_code.node_name",
+  ]
+
+
+  allowed_pending_messages = 10000
+
+  percentile_limit = 1000
+
+
+
+[[inputs.cloudwatch]]
+  # grab RDS metrics for Horizon RDS
+  region = "$REGION_NAME"
+  period = '1m'
+  delay = '5m'
+  interval = '5m'
+  namespace = 'AWS/RDS'
+
+  [[inputs.cloudwatch.metrics]]
+    names = [
+      'BurstBalance',
+      'CPUUtilization',
+      'DatabaseConnections',
+      'DiskQueueDepth',
+      'FreeableMemory',
+      'FreeStorageSpace',
+      'MaximumUsedTransactionIDs',
+      'NetworkReceiveThroughput',
+      'NetworkTransmitThroughput',
+      'OldestReplicationSlotLag',
+      'ReadIOPS',
+      'ReadLatency',
+      'ReadThroughput',
+      'ReplicationSlotDiskUsage',
+      'SwapUsage',
+      'TransactionLogsDiskUsage',
+      'TransactionLogsGeneration',
+      'WriteIOPS',
+      'WriteLatency',
+      'WriteThroughput',
+    ]
+
+    [[inputs.cloudwatch.metrics.dimensions]]
+      name = 'DBInstanceIdentifier'
+      value = '$RDS_DB_INSTANCE_IDENTIFIER'
+
+###############################################################################
+#                             DEBUG OUTPUTS                                   #
+###############################################################################
+
+# enable to debug
+# [[outputs.file]]
+#   files = ["/tmp/metrics.out", "stdout"]
+#   data_format = "influx"
+
+
+# vim: ft=toml
