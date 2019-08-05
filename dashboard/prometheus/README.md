@@ -11,7 +11,7 @@ At the moment, prometheus stores 2 kinds of metrics:
  
  All metrics should be kept for at least 180 days.
  
-Blockchain health is a metric that's gathered from a telegraf client that sits in Frankfurt and performs periodic HTTP requests into our horizons url.
+Blockchain health is a metric that's gathered from a telegraf client that sits in Frankfurt, Tokyo and Oregon and performs periodic HTTP requests into our horizons url and calculates the average response time.
 
 ## Configuration
 Prometheus is running on docker-compose, installed on 2 instances (not as a synced cluster, but rather as two independent instances for high availability)
@@ -22,7 +22,7 @@ Configuration files for Prometheus are stored in this repo.
 
  - VPC: Default Subnets: 2 private subnets, 2 public subnets 
  - Instances: 2 instances, each instance run on a different private subnet 
- - LoadBalancer: ALB with 1 hour stickiness 
+ - LoadBalancer: ALB with a target group that has 1 of the 2 prometheus (you cant add them both at the same time as it cauases 'jumps' in the graph. so only one prometheus can be in the tg at any given time, but both are collecting metrics at all times, for HA).
  - Domain: Route53 record on kin.org from  [https://prometheus-dashboard.kin.org/graph](https://prometheus-dashboard.kin.org/graph) to the ALB.
 
 ## Monitoring Prometheus:
