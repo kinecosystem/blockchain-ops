@@ -13,7 +13,7 @@
 
   # Telegraf will cache metric_buffer_limit metrics for each output, and will
   # flush this buffer on a successful write.
-  metric_buffer_limit = 10000
+  metric_buffer_limit = 100000
 
   # Collection jitter is used to jitter the collection by a random amount.
   # Each plugin will sleep for a random time within jitter before collecting.
@@ -41,8 +41,10 @@
 ###############################################################################
 
 [[outputs.prometheus_client]]
+  flush_interval= "20s"
   ## Address to listen on.
   listen = ":9273"
+  expiration_interval = "0s"
   namepass = ["horizon_response_time","horizon_request_count"]
   collectors_exclude = ["gocollector", "process"]
   [outputs.prometheus_client.tagpass]
