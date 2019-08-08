@@ -1,0 +1,15 @@
+---
+version: "3"
+
+services:
+  blockchain-pulse-service:
+    command: pipenv run python main.py
+    #network_mode: host
+    container_name: blockchain-pulse-service
+    image: kinecosystem/blockchain-pulse-service:v1.0.0
+    ports:
+      - "5000:5000"
+    environment:
+      REQUEST_TIMEOUT: 2
+      CORE_URLS: "https://core-1.somewhere/info,https://core2-somewhere/info"
+    restart: always
