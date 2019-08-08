@@ -62,10 +62,11 @@ def is_git_dir_modified(c):
     return False
 
 
-def git_dir_checkout_branch(c, repo_name, remote, branch):
+def git_dir_checkout_branch(c, org_name, repo_name, remote, branch):
     """Checkout a specific branch for given repo directory."""
     print('Fetching updates from Git repository')
-    c.run('git remote add {0} git@github.com:{0}/{1}.git'.format(remote, branch), warn=True)
+    c.run('git remote add {remote} git@github.com:{org_name}/{repo_name}.git'.format(remote=remote, org_name=org_name, repo_name=repo_name),
+          warn=True)
     c.run('git fetch {} {}'.format(remote, branch))
 
     print('Checking out {}/{}'.format(remote, branch))
@@ -75,10 +76,13 @@ def git_dir_checkout_branch(c, repo_name, remote, branch):
     c.run('git pull {} {}'.format(remote, branch))
 
 
-def init_git_repo(c, git_url, dir_name, repo_name, remote='origin', branch='master'):
+def init_git_repo(c, repo_name, org_name='kinecosystem', remote='origin', branch='master'):
     """Make sure git repo directory is available before building."""
     # clone git repo if it doesn't exist,
     # otherwise checkout master branch
+    dir_name = '{}-git'.format(repo_name)
+    git_url = 'https://github.com/{}/{}.git'.format(org_name, repo_name)
+
     if not os.path.isdir('{}/{}/volumes/{}'.format(os.getcwd(), c.cwd, dir_name)):
         print('%s git repository doesn\'t exist, cloning' % repo_name)
         c.run('git clone --branch {branch} {git_url} volumes/{dir_name}'.format(branch=branch, git_url=git_url, dir_name=dir_name))
@@ -87,11 +91,13 @@ def init_git_repo(c, git_url, dir_name, repo_name, remote='origin', branch='mast
             if is_git_dir_modified(c):
                 raise Exit('Stopping, please clean changes and retry')
 
-            git_dir_checkout_branch(c, repo_name, remote, branch)
+            git_dir_checkout_branch(c, org_name, repo_name, remote, branch)
+
+    return dir_name
 
 
 @task
-def build_core(c, version, remote='origin', branch='master', production=True):
+def build_core(c, version, org_name='kinecosystem', repo_name='core', remote='origin', branch='master', production=True):
     """Build Core binary docker image.
 
     By default, builds a Docker image tagged ready for production.
@@ -105,28 +111,34 @@ def build_core(c, version, remote='origin', branch='master', production=True):
         #
         # NOTE docker compose doesn't have a way of knowing if an image was already
         # built, so we search for it manually
-        if not production and is_image_exists(c, 'images_stellar-core'):
+        if not production and is_image_exists(c, 'images_{}'.format(repo_name)):
             return
 
-        init_git_repo(c, 'https://github.com/kinecosystem/stellar-core.git', 'stellar-core-git', 'stellar-core', remote, branch)
+        dir_name = init_git_repo(c, repo_name, org_name, remote, branch)
 
         print('Building core')
 
         if production:
             c.run('sudo docker build '
                   '-f dockerfiles/Dockerfile.stellar-core-build '
-                  '-t kinecosystem/stellar-core-build '
-                  '.')
+                  '-t {org_name}/stellar-core-build '
+                  '.'.format(org_name=org_name))
 
             c.run('sudo docker run --rm '
-                  '-v {}/{}/volumes/stellar-core-git:/stellar-core '
-                  'kinecosystem/stellar-core-build'.format(os.getcwd(), c.cwd))
+                  '-v {cwd}/{pwd}/volumes/{dir_name}:/{repo_name} '
+                  '{org_name}/stellar-core-build'.format(
+                      cwd=os.getcwd(),
+                      pwd=c.cwd,
+                      org_name=org_name,
+                      repo_name=repo_name,
+                      dir_name=dir_name,
+                      ))
 
             c.run('sudo docker build '
                   '-f dockerfiles/Dockerfile.stellar-core '
-                  '-t kinecosystem/stellar-core:latest '
-                  '-t kinecosystem/stellar-core:{version} '
-                  '.'.format(version=version))
+                  '-t {org_name}/{repo_name}:latest '
+                  '-t {org_name}/{repo_name}:{version} '
+                  '.'.format(org_name=org_name, repo_name=repo_name, version=version))
         else:
             c.run('sudo docker-compose build stellar-core-build')
             c.run('sudo docker-compose run stellar-core-build')
@@ -134,7 +146,7 @@ def build_core(c, version, remote='origin', branch='master', production=True):
 
 
 @task
-def build_go(c, version, remote='origin', branch='master', app='horizon', production=True):
+def build_go(c, version, org_name='kinecosystem', repo_name='go', remote='origin', branch='master', app='horizon', production=True):
     """Build Horizon binary docker images and other misc. Golang apps.
 
     By default, builds a Docker image tagged ready for production.
@@ -151,16 +163,20 @@ def build_go(c, version, remote='origin', branch='master', app='horizon', produc
         if not production and is_image_exists(c, 'images_{}'.format(app)):
             return
 
-        init_git_repo(c, 'https://github.com/kinecosystem/go.git', 'go-git', 'go', remote, branch)
+        dir_name = init_git_repo(c, repo_name, org_name, remote, branch)
 
         cmd = ' '.join([
             'bash', '-c',
             ('"go build -ldflags=\''
-             '-X \\"github.com/kinecosystem/go/support/app.buildTime={timestamp}\\"'
+             '-X \\"github.com/{org_name}/{repo_name}/support/app.buildTime={timestamp}\\"'
              ' '
-             '-X \\"github.com/kinecosystem/go/support/app.version={version}\\"'
+             '-X \\"github.com/{org_name}/{repo_name}/support/app.version={version}\\"'
              ' \''
-             ).format(timestamp=datetime.now(timezone.utc).isoformat(), version=version),
+             ).format(
+                 org_name=org_name,
+                 repo_name=repo_name,
+                 timestamp=datetime.now(timezone.utc).isoformat(),
+                 version=version),
             '-o', './{}'.format(app), './services/{}"'.format(app),
         ])
 
@@ -173,29 +189,35 @@ def build_go(c, version, remote='origin', branch='master', app='horizon', produc
         if production:
             c.run('sudo docker build '
                   '-f dockerfiles/Dockerfile.horizon-build '
-                  '-t kinecosystem/horizon-build '
-                  '.')
+                  '-t {org_name}/horizon-build '
+                  '.'.format(org_name=org_name))
         else:
             # build using docker compose for local test network
             c.run('sudo docker-compose build horizon-build')
 
-        with c.cd('volumes/go-git'):
+        with c.cd('volumes/{}'.format(dir_name)):
             vendor(c, production)
 
         if production:
             # compile go app
             c.run('sudo docker run '
                   '--rm '
-                  '-v {}/{}/volumes/go-git:/go/src/github.com/kinecosystem/go '
-                  'kinecosystem/horizon-build '
-                  '{}'.format(os.getcwd(), c.cwd, cmd))
+                  '-v {cwd}/{pwd}/volumes/{dir_name}:/{repo_name}/src/github.com/{org_name}/{repo_name} '
+                  '{org_name}/horizon-build '
+                  '{cmd}'.format(
+                      cwd=os.getcwd(),
+                      pwd=c.cwd,
+                      org_name=org_name,
+                      repo_name=repo_name,
+                      dir_name=dir_name,
+                      cmd=cmd))
 
             # build runtime image (copy binary into image)
             c.run('sudo docker build '
                   '-f dockerfiles/Dockerfile.{app} '
-                  '-t kinecosystem/{app}:latest '
-                  '-t kinecosystem/{app}:{version} '
-                  '.'.format(app=app, version=version))
+                  '-t {org_name}/{app}:latest '
+                  '-t {org_name}/{app}:{version} '
+                  '.'.format(org_name=org_name, app=app, version=version))
         else:
             # build using docker compose for local test network
 
