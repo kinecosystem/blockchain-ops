@@ -4,11 +4,10 @@ import os.path
 from datetime import datetime, timezone
 from hashlib import sha256
 from time import sleep
-import platform
 
 import requests
 from invoke import task, call
-from invoke.exceptions import Exit, Failure
+from invoke.exceptions import Exit
 
 from kin_base import Keypair as BaseKeypair, Builder as BaseBuilder
 from kin import KinClient, Environment as KinEnvironment
