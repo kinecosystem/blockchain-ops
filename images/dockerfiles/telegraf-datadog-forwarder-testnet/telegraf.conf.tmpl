@@ -154,7 +154,7 @@
  #  data_format = "influx"
  #  namepass = ["horizon_response_time"]
  #  fielddrop = ["stddev", "sum", "mean" ,"upper", "lower", "90_percentile", "70_percentile", "50_percentile", "95_percentile", "host", "node_name"] # we only need 99_percentile
- #  tagexclude = ["metric_type", "request_method", "host", "node_name", "status_code", "app"]
+ #  tagexclude = ["metric_type", "request_method", "header_accept", "host", "node_name", "status_code", "app"]
  #  [outputs.kinesis.tagpass]
  #   request_method = ["POST"]
  #
