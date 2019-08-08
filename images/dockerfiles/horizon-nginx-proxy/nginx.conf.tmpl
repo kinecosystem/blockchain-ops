@@ -24,7 +24,7 @@ http {
 
   # track requests with sse headers using the http_accpet variable
   map $http_accept $header_accept {
-    default "";
+    default "other";
     "text/event-stream" "sse";
   }
 
