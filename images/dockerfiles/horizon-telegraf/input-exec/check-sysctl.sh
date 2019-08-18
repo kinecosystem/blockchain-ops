@@ -34,13 +34,19 @@ sysctl_stats=(
 ["net.netfilter.nf_conntrack_max"]="131072"
 )
 
+result=0
+
 for stat in "${!sysctl_stats[@]}"; do
-	    curr=`sysctl $stat | awk '{print $3}'`
-	        if [ "$curr" != "${sysctl_stats[$stat]}" ]; then
-			          #echo "current conf for $stat: $curr , Expected: ${sysctl_stats[$stat]}";
-				  echo "false"
-				  exit 1
-                fi
+	    curr=`sysctl $stat |  awk '{ print substr($0, index($0,$3)) }'`
+	    #remove spaces in net.ipv4.tcp_mem" ans similar
+	    trimmed=`echo $curr`
+		if [ "$trimmed" != "${sysctl_stats[$stat]}" ]; then
+			#echo "current conf for $stat: $trimmed , Expected: ${sysctl_stats[$stat]}";
+			result=1
+		fi
 done
-echo "true"
-exit 0
+
+
+printf 'sysctl_network_config_error network=%d\n' $result
+
+

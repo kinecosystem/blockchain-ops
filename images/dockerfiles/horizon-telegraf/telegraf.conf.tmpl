@@ -67,11 +67,10 @@
   # and the latest one ingested by horizon
   commands = [ "/opt/telegraf/scripts/check-sysctl.sh", ]
   interval = "60m"
-  name_prefix = "horizon_network_"
+  name_prefix = "horizon_"
   # Timeout for each command to complete.
   timeout = "5s"
-  data_format = "value"
-  data_type = "boolean"
+  data_format = "influx"
 
 
 [[inputs.exec]]
