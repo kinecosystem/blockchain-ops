@@ -62,9 +62,7 @@
   dns_lookup = false
 
 [[inputs.exec]]
-  # every second, sample the ingestion distance at horizon.
-  # ingestion distance is the difference between the latest ledger in core
-  # and the latest one ingested by horizon
+  # every hour, check that the network configuration added hasn't changed (values: 1/0)
   commands = [ "/opt/telegraf/scripts/check-sysctl.sh", ]
   interval = "60m"
   name_prefix = "horizon_"
