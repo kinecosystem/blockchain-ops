@@ -38,7 +38,7 @@ result=0
 
 for stat in "${!sysctl_stats[@]}"; do
 	    curr=`sysctl $stat |  awk '{ print substr($0, index($0,$3)) }'`
-	    #remove spaces in net.ipv4.tcp_mem" ans similar
+	    #remove spaces in net.ipv4.tcp_mem" and similar
 	    trimmed=`echo $curr`
 		if [ "$trimmed" != "${sysctl_stats[$stat]}" ]; then
 			#echo "current conf for $stat: $trimmed , Expected: ${sysctl_stats[$stat]}";
