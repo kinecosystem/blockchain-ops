@@ -65,6 +65,18 @@
   # every second, sample the ingestion distance at horizon.
   # ingestion distance is the difference between the latest ledger in core
   # and the latest one ingested by horizon
+  commands = [ "/opt/telegraf/scripts/check-sysctl.sh", ]
+  interval = "60m"
+  name_prefix = "horizon_"
+  # Timeout for each command to complete.
+  timeout = "5s"
+  data_format = "influx"
+
+
+[[inputs.exec]]
+  # every second, sample the ingestion distance at horizon.
+  # ingestion distance is the difference between the latest ledger in core
+  # and the latest one ingested by horizon
   commands = [ "/opt/telegraf/scripts/get-ingestion-distance.sh", ]
   interval = "1s"
   name_prefix = "horizon_"
