@@ -1,7 +1,7 @@
 __PHONY__: build build-testing
 
 CORE_VERSION := kinecosystem-v2.1.0-stellar-v9.2.0
-HORIZON_VERSION := kinecosystem-v2.0.0-stellar-v0.16.1
+HORIZON_VERSION := v2.1.0
 
 core-binary:
 	docker pull kinecosystem/stellar-core:${CORE_VERSION}
