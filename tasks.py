@@ -401,9 +401,12 @@ def start_friendbot(c):
             root_account_seed=derive_root_account_seed(PASSPHRASE)), hide='stderr')
 
 
-@task(rm_network, start_core, start_horizon, start_friendbot)
-def network(_):
+@task(rm_network, start_core, start_horizon)
+def network(c, with_friendbot=False):
     """Initialize a new local test network with single core and horizon instances."""
+    if with_friendbot:
+        start_friendbot(c)
+
     base_reserve_0()
     protocol_version_9()
     tx_set_size_500()
