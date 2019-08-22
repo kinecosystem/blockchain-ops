@@ -230,7 +230,7 @@ def build_go(c, version, org_name='kinecosystem', repo_name='go', remote='origin
 
 
 @task
-def push_dockerhub(c, app, version, latest=True):
+def push_dockerhub(c, app, version, latest=False):
     """Push image to Dockerhub."""
     if app.lower() == 'core':
         c.run('sudo docker push kinecosystem/stellar-core:{version}'.format(version=version))
