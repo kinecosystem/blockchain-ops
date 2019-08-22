@@ -7,7 +7,7 @@ from time import sleep
 
 import requests
 from invoke import task, call
-from invoke.exceptions import Exit
+from invoke.exceptions import Exit, Failure
 
 from kin_base import Keypair as BaseKeypair, Builder as BaseBuilder
 from kin import KinClient, Environment as KinEnvironment
@@ -66,13 +66,15 @@ def git_dir_checkout_branch(c, org_name, repo_name, remote, branch):
     print('Fetching updates from Git repository')
     c.run('git remote add {remote} git@github.com:{org_name}/{repo_name}.git'.format(remote=remote, org_name=org_name, repo_name=repo_name),
           warn=True)
-    c.run('git fetch {} {}'.format(remote, branch))
+    c.run('git fetch --all')
 
     print('Checking out {}/{}'.format(remote, branch))
-    c.run('git checkout {}/{}'.format(remote, branch))
-
-    print('Pulling {}/{}'.format(remote, branch))
-    c.run('git pull {} {}'.format(remote, branch))
+    try:
+        c.run('git checkout {}/{}'.format(remote, branch))
+    except Failure:
+        # probably branch is tag name
+        print('Checking out failed. Assuming this is a tag, attempting to checkout without stating remote')
+        c.run('git checkout {}'.format(branch))
 
 
 def init_git_repo(c, repo_name, org_name='kinecosystem', remote='origin', branch='master'):
