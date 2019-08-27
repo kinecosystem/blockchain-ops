@@ -1,3 +1,27 @@
+
+#########################################################################
+############################ Deprecated!!!!  ############################ 
+#########################################################################
+Please use new repos instead:
+kinecosystem/blockchain-ops/apps/docker-quickstart -> https://github.com/kinecosystem/blockchain-docker-quickstart.git
+kinecosystem/blockchain-ops/apps/horizon-health-check -> https://github.com/kinecosystem/horizon-health-check
+kinecosystem/blockchain-ops/dashboard/prometheus -> https://github.com/kinecosystem/blockchain-prometheus.git
+kinecosystem/blockchain-ops/dashboard/healthcheck-telegraf-client -> https://github.com/kinecosystem/blockchain-healthcheck-telegraf-client.git
+kinecosystem/blockchain-ops/images/dockerfiles/blockchain-healthcheck-telegraf ->https://github.com/kinecosystem/blockchain-healthcheck-telegraf.git
+kinecosystem/blockchain-ops/images/dockerfiles/filebeat-for-docker-logs -> https://github.com/kinecosystem/filebeat-for-docker-logs.git
+kinecosystem/blockchain-ops/images/dockerfiles/horizon-nginx-proxy/ -> https://github.com/kinecosystem/horizon-nginx-proxy.git
+kinecosystem/blockchain-ops/images/dockerfiles/horizon-telegraf-test-env/ ->https://github.com/kinecosystem/horizon-telegraf-test-env.git
+kinecosystem/blockchain-ops/images/dockerfiles/horizon-telegraf/ -> https://github.com/kinecosystem/horizon-telegraf.git
+kinecosystem/blockchain-ops/images/dockerfiles/postgres-core -> https://github.com/kinecosystem/postgres-core.git
+kinecosystem/blockchain-ops/images/dockerfiles/postgres-horizon -> https://github.com/kinecosystem/postgres-horizon.git
+kinecosystem/blockchain-ops/images/dockerfiles/stellar-core-metrics-exporter -> https://github.com/kinecosystem/stellar-core-metrics-exporter.git
+kinecosystem/blockchain-ops/images/dockerfiles/stellar-core-telegraf-test-env ->https://github.com/kinecosystem/stellar-core-telegraf-test-env.git
+kinecosystem/blockchain-ops/images/dockerfiles/stellar-core-telegraf -> https://github.com/kinecosystem/stellar-core-telegraf.git
+kinecosystem/blockchain-ops/images/dockerfiles/telegraf-datadog-forwarder-testnet/ ->https://github.com/kinecosystem/telegraf-datadog-forwarder-testnet.git
+kinecosystem/blockchain-ops/images/dockerfiles/telegraf-datadog-forwarder -> https://github.com/kinecosystem/telegraf-datadog-forwarder.git
+
+#########################################################################################################
+#########################################################################################################
 # Blockchain Operations
 
 This repository contains all operational code and guides for the Kin blockchain.
