@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-ansible = "==2.7.10"
+ansible = "==2.7.12"
 "boto3" = "*"
 
 [dev-packages]
