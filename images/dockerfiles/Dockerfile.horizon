@@ -1,5 +1,7 @@
 FROM ubuntu:16.04
 
+RUN apt-get -qq update && apt-get -qq install libsodium-dev
+
 RUN mkdir -p /opt/horizon
 WORKDIR /opt/horizon
 VOLUME ["/opt/horizon"]

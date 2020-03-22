@@ -82,7 +82,7 @@ def init_git_repo(c, repo_name, org_name='kinecosystem', remote='origin', branch
     # clone git repo if it doesn't exist,
     # otherwise checkout master branch
     dir_name = '{}-git'.format(repo_name)
-    git_url = 'https://github.com/{}/{}.git'.format(org_name, repo_name)
+    git_url = 'git@github.com:{}/{}.git'.format(org_name, repo_name)
 
     if not os.path.isdir('{}/{}/volumes/{}'.format(os.getcwd(), c.cwd, dir_name)):
         print('%s git repository doesn\'t exist, cloning' % repo_name)
@@ -120,12 +120,12 @@ def build_core(c, version, org_name='kinecosystem', repo_name='core', remote='or
         print('Building core')
 
         if production:
-            c.run('sudo docker build '
+            c.run('docker build '
                   '-f dockerfiles/Dockerfile.stellar-core-build '
                   '-t {org_name}/stellar-core-build '
                   '.'.format(org_name=org_name))
 
-            c.run('sudo docker run --rm '
+            c.run('docker run --rm '
                   '-v {cwd}/{pwd}/volumes/{dir_name}:/stellar-core '
                   '{org_name}/stellar-core-build'.format(
                       cwd=os.getcwd(),
@@ -135,15 +135,15 @@ def build_core(c, version, org_name='kinecosystem', repo_name='core', remote='or
                       dir_name=dir_name,
                       ))
 
-            c.run('sudo docker build '
+            c.run('docker build '
                   '-f dockerfiles/Dockerfile.stellar-core '
                   '-t {org_name}/{repo_name}:latest '
                   '-t {org_name}/{repo_name}:{version} '
                   '.'.format(org_name=org_name, repo_name=repo_name, version=version))
         else:
-            c.run('sudo docker-compose build stellar-core-build')
-            c.run('sudo docker-compose run stellar-core-build')
-            c.run('sudo docker-compose build stellar-core')
+            c.run('docker-compose build stellar-core-build')
+            c.run('docker-compose run stellar-core-build')
+            c.run('docker-compose build stellar-core')
 
 
 @task
